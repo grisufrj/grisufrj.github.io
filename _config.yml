@@ -86,6 +86,14 @@ authors:
     facebook:       victorpiresvrp
     github:         slowhusky
 
+  mavellar:
+    display_name:   Matheus Avellar de Barros
+    avatar:         images/mavellar.jpg
+    bio:            "Sommelier de pizza, cientista e desenvolvedor de inutilidades<hr>"
+    email:          matheusavellar at dcc.ufrj.br
+    github:         matheusavellar
+    twitter:        avll0
+
 social:
   - title: "github"
     url: "https://github.com/grisufrj"
