@@ -17,6 +17,8 @@ Uma das ferramentas potencialmente maliciosas mais bem conhecidas na área de co
 Um dos primeiros casos famosos de keylogging ocorreu em 1984, quando a embaixada americana em Moscou descobriu que pelo menos 16 máquinas de escrever possuíam pequenos dispositivos implantados. Esses dispositivos eram capazes de detectar teclas sendo pressionadas e, em seguida, transmitir essa informação por meio de ondas de rádio para agentes soviéticos no lado de fora do prédio. Esse achado resultou no início do GUNMAN Project, um projeto ultrassecreto cujo objetivo era encontrar qualquer vulnerabilidade em equipamentos de telecomunicação da embaixada de Moscou.
 
 Keyloggers físicos como os de Moscou, impossíveis de detectar por software, ainda estão em uso. Porém, eles vão além do escopo deste artigo. Aqui, vamos dar uma olhada somente em keyloggers de software.
+
+<!-- more -->
 ## Event-based
 O conceito de programar *event-based* é: esperar algo acontecer e, quando acontecer, executar algum código. No caso de um keylogger, nosso "evento" é a tecla sendo pressionada.
 
