@@ -10,6 +10,8 @@ published: true
 
 O [docker](https://www.docker.com/) é um meio termo entre uma máquina virtual (= que roda um sistema guest (convidado) dentro de um sistema host (hospedeiro)) e um sistema rodando simultaneamente e concorrentemente com outro. Em primeiro lugar, ele é bem mais leve e mais rápido do que uma máquina virtual completa, pois reutiliza vários sub-sistemas do sistema host (diferentemente de uma máquina virtual, que tipicamente "emula" todos os aspectos de hardware e de software do guest), tal como o kernel. Em segundo lugar, assim como uma máquina virtual, tudo o que roda no docker está, a princípio (e por padrão) isolado do sistema host. Isso é feito por debaixo dos panos através de tecnologias existentes no kernel do Linux tais como cgroups e namespaces; uma consequência disso é que só é possível rodar o docker em sistemas relativamente recentes (por exemplo, qualquer Ubuntu 14.04 para cima já está de bom tamanho).
 
+<!-- more -->
+
 
 ![Comparação entre as arquiteturas de máquina virtual e do docker (containers). Créditos da imagem: http://patg.net/containers,virtualization,docker/2014/06/05/docker-intro/](http://patg.net/assets/container_vs_vm.jpg)
 
