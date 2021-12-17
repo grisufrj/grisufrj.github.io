@@ -1,0 +1,21 @@
+baseURL= 'http://blog.dcc.ufrj.br/'
+languageCode = 'pt-br'
+title= 'Blog do GRIS'
+theme= "mainroad"
+disqusShortname= "grisufrj"
+paginate="5"
+
+[Author]
+    name="GRIS"
+    bio="Grupo de Resposta a Incidentes de Segurança."
+    avatar="/images/GRIS_logo1.png"
+
+[Params]
+    description= "Blog do GRIS"
+
+[Params.logo]
+    logo="/images/GRIS_logo1.png"
+
+[Params.widget.social]
+    github= "grisufrj"
+    facebook= "grisdccufrj"
