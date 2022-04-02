@@ -1,21 +1,54 @@
-baseURL= 'http://blog.dcc.ufrj.br/'
+baseURL = 'http://blog.dcc.ufrj.br/'
 languageCode = 'pt-br'
-title= 'Blog do GRIS'
-theme= "mainroad"
-disqusShortname= "grisufrj"
-paginate="5"
+title = 'Blog do GRIS'
+theme = "mainroad"
+disqusShortname = "grisufrj"
+paginate = "5"
 
 [Author]
-    name="GRIS"
-    bio="Grupo de Resposta a Incidentes de Segurança."
-    avatar="/images/GRIS_logo1.png"
+name = "GRIS"
+bio = "Grupo de Resposta a Incidentes de Segurança."
+avatar = "/images/GRIS_logo1.png"
+
+[Author.jvitor]
+name = "João Vitor Rebouças"
+avatar = "images/jvitor.jpg"
+bio = "Estudante de ciência da computação e membro da equipe de Redes Sites e Sistemas do GRIS"
+
+[Author.lgribeiro]
+name = "Luiz Guilherme Ribeiro"
+avatar = "images/lgribeiro.jpg"
+bio = "Estudante de ciência da computação, entusiasta da área de segurança e amante de soluções criativas e mirabolantes (gambiarras)"
+
+[Author.thiagowfx]
+name = "Thiago Barroso Perrotta"
+avatar = "images/thiagowfx.png"
+bio = ""
+
+[Author.vpires]
+name = "Victor Ribeiro Pires"
+avatar = "images/vpires.jpg"
+bio = "Estudante de ciência da computação"
+
+[Author.mavellar]
+name = "Matheus Avellar de Barros"
+avatar = "images/mavellar.jpg"
+bio = "Sommelier de pizza, cientista e desenvolvedor de inutilidades<hr>"
 
 [Params]
-    description= "Blog do GRIS"
+description = "Blog do GRIS"
+authorbox = true
+pager = true
+
+[Params.sidebar]
+home = "right"
+list = "right"
+sidebar = "right"
+widgets = ["search", "categories", "taglist", "social"]
 
 [Params.logo]
-    logo="/images/GRIS_logo1.png"
+logo = "/images/GRIS_logo1.png"
 
 [Params.widget.social]
-    github= "grisufrj"
-    facebook= "grisdccufrj"
+github = "grisufrj"
+facebook = "grisdccufrj"

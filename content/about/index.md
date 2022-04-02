@@ -3,7 +3,7 @@ layout: page
 title: Sobre o GRIS
 comments: false
 modified: 2014-12-24
-author: gris
+menu: main
 ---
 
 Atuamos no Departamento de Ciência da Computação da Universidade Federal do Rio de Janeiro e em outras unidades solicitantes da Universidade. Temos como objetivo a detecção, resolução e prevenção de incidentes de segurança, além de oferecer suporte acadêmico aos estudantes da UFRJ que possuam interesse particular na área de segurança da informação. Dentre as principais atividades do GRIS estão:
