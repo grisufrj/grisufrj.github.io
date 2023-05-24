@@ -1,8 +1,7 @@
 baseURL = 'http://blog.dcc.ufrj.br/'
-languageCode = 'pt-br'
-title = 'Blog do GRIS'
 theme = "mainroad"
 disqusShortname = "grisufrj"
+defaultContentLanguage = 'pt'
 paginate = "5"
 
 [Author]
@@ -35,6 +34,12 @@ name = "Matheus Avellar de Barros"
 avatar = "images/mavellar.jpg"
 bio = "Sommelier de pizza, cientista e desenvolvedor de inutilidades<hr>"
 
+[Author.esoj]
+name = "José Luiz Oliveira"
+avatar = "images/esoj.jpg"
+bio = "Pwn"
+
+
 [Params]
 description = "Blog do GRIS"
 authorbox = true
@@ -52,3 +57,14 @@ logo = "/images/GRIS_logo1.png"
 [Params.widget.social]
 github = "grisufrj"
 facebook = "grisdccufrj"
+
+
+
+[languages]
+[languages.en]
+title = "GRIS Blog"
+languageCode = "en"
+
+[languages.pt]
+title = "Blog do GRIS"
+languageCode = "pt"
