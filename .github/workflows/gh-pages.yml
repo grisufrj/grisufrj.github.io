@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - hugo  # Set a branch to deploy
+      - master
   pull_request:
 
 jobs:
