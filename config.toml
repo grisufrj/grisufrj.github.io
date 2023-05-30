@@ -1,6 +1,5 @@
 baseURL = 'http://blog.dcc.ufrj.br/'
 theme = "mainroad"
-disqusShortname = "grisufrj"
 defaultContentLanguage = 'pt'
 paginate = "5"
 
