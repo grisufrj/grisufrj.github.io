@@ -22,6 +22,7 @@ The Linux kernel allows userspace processes to enable mitigations by calling prc
 
 We have measured that on some instances of Google, AWS, Azure and Oracle, the spectre-BTI mitigation using prctl still leaves the victim exposed to attacks in some cases. In this research, we tested multiple scenarios in an attempt to enumerate the causes of failure for the mitigations.
 
+Note: The title *hyperbleed* is just a joke/meme/trolling and a way of internally tracking the bug.
 
 
 ## Current Hardware Mitigations (and their software interfaces on the Linux Kernel)
@@ -1093,6 +1094,8 @@ Given our research was not comprehensive (many different stances and offers were
 ## Acknowledgements
 
 We would like to thank Alexandra Sandulescu for the excellent feedback, discussions and for reviewing/editing this write-up.
+
+## Tool & source code
 
 The tool and results for multiple instances can be found at https://github.com/es0j/hyperbleed .
 
