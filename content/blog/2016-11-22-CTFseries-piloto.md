@@ -5,6 +5,7 @@ description: "Episódio piloto da série de guias para CTFs/wargames"
 tags: [CTF, engenharia reversa]
 categories: [CTF/Wargame, reverse ]
 author: lgribeiro
+date: 2016-11-22
 published: true
 ---
 

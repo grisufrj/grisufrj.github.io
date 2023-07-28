@@ -5,6 +5,7 @@ description: "Sample post with a background image CSS override."
 tags: [sample post]
 categories: [image]
 author: gris
+date: 2013-10-26
 published: false
 image:
   background: triangular.png

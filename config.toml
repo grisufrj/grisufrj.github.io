@@ -43,6 +43,10 @@ name = "Rodrigo Rubira Branco"
 avatar = "images/bsdaemon.jpg"
 bio = " Vuln researcher and exploit writer. Failed farmer."
 
+[Author.gabrielott]
+name = "Gabriel da Fonseca Ottoboni Pinho"
+avatar = "images/ottoboni.jpg"
+bio = "POSIX > bash"
 
 [Params]
 description = "Blog do GRIS"

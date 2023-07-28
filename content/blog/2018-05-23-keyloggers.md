@@ -5,6 +5,7 @@ description: "O que são, para que servem, e como fazer um?"
 tags: [keylogger, spyware, web, beginner]
 author: mavellar
 published: true
+date: 2018-05-23
 image:
   background: triangular.png
 ---

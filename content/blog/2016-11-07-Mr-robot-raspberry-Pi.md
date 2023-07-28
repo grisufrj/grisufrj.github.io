@@ -5,6 +5,7 @@ description: "Como criar um raspberry Pi semelhante ao utilizado por Elliot na p
 tags: [Mr_robot, raspberry, hack, reverse_shell]
 categories: [raspberry, hack]
 author: lgribeiro
+date: 2016-11-07
 published: true
 ---
 

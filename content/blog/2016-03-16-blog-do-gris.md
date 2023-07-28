@@ -5,6 +5,7 @@ description: "Blog do GRIS"
 tags: []
 categories: []
 author: jvitor
+date: 2016-03-16
 published: false
 ---
 

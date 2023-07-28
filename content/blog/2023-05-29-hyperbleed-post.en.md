@@ -3,6 +3,7 @@ layout: post
 title: Hyperbleed - Current state of spectre-BTI mitigations on cloud
 description: "Current state of spectre-BTI mitigations on cloud"
 tags: [cpu, spectre, cloud]
+date: 2023-05-29
 author:
   - bsdaemon 
   - esoj  
