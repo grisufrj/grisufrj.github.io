@@ -5,7 +5,7 @@ published: true
 author: ruhptura
 ---
 
-# Introdução
+## Introdução
 
 Você alguma vez já se perguntou se seria possível alterar o código fonte de um jogo à sua maneira e ainda assim continuar jogando? Nesse artigo, vamos modificar um jogo em tempo real em seu nível mais baixo, utilizando assembly, e desenvolver uma modificação simples em python utilizando a técnica de *patching* de memória.
 
@@ -13,11 +13,11 @@ Antes porém, é possível que você não saiba alguns termos que foram utilizad
 
 Por outro lado, a palavra *patching* refere-se ao ato de alterar o código binário do jogo, através justamenta de suas instruções em ASM, como se você estivesse “reprogramando” aquele *game*.
 
-Para demonstrar um pouco do poder de manipulação das instruções em ASM, usarei o [Assault Cube](https://github.com/assaultcube/AC) como exemplo, que é um jogo de tiro em primeira pessoa *open source*. Nosso objetivo será modificar o jogo, de maneira **que quando o jogador receba um tiro ele ganhe vida!
+Para demonstrar um pouco do poder de manipulação das instruções em ASM, usarei o [Assault Cube](https://github.com/assaultcube/AC) como exemplo, que é um jogo de tiro em primeira pessoa *open source*. Nosso objetivo será modificar o jogo, de maneira que quando o jogador receba um tiro ele ganhe vida!
 
-Importante notar que parte da razão da escolha desse jogo é que ele não tem *anticheat*, portanto, não tente aplicar o conteúdo desse artigo em qualquer jogo sem esse conhecimento, pois você pode ser banido. Além disso, seja uma pessoa ética e limite-se ao modo *singleplayer* para não atrapalhar a diversão de outras pessoas que estão sendo honestas.
+Importante notar que parte da razão da escolha desse jogo é que ele não tem *anticheat*. Portanto, não tente aplicar o conteúdo desse artigo em qualquer jogo sem esse conhecimento, pois você pode ser banido. Além disso, seja uma pessoa ética e limite-se ao modo *singleplayer* para não atrapalhar a diversão de outras pessoas que estão sendo honestas.
 
-# Fazendo análise dinâmica
+## Fazendo análise dinâmica
 
 O programa mais famoso, e sem dúvidas um dos mais úteis para se fazer análise dinâmica em jogos é o [Cheat Engine](https://github.com/cheat-engine/cheat-engine/). Usaremos ele para descobrir a posição de memória da instrução desejada.
 
@@ -41,7 +41,7 @@ Essa instrução subtrai um valor qualquer salvo no registrador **EDI** do valor
 
 Vale dizer que os três bytes em hexadecimal que aparecem ao lado da instrução (**29 7B 04**), são equivalentes a **sub [ebx+04],edi** para o computador. 
 
-# Fazendo o patching
+## Fazendo o patching
 
 Vamos então modificar diretamente a instrução escrita nessa região de memória:
 
@@ -109,7 +109,7 @@ if __name__ == '__main__':
 	hack()
 ```
 
-# Referências
+## Referências
 
 - Assault Cube: <https://github.com/assaultcube/AC>
 - Cheat Engine: <https://github.com/cheat-engine/cheat-engine/>
