@@ -41,12 +41,17 @@ bio = "Pwn"
 [Author.bsdaemon]
 name = "Rodrigo Rubira Branco"
 avatar = "images/bsdaemon.jpg"
-bio = " Vuln researcher and exploit writer. Failed farmer."
+bio = "Vuln researcher and exploit writer. Failed farmer."
 
 [Author.gabrielott]
 name = "Gabriel da Fonseca Ottoboni Pinho"
 avatar = "images/ottoboni.jpg"
 bio = "POSIX > bash"
+
+[Author.ruhptura]
+name = "Abid Lohan"
+avatar = "images/ruhptura.png"
+bio = "The best feeling in the life: popping a flag after hours doing a CTF challenge."
 
 [Params]
 description = "Blog do GRIS"
