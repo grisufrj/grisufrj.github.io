@@ -1,5 +1,5 @@
 ---
-title: "Game Hacking: Usando patching de maneira dinâmica para modificar jogos"
+title: "Game Hacking: Usando Patching de Maneira Dinâmica Para Modificar Jogos"
 date: 2023-08-03
 published: true
 author: ruhptura
