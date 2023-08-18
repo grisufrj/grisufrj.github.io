@@ -57,6 +57,8 @@ bio = "The best feeling in the life: popping a flag after hours doing a CTF chal
 description = "Blog do GRIS"
 authorbox = true
 pager = true
+twitter_cards = true
+images = ["images/GRIS_logo1.png"]
 
 [Params.sidebar]
 home = "right"
