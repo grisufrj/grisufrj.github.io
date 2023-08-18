@@ -1,4 +1,4 @@
-baseURL = 'http://blog.dcc.ufrj.br/'
+baseURL = 'http://blog.gris.dcc.ufrj.br/'
 theme = "mainroad"
 defaultContentLanguage = 'pt'
 paginate = "5"
