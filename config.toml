@@ -58,6 +58,11 @@ name = "Jhayson Jales"
 avatar = "images/jhaysonj.png"
 bio = "O cara responsável por fazer o GRIS voltar a ser extensão :)"
 
+[Author.guilhermecapp]
+name = "Guilherme Cappelli"
+avatar = "images/guilhermecapp.png"
+bio = "Descrição temporária"
+
 [Params]
 description = "Blog do GRIS"
 authorbox = true
