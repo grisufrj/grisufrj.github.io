@@ -63,6 +63,11 @@ name = "Guilherme Cappelli"
 avatar = "images/guilhermecapp.png"
 bio = "Descrição temporária"
 
+[Author.jurbas]
+name = "João Pedro Duarte"
+avatar = "images/jurbas.jpg"
+bio = "Apreciador de café e segurança da informação"
+
 [Params]
 description = "Blog do GRIS"
 authorbox = true
