@@ -63,9 +63,14 @@ name = "Guilherme Cappelli"
 avatar = "images/guilhermecapp.png"
 bio = "Descrição temporária"
 
-[Author.RichardPiccoli]
+[Author.richardpiccoli]
 name = "Richard Piccoli"
 avatar = "images/RichardPiccoli.png"
+bio = "Descrição temporária"
+
+[Author.eduardopiccoli]
+name = "Luiz Eduardo Lahm Piccoli"
+avatar = "images/eduardopiccoli.jpg"
 bio = "Descrição temporária"
 
 [Params]
