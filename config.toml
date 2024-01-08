@@ -63,6 +63,11 @@ name = "Guilherme Cappelli"
 avatar = "images/guilhermecapp.png"
 bio = "Descrição temporária"
 
+[Author.RichardPiccoli]
+name = "Richard Piccoli"
+avatar = "images/RichardPiccoli.png"
+bio = "Descrição temporária"
+
 [Params]
 description = "Blog do GRIS"
 authorbox = true
