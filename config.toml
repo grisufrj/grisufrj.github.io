@@ -68,6 +68,16 @@ name = "João Pedro Duarte"
 avatar = "images/jurbas.jpg"
 bio = "Apreciador de café e segurança da informação"
 
+[Author.richardpiccoli]
+name = "Richard Piccoli"
+avatar = "images/RichardPiccoli.png"
+bio = "Estudante de ciência da computação"
+
+[Author.eduardopiccoli]
+name = "Luiz Eduardo Lahm Piccoli"
+avatar = "images/eduardopiccoli.jpg"
+bio = "Descrição temporária"
+
 [Params]
 description = "Blog do GRIS"
 authorbox = true
