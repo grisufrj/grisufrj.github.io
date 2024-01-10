@@ -78,6 +78,11 @@ name = "Luiz Eduardo Lahm Piccoli"
 avatar = "images/eduardopiccoli.jpg"
 bio = "Descrição temporária"
 
+[Author.martinamarques]
+name = "Martina Marques Jardim"
+avatar = "images/martina.jpg"
+bio = "Entusiasta de Álgebra Linear"
+
 [Params]
 description = "Blog do GRIS"
 authorbox = true
