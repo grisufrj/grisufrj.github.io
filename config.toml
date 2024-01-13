@@ -88,6 +88,11 @@ name = "Michelle Fortunato"
 avatar = "images/michelle.jpg"
 bio = "Alquimia, Ressonância e Gratidão, mas também Segurança da Informação"
 
+[Author.gbrods]
+name = "Gabriel Rodrigues da Silva"
+avatar = "images/gbrods.jpg"
+bio = "Sou um jovem estudante de Engenharia de Computação e Informação ☺"
+
 [Params]
 description = "Blog do GRIS"
 authorbox = true
