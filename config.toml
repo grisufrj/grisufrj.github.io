@@ -93,6 +93,12 @@ name = "Gabriel Rodrigues da Silva"
 avatar = "images/gbrods.jpg"
 bio = "Sou um jovem estudante de Engenharia de Computação e Informação ☺"
 
+[Author.0xmr]
+name = "João Pedro Nunes"
+avatar = "images/lasanha.jpg"
+bio = "pwning "
+
+
 [Params]
 description = "Blog do GRIS"
 authorbox = true
