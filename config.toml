@@ -104,7 +104,7 @@ description = "Blog do GRIS"
 authorbox = true
 pager = true
 twitter_cards = true
-images = ["images/GRIS_logo1.png"]
+images = ["images/GRIS_logo.png"]
 
 [Params.sidebar]
 home = "right"
