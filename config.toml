@@ -60,8 +60,44 @@ bio = "O cara responsável por fazer o GRIS voltar a ser extensão :)"
 
 [Author.guilhermecapp]
 name = "Guilherme Cappelli"
-avatar = "images/guilhermecapp.png"
+avatar = "images/guilhermecappicon.gif"
 bio = "Descrição temporária"
+
+[Author.jurbas]
+name = "João Pedro Duarte"
+avatar = "images/jurbas.jpg"
+bio = "Apreciador de café e segurança da informação"
+
+[Author.richardpiccoli]
+name = "Richard Piccoli"
+avatar = "images/RichardPiccoli.png"
+bio = "Estudante de ciência da computação"
+
+[Author.eduardopiccoli]
+name = "Luiz Eduardo Lahm Piccoli"
+avatar = "images/eduardopiccoli.jpg"
+bio = "Descrição temporária"
+
+[Author.martinamarques]
+name = "Martina Marques Jardim"
+avatar = "images/martina.jpg"
+bio = "Entusiasta de Álgebra Linear"
+
+[Author.michellefortunato]
+name = "Michelle Fortunato"
+avatar = "images/michelle.jpg"
+bio = "Alquimia, Ressonância e Gratidão, mas também Segurança da Informação"
+
+[Author.gbrods]
+name = "Gabriel Rodrigues da Silva"
+avatar = "images/gbrods.jpg"
+bio = "Sou um jovem estudante de Engenharia de Computação e Informação ☺"
+
+[Author.0xmr]
+name = "João Pedro Nunes"
+avatar = "images/lasanha.jpg"
+bio = "pwning "
+
 
 [Params]
 description = "Blog do GRIS"
