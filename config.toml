@@ -6,7 +6,7 @@ paginate = "5"
 [Author]
 name = "GRIS"
 bio = "Grupo de Resposta a Incidentes de Segurança."
-avatar = "/images/GRIS_logo1.png"
+avatar = "/images/GRIS_logo.png"
 
 [Author.jvitor]
 name = "João Vitor Rebouças"
