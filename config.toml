@@ -77,7 +77,7 @@ sidebar = "right"
 widgets = ["search", "categories", "taglist", "social"]
 
 [Params.logo]
-logo = "/images/GRIS_logo1.png"
+logo = "/images/GRIS_logo.png"
 
 [Params.widget.social]
 github = "grisufrj"
