@@ -8,7 +8,8 @@ tags:
   - "C"
   - "Engenharia Reversa"
   - "CTF"
-
+categories:
+  - "Hard"
 images: []
 author: martinamarques
 ---
