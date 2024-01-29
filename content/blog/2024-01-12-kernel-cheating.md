@@ -5,6 +5,10 @@ published: true
 description: "Uma abstração em alto nível do funcionamento de um cheat kernel level utilizando IOCTL"
 images: ["/images/kernel-1.png"]
 author: ruhptura
+categories:
+  - "Easy"
+tags:
+  - "Game Hacking"
 ---
 
 # O que é o kernel

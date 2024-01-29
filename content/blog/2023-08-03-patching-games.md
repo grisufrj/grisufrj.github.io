@@ -6,6 +6,14 @@ description: "Implementando patches dinâmicos em jogos com pymem"
 tags: [Game Hacking]
 images: ["/images/2023-08-03-1.png"]
 author: ruhptura
+categories:
+  - "Medium"
+tags:
+  - "Game Hacking"
+  - "Engenharia Reversa"
+  - "Python"  
+  - "ASM"
+
 ---
 
 ## Introdução
