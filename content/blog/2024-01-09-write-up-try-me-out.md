@@ -3,7 +3,7 @@ title: "Write Up do Desafio Try me Out"
 date: 2024-01-09
 published: true
 description: "Solução de um dos desafios incluidos no CTF da H2HC de 2023."
-tags: [Linear Algebra, C, Reverse Engineering, SVD decomposition, H2HC]
+tags: [Linear Algebra, C, Engenharia Reversa, CTF]
 images: []
 author: martinamarques
 ---

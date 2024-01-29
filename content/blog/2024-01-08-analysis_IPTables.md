@@ -3,6 +3,7 @@ title: "IPTables: Análise detalhada sobre o IPTables"
 date: 2024-01-08
 published: true
 description: "Conceito, Funcionamento e Importância do IPTables"
+tags: [Redes]
 images: ["/images/2024-01-08-21.jpg"]
 author: eduardopiccoli
 ---

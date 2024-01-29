@@ -3,7 +3,7 @@ title: "Assault Cube Hack: Parte 1"
 date: 2024-01-07
 published: true
 description: "POC de hack interno para Assault Cube"
-tags: ["C++", "Game Hacking", "Assault Cube"]
+tags: [C++, Game Hacking]
 author: jurbas
 ---
 

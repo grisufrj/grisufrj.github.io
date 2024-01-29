@@ -3,7 +3,6 @@ title: "Sinergia entre a Internet Industrial das Coisas (IIoT) e as Infraestrutu
 date: 2024-01-11
 published: true
 description: "Infraestruturas Críticas"
-tags: [ICS, SCADA, IIoT, critical infrastructure, industry]
 images: []
 author: michellefortunato
 ---
