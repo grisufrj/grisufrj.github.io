@@ -2,8 +2,9 @@
 layout: post
 title: CTF series piloto -- IO netgarage
 description: "Episódio piloto da série de guias para CTFs/wargames"
-tags: [CTF, engenharia reversa]
-categories: [CTF, Engenharia Reversa]
+tags:
+  - "CTF"
+  - "Engenharia Reversa"
 author: lgribeiro
 date: 2016-11-22
 published: true

@@ -3,7 +3,12 @@ title: "pwn 101: Desafios de Introdução a Buffer Overflow"
 date: 2024-01-12
 published: true
 description: "Introdução a exploit de binários"
-tags: [CTF, C, Pwn]
+categories:
+  - "Easy"
+tags:
+  - "C"
+  - "CTF"
+  - "Pwn"
 images: ["/images/pwningimage.jpg"]
 author: 0xmr
 ---

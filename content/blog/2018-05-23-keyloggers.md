@@ -2,7 +2,10 @@
 layout: post
 title: Keyloggers
 description: "O que são, para que servem, e como fazer um?"
-tags: [keylogger, spyware, web, beginner]
+categories:
+  - "Easy"
+tags:
+  - "Web"
 author: mavellar
 published: true
 date: 2018-05-23

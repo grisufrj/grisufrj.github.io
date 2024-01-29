@@ -3,7 +3,10 @@ title: "Redes: IDS e IPS"
 date: 2024-01-08
 published: true
 description: "Principais diferenças entre sistemas de prevenção e detecção de intrusões"
-tags: [Redes]
+categories:
+  - "Easy"
+tags:
+  - "Redes"
 images: ["/images/2024-01-06-9.png"]
 author: jhaysonj
 ---
