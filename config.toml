@@ -5,8 +5,52 @@ paginate = "5"
 
 [services.googleAnalytics]
   ID = "G-YWN8S4BKK0" # Enable Google Analytics by entering your tracking ID
+# Define o cabeçalho
+[Params.logo]
+  image = "/images/gris-logo-2020's_black.png" # Logo image. Path relative to "static"
+  title = "GRIS" # Logo title, otherwise will use site title
+  subtitle = "Grupo de Respostas a Incidentes de Segurança" # Logo subtitle
+
+# Hexadecimal da cor de highlight
+[Params.style.vars]
+#highlightColor = "#3cff00" 
+
+# Adiciona o youtube no menu de redes sociais
+[[Params.widgets.social.custom]]
+  title = "Youtube"
+  url = "https://www.youtube.com/@gris-ufrj270"
+  #icon = "youtube.svg" # Optional. Path relative to "layouts/partials"
+
+# Adiciona o Instagram no menu de redes sociais
+[[Params.widgets.social.custom]]
+  title = "Instagram"
+  url = "https://www.instagram.com/grisufrj"
 
 
+
+# Configurando particularidades do template
+[Params]
+description = "Blog do GRIS"
+authorbox = true
+pager = true
+twitter_cards = true
+images = ["images/GRIS_logo.png"]
+
+# Adiciona suporte a latex
+mathjax = true # Enable MathJax
+mathjaxPath = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js" # Specify MathJax path
+mathjaxConfig = "TeX-AMS-MML_HTMLorMML" # Specify MathJax config
+
+[Params.sidebar]
+home = "right"
+list = "right"
+sidebar = "right"
+widgets = ["search", "categories", "taglist", "social"]
+
+
+
+
+# Configuração dos autores
 [Author]
 name = "GRIS"
 bio = "Grupo de Resposta a Incidentes de Segurança."
@@ -103,25 +147,6 @@ avatar = "images/lasanha.jpg"
 bio = "pwning "
 
 
-[Params]
-description = "Blog do GRIS"
-authorbox = true
-pager = true
-twitter_cards = true
-images = ["images/GRIS_logo.png"]
-
-[Params.sidebar]
-home = "right"
-list = "right"
-sidebar = "right"
-widgets = ["search", "categories", "taglist", "social"]
-
-[Params.logo]
-logo = "/images/GRIS_logo.png"
-
-[Params.widget.social]
-github = "grisufrj"
-facebook = "grisdccufrj"
 
 
 
