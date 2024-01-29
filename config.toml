@@ -35,6 +35,7 @@ authorbox = true
 pager = true
 twitter_cards = true
 images = ["images/GRIS_logo.png"]
+post_meta = ["author", "date", "categories"] # adiciona menu de descrição no resumo do post
 
 # Adiciona suporte a latex
 mathjax = true # Enable MathJax
@@ -158,4 +159,5 @@ languageCode = "en"
 [languages.pt]
 title = "Blog do GRIS"
 languageCode = "pt"
+
 
