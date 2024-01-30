@@ -4,6 +4,8 @@ date: 2024-01-11
 published: true
 description: "Infraestruturas Críticas"
 images: []
+categories:
+  - "Medium"
 author: michellefortunato
 ---
 
