@@ -18,7 +18,7 @@ paginate = "5"
 # Adiciona o youtube no menu de redes sociais
 [[Params.widgets.social.custom]]
   title = "Youtube"
-  url = "https://www.youtube.com/@gris-ufrj270"
+  url = "https://www.youtube.com/@grisufrj"
   #icon = "youtube.svg" # Optional. Path relative to "layouts/partials"
 
 # Adiciona o Instagram no menu de redes sociais
@@ -35,7 +35,7 @@ authorbox = true
 pager = true
 twitter_cards = true
 images = ["images/GRIS_logo.png"]
-post_meta = ["date", "categories"] # adiciona menu de descrição no resumo do post
+post_meta = ["author", "date", "categories"] # adiciona descrição no resumo das postagens
 
 # Adiciona suporte a latex
 mathjax = true # Enable MathJax
