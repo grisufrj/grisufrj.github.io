@@ -35,7 +35,9 @@ authorbox = true
 pager = true
 twitter_cards = true
 images = ["images/GRIS_logo.png"]
-post_meta = ["author", "date", "categories"] # adiciona descrição no resumo das postagens
+post_meta = ["date", "categories"] # adiciona descrição no resumo das postagens
+#post_meta = ["author", "date", "categories"] # adiciona descrição no resumo das>
+
 
 # Adiciona suporte a latex
 mathjax = true # Enable MathJax
