@@ -121,4 +121,4 @@ const unsigned int offsetAmmunitionPtr = 0x14;
 
 ## Próximos Passos
 
-Confira a [Parte 2](/blog/2024-01-14-assault-cube-hack-parte-2) da nossa série sobre hacking no Assault Cube.
+Confira a [Parte 2](/blog/2024-02-19-assault-cube-hack-parte-2) da nossa série sobre hacking no Assault Cube.
