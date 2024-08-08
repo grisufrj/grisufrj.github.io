@@ -1518,6 +1518,7 @@ flag: `picoCTF{7h3_cu570m3r_15_n3v3r_SEGFAULT_63191ce6}`
 
 Source code:
 
+```c
 #include <stdio.h>
 
 
