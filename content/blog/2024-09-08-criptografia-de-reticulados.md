@@ -1,6 +1,6 @@
 ---
 title: "Explorando Criptografia de Reticulados"
-date: 2024-08-10
+date: 2024-08-09
 published: true
 description: "Uma introdução a criptografias baseadas em reticulado"
 tags:
