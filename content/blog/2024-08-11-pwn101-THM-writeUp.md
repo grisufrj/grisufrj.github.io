@@ -21,7 +21,7 @@ nc 10.10.151.216 9001
 
 Ao conectarmos com a aplicação recebemos um texto com um pedido de ajuda para fornecer os ingredientes para o programa como input. A sala fornece uma dica de inicio 'AAAAAAAAAAA'. É de se imaginar que o programa possua algum tipo de buffer overflow. É fácil de receber um shell quando tentamos quebrar a aplicação fornecendo uma string com um tamanho grande.
 
-![alt text](/static/images/crow-post-pwn/desafio1Imagem1.png)
+![alt text](/images/crow-post-pwn/desafio1Imagem1.png)
 
 Porém, vamos tentar entender direito o que está acontecendo. Talvez não tenhamos tanta sorte da próxima vez.
 
