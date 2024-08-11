@@ -1,6 +1,6 @@
 ---
 title: "Forense Digital: Aquisição de logs e memória volátil/não volátil"
-date: 2024-09-08
+date: 2024-08-09
 description: Resumo de ferramentas para forense digital, como logs e aquisição de imagem
 categories:
   - easy
