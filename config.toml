@@ -142,7 +142,12 @@ bio = "Alquimia, Ressonância e Gratidão, mas também Segurança da Informaçã
 [Author.gbrods]
 name = "Gabriel Rodrigues da Silva"
 avatar = "images/gbrods.jpg"
-bio = "Sou um jovem estudante de Engenharia de Computação e Informação ☺"
+bio = "Entusiasta de cibersegurança em busca de novos conhecimentos!\nLinkedIn: https://www.linkedin.com/in/gbrods/"
+
+[Author.brenoppr]
+name = "Breno"
+avatar = "/images/GRIS_logo.png"
+bio = "Descrição temporária"
 
 [Author.0xmr]
 name = "João Pedro Nunes"
