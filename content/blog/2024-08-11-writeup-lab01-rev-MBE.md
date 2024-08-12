@@ -27,6 +27,15 @@ Todas as ferramentas utilizadas estarão listadas ao final do write-up.
 
 ## Lab1C
 
+Conferindo algumas informações do arquivo:
+
+```sh
+lab1C@warzone:~$ file /levels/lab01/lab1C
+/levels/lab01/lab1C: setuid ELF 32-bit LSB  executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=1522352e3de50fd6d180831ba18e2bca16be4204, not stripped
+```
+
+Nosso código está rodando em 32 bits. Isso é importante para entendermos como são passados os parâmetros das funções, dadas as características da arquitetura. Nesse caso, os parâmetros são passados através da Stack.
+
 Acessando com a senha padrão `lab01start`, o primeiro problema nos prompta com uma interface para inserir uma senha: 
 
 ```
@@ -85,7 +94,17 @@ Nota-se, em `<main+81>`:
     0x08048703 <+86>:    jne    0x8048724 <main+119>
 ```
 
-Há uma chamada de `scanf()` e uma comparação entre o valor inputado e `0x149a` (5274 em decimal). Portanto, ao inserir `5274` como senha, devemos satisfazer a comparação e evitar o jump subsequente. Dessa maneira, repare que o código realiza uma syscall em `<main+107>`. Assim, então, acessamos o usuário `lab1B` e recuperamos a senha `n0_str1ngs_n0_pr0bl3m`.
+Há uma chamada de `scanf()` e uma comparação entre o valor inputado e `0x149a` (5274 em decimal). Portanto, ao inserir `5274` como senha, devemos satisfazer a comparação e evitar o jump subsequente.Assim, então, acessamos o usuário `lab1B` e recuperamos a senha `n0_str1ngs_n0_pr0bl3m`.
+
+```sh
+#!/bin/bash
+
+file="/tmp/lab1B_pass.txt"
+
+(python3 -c "print(str(5274))"; echo "cat /home/lab1B/.pass > $file") | /levels/lab01/lab1C
+
+echo "Password stored at $file"
+```
 
 ## Lab1B
 
@@ -170,7 +189,7 @@ Ao efetuar o disassembly, reparamos que a função `test()` é chamada em `<main
    0x08048c5d <+121>:   call   0x8048a74 <test>     # chama test()
 ```
 
-Repare que o input do usuário é inserido como par0metro, além de um valor fixo `0x1337d00d`. Conferindo a função `test()`:
+Repare que o input do usuário é inserido como parametro, além de um valor fixo `0x1337d00d`. Conferindo a função `test()`:
 
 ```sh
 Dump of assembler code for function test:
@@ -232,7 +251,7 @@ Dump of assembler code for function test:
 End of assembler dump.
 ```
 
-Investigando a função `test()`, vemos que existe um grande if-else ou switch-case que realiza a chamada de uma função `decrypt()` em todos os seus casos. O único caso que se diferencia é o último, cujo é usada a função `rand()` para ser o parametro dessa chamada. 
+Investigando a função `test()`, vemos que existe um grande if-else (ou switch-case) que realiza a chamada de uma função `decrypt()` em todos os seus casos. O único caso que se diferencia é o último, cujo é usada a função `rand()` para ser o parametro dessa chamada. 
 
 Em partes, vamos analizar o comportamento da função para entendê-la. Primeiramente:
 
@@ -251,7 +270,7 @@ Nesse momento, é calculada a diferença entre a senha inputada e o valor hexade
    0x08048a8b <+23>:    ja     0x8048bd5 <test+353>
 ```
 
-Aqui, vemos o que chama o caso com o `rand()`: a diferença for maior que 21. Então, caso a diferença for igual ou menor que 21:
+Aqui, vemos o que provoca o caso do switch-case com o `rand()`: a diferença entre os valores ser maior que 21. Então, caso a diferença seja igual ou menor que 21:
 
 ```sh
    0x08048a91 <+29>:    mov    eax,DWORD PTR [ebp-0xc]
@@ -362,7 +381,7 @@ Além disso, existe um loop onde todos os caracteres dessa string estranha são 
    0x08048a2e <+119>:   jb     0x8048a08 <decrypt+81>
 ```
 
-Após a decriptação, a string final é vista novamente em `main<+xx>`:
+Após a decriptação, a string final é vista novamente em `main<+132>`:
 ```sh
    0x08048a30 <+121>:   mov    DWORD PTR [esp+0x4],0x8048d03 # string nova?
    0x08048a38 <+129>:   lea    eax,[ebp-0x1d]
@@ -391,7 +410,7 @@ Dado o funcionamento do XOR, podemos realizar XOR entre a string original e a en
 18
 ```
 
-Precisamos, então, de uma diferença de 18! Como fazemos `0x1337D00D - input`, sabemos que `0x1337D00D + 0x12` é o input desejado. Assim, chegamos a `322424827` e voilà!
+Precisamos, então, de uma diferença de 18! Como fazemos `0x1337D00D - input`, sabemos que `0x1337D00D + 0x12` é o input desejado. Assim, chegamos a `322424827` e voilà! Temos a senha `1337_3nCRyptI0n_br0`.
 
 ### Exploit
 
