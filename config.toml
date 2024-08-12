@@ -159,7 +159,10 @@ name = "Davi Gomes"
 avatar = "images/davi.jpg"
 bio = "Nya~! ✩"
 
-
+[Author.kitagawa]
+name = "Pedro Kitagawa"
+avatar = "images/kitagawa.jpg"
+bio = "damn"
 
 
 [languages]
