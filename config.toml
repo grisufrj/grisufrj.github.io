@@ -164,6 +164,10 @@ name = "Pedro Kitagawa"
 avatar = "images/kitagawa.jpg"
 bio = "pwn|rev"
 
+[Author.asw4ng]
+name = "Bruno Carvalho"
+avatar = "images/Asw4ng.png"
+bio = "Nom~"
 
 [languages]
 [languages.en]
