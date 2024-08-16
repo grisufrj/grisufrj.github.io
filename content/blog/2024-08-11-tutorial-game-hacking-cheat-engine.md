@@ -8,23 +8,269 @@ author: asw4ng
 published: false
 ---
 
-Abordaremos neste artigo sobre os princípios fundamentais sobre Game Hacking, com a utilização do Cheat Engine. (Explicar de forma sucinta o que é Cheat Engine). (Falar sobre as práticas e exemplos deste POST).
+Abordaremos neste artigo sobre os princípios fundamentais sobre Game Hacking, ensinando como utilizar o Cheat Engine, um programa clássico para mudar aspectos de um jogo a seu favor. 
+
+### Sobre Processos
+Antes de tudo, é bom deixar bem definido sobre o que é um jogo para o computador. Ao abrirmos qualquer programa executável, o sistema operacional cria um novo processo para rodar este programa. Um **Processo** é, portanto, uma tarefa em execução no computador. Podem ter múltiplos processos rodando ao mesmo tempo, sendo em janelas ou em plano de fundo, e pode se criar vários processos de um mesmo programa. 
+
+### Sobre Cheat Engine
+O Cheat Engine é um Memory Scanner. Dado um processo, ele busca na memória RAM que este processo utiliza por determinados valores ou padrões em tempo real. Com isso podemos procurar por endereços de memória interessantes, como a posição do jogador ou a vida de um inimigo. Além disso, o Cheat Engine também possui funcionalidades de Debugger e Auto Assembler, muito úteis para análise e modificação da lógica do jogo.
+
+Neste post, vamos resolver como exemplo dois tutoriais que vem junto ao baixar o Game Engine, e desta forma mostrando na prática como usar as ferramentas para hackear.
 
 ## Solucionando o Tutorial Padrão (Tutorial-x86_64.exe)
+Começaremos solucionando todas as 9 etapas do tutorial padrão do Cheat Engine. Este tutorial pode ser aberto tanto pelo executável, que se encontra na pasta do executável do Cheat Engine, quanto no menu help dele aberto:
 
-	(CONTEÚDO!!!)
+![Figura](/images/CheatEngine_Tutorial/Pasta.jpg) ![Figura 2](/images/CheatEngine_Tutorial/Help.jpg)
+### Etapa 1: Anexando um Processo 
+
+![Figura](/images/CheatEngine_Tutorial/Step1.jpg)
+
+Depois de abrir o tutorial, temos que comunicar ao Cheat Engine qual processo ele deve analisar. Para anexar o processo do tutorial, basta clicar no ícone de busca abaixo, ir na aba de processos e escolher aquele com o nome "Tutorial-x86_64.exe":
+
+![Figura](/images/CheatEngine_Tutorial/Welcome.jpg)
+
+Em geral, podem existir múltiplos processos com o mesmo nome. Isso ocorre com frequência em browsers (cada aba é um processo distinto), mas podem haver processos que rodam em plano de fundo que abrem junto com o processo principal. O que distingue cada um é pelo PID, o número ao lado do nome na tela acima. 
+
+No caso deste tutorial, somente existe um processo com este nome, portanto podemos selecionar ele e seguir em frente.
+
+### Etapa 2: Escaneando por Valores Conhecidos
+
+![Figura](/images/CheatEngine_Tutorial/Step2.jpg)
+
+Nesta Etapa, desejamos mudar o valor da vida que aparece na tela. Para isso, temos que encontrar aonde na memória o valor está sendo guardado. Temos o valor inicial exato da vida, 100. O tutorial sugere que o tipo da variável é de 4-bytes, mas em casos gerais é bem possível não sabermos exatamente o tipo, então vou progredir sem essa informação.
+
+Com isso, os campos para o primeiro escaneamento ficam:
+
+	Value: 100
+	Scan Type: Exact Value
+	Value Type: All ou 4-bytes
+	
+Realizando então o primeiro escaneamento (clickando no botão 'First Scan' acima do campo *Value*), encontramos vários endereços de memória com o valor 100:
+
+![Figura](/images/CheatEngine_Tutorial/Step2.1.jpg)
+
+Para distinguir entre estes inúmeros valores, temos que ver como cada um se comporta e ver diferenças. Vamos utilizar escaneamentos em sequência usando informações que sabemos da vida. Temos no tutorial um botão para reduzir a vida. No caso, foi reduzido 3 pontos de vida, resultando em 97 de vida total. Temos estas duas informações para filtrar a lista de endereços, sabemos que se algum endereço não mudou desta forma não pode ser a variável que queremos.
+
+No caso, usamos a informação da vida total e usamos outro escaneamento do tipo 'Exact Value' e clickando em *Next Scan*: 
+
+![Figura](/images/CheatEngine_Tutorial/Step2.2.jpg)
+
+Somente um sobrou! Muitas vezes não conseguimos filtrar totalmente os endereços de uma vez, para estes casos devemos realizar vários escaneamentos para reduzir a um número aceitável de candidatos. 
+
+Clickando duas vezes neste endereço irá mandar ele para a lista de endereços guardados abaixo. Clique duas vezes no valor e o mude para 1000. O botão *Next* do tutorial deve liberar.
+
+> *O texto que se vê e seu valor real são duas variáveis distintas, de tipos diferentes. O texto pode atualizar com o novo valor ou não ao modificar o valor para 1000. Para verificar, force um update do valor pelo programa original, neste caso pelo botão 'Hit me' e veja se o valor está levemente menor que o valor que você botou.*
+
+### Etapa 3: Escaneando por Valores Desconhecidos
+
+![Figura](/images/CheatEngine_Tutorial/Step3.jpg)
+
+Para esta etapa, temos que mudar o valor de uma variável que não sabemos o seu valor. As únicas informações que temos dela são de que seu valor está entre 0 e 500 e que seu valor decresce quando apertado o botão *Hit me*. O programa também mostra por 1 segundo o quanto decresceu ao apertar o botão.
+
+Para começar, podemos realizar o primeiro escaneamento de duas formas, uma geral e outra se utilizando das informações dadas:
+
+Geral:
+
+	Value: ---
+	Scan Type: Unknown Value
+	Value Type: All
+
+Entre 0 e 500:
+
+	Value: 0 and 500
+	Scan Type: Value between...
+	Value Type: All
+
+Para escaneamentos seguintes, utilizamos *Decreased Value/Decreased Value by...* se apertado o botão ou *Unchanged Value* se feito nada. Achado o endereço correto, mude seu valor para 5000.
+
+### Etapa 4: Floats e Doubles
+
+![Figura](/images/CheatEngine_Tutorial/Step4.jpg)
+
+Temos agora que achar dois valores conhecidos, sabendo que eles são dos tipos float e double.
+
+### Sobre Números em Ponto Flutuante
+Ponto Flutuante é uma maneira de se representar números racionais digitalmente, capaz de suportar números decimais e números muito grandes. Estes seguem o formato da notação científica, como $$ 12345 = 1,2345 \times 10^{4}. $$ Na variável em si, sendo float (4-bytes) ou double (8-bytes), é guardado 3 informações: 1 bit de sinal (S), a mantissa (M) e o expoente (E), de forma que o valor seja dado da forma:
+
+$$
+valor = (-1)^S\times M\times 2^E 
+$$
+
+Configuração de uma variável float (4-bytes):
+
+![Figura](/images/CheatEngine_Tutorial/Step4.1.jpg)
+
+
+Para achar estes valores, deve-se seguir o passo-a-passo da Etapa 2, com o campo *Value Type* correspondente.
+
+### Etapa 5: Achando e Removendo Instruções
+
+![Figura](/images/CheatEngine_Tutorial/Step5.jpg)
+
+Algo que não foi comentado até agora é que o local onde uma variável é guardada pode mudar ao reiniciar o programa ou até mesmo durante sua execução, fazendo com que tenha que se repetir o processo de procura. Existem duas formas de fazer mudanças no funcionamento do programa que possam ser repetidos caso isto aconteça: mudanças no código e ponteiros com base um endereço estático. Nesta etapa, vamos procurar e modificar uma instrução que reduz o valor desejado. 
+
+Após encontrar o endereço do valor, desejamos encontrar o código que muda o seu valor. Para tal, clique no endereço com o botão direito do mouse e depois na opção '*Find out what writes to this address*'
+
+![Figura](/images/CheatEngine_Tutorial/Step5.1.jpg)
+
+Isso vai anexar o Debugger ao processo sendo analisado. Toda vez que alguma instrução acessar a variável ela será listada nesta janela, portanto para achar a instrução que muda o valor só precisamos apertar novamente o botão *Change Value*. Se tudo estiver correto, irá aparecer uma ou mais instruções como ilustrado a seguir:
+
+![Figura](/images/CheatEngine_Tutorial/Step5.2.jpg)
+
+Como só precisamos impedir do botão de mudar o valor, podemos só substituir esta instrução por NOP (No Operation). A forma mais simples é pelo botão *Replace*. Selecione a instrução desejada, clique no *Replace* e confirme a ação. Pare o Debugger clicando em *Stop* no canto inferior direito e veja se o valor não mude ao clicar em *Change Value*.
+
+### Etapa 6: Ponteiros
+
+![Figura](/images/CheatEngine_Tutorial/Step6.jpg)
+
+Na programação, muitas vezes é utilizado variáveis que guardam endereços de outras variáveis. Estas variáveis são chamadas de **Ponteiros**. Podemos acessar o valor da variável a qual temos o endereço em um ponteiro, acessando de forma indireta. Para achar um ponteiro para uma certa variável, primeiro temos que descobrir o endereço desta. Como temos acesso ao valor exato, podemos seguir o passo-a-passo da Etapa 2.
+
+Com o endereço correto em mão, clique com o botão direito nele e selecione a opção *Find out what access this address* para abrir o Debugger:
+
+![Figura](/images/CheatEngine_Tutorial/Step6.0.jpg)
+
+Isso significa que as próximas vezes que uma instrução tente acessar este endereço será listado. Mudando o valor da variável, temos estas instruções que aparece listadadas:
+
+![Figura](/images/CheatEngine_Tutorial/Step6.1.jpg)
+
+Veja que todas as instruções possuem um termo entre colchetes. Em assembly, ter um registrador como rax significa uma operação sobre ele, mas ter um termo [rax] a instrução opera sobre o endereço com o valor atual deste registrador. Como podemos observar na imagem abaixo, **depois da execução** da segunda instrução o registrador rdx tem o endereço em Hexadecimal da variável desejada. Poderia ter na instrução um termo do tipo:
+
+```s
+	mov [rcx+8], eax
+```
+
+Neste caso, significa que tem um offset de 8 sendo adicionado ao conteúdo do ponteiro, que devemos levar em conta para achá-lo. No caso do tutorial, o offset é zero, então podemos usar diretamente o endereço da variável. Fazendo um escaneamento de valor exato só que com valor em Hexadecimal (só marcar o quadrado *Hex* ao lado do campo *Value*):
+
+![Figura](/images/CheatEngine_Tutorial/Step6.2.jpg)
+
+Achamos nosso ponteiro! Mas o Cheat Engine está tratando ele como uma variável de 4-bytes e não como um ponteiro, então devemos consertar isso. Existem duas formas: mudar o tipo do endereço salvo na lista ou adicionar manualmente. Foi escolhido para este tutorial adicionar manualmente. Copie o endereço do ponteiro (No caso temos um endereço estático 'Tutorial-x86_64.exe+325AD0') e clique no botão *Add Address Manualy*, no canto inferior direito acima da lista de endereços salvos. Na nova janela, cole o endereço e selecione a opção *Pointer*. Se tudo ocorrer corretamente, deve estar mostrando o valor atual da variável ao lado do campo Address, como na imagem a seguir:
+
+![Figura](/images/CheatEngine_Tutorial/Step6.3.jpg)
+
+Salve e veja que conseguimos modificar o valor diretamente pelo ponteiro. Para finalizar, mude o valor para 5000, congele o ponteiro selecionando a caixa *Active*  como a imagem abaixo e clique no botão *Change Pointer* do tutorial.
+
+![Figura](/images/CheatEngine_Tutorial/Step6.4.jpg)
+
+### Etapa 7: Injeção de Código
+
+![Figura](/images/CheatEngine_Tutorial/Step7.jpg)
+
+Injeção de código é uma técnica de forçar o programa a executar seu código em vez do original, geralmente feito substituindo uma instrução por uma instrução *jmp* para parte de seu código. Neste caso, desejamos que uma parte do código que retira 1 de vida ao apertar o botão aumente 2 de vida ao invés disso. O primeiro passo é encontrar a instrução que faz esta redução.
+
+Após encontrar o endereço da variável pelo escaneamento *Exact Value*, clique na opção *Find out what writes to this Address* e clique novamente no botão *Hit me*. Com isso achamos a instrução:
+
+![Figura](/images/CheatEngine_Tutorial/Step7.1.jpg)
+
+Com a instrução selecionada, clique em *Show disassembler* e, mantendo a instrução selecionada nesta janela, precione as teclas Ctrl+A para abrir o Auto-Assembler. Utilize o template de Injeção de Código no Auto-Assembler:
+
+![Figura](/images/CheatEngine_Tutorial/Step7.2.jpg)
+
+Temos o seguinte código na janela agora:
+
+````s
+alloc(newmem,2048,"Tutorial-x86_64.exe"+2DB57) 
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+
+originalcode:
+sub dword ptr [rsi+000007E0],01
+
+exit:
+jmp returnhere
+
+"Tutorial-x86_64.exe"+2DB57:
+jmp newmem
+nop 2
+returnhere:
+````
+
+O fluxo do código segue: 
+	
+	"Tutorial-x86_64.exe"+2DB57 (Posição original do código anterior) -> newmem -> originalcode -> exit.
+	
+Chamo a atenção para o fato de que o código original ainda será executado se nada fizermos. Podemos somar 3 para que +3 -1 = +2, mas também podemos só pular a execução do código original:
+
+```s
+newmem: //this is allocated memory, you have read,write,execute access
+//place your code here
+add dword ptr [rsi+000007E0],02
+jmp exit
+
+originalcode:
+sub dword ptr [rsi+000007E0],01
+
+exit:
+jmp returnhere
+```
+
+Agora só falta aplicar a injeção. Clique no botão *Execute* e teste se funcionou apertando o botão *Hit me*.
+
+### Etapa 8: Ponteiros para Ponteiros para Ponteiros para...
+
+![Figura](/images/CheatEngine_Tutorial/Step8.jpg)
+
+Nada impede que o endereço apontado por um Ponteiro seja de outro Ponteiro. Na verdade, isso é bem comum. Para chegarmos à base da sequência, teremos que repetir o passo-a-passo da etapa 6 até não conseguirmos mais, possivelmente chegando em um endereço estático.
+
+Depois de achar o endereço do valor pelo escaneamento de valor exato, analizamos quais instruções acessam tal valor:
+
+![Figura](/images/CheatEngine_Tutorial/Step8.1.jpg)
+
+Diferentemente da etapa 6, vemos agora que a instrução acessa nosso valor com um offset de 18 (hexadecimal) no endereço do ponteiro. Portanto, para achar o endereço do ponteiro, temos entender que o valor no ponteiro vai ser 18 menos que o endereço da variável, ou o valor em rsi (**LEMBRANDO:** os valores vistos dentro dos registradores são os DEPOIS da instrução ser executada. Se a instrução modificar o registrador de interesse, o valor dentro NÃO é confiável).
+
+Procurando pela memória o valor contido no ponteiro, encontramos seu endereço:
+
+![Figura](/images/CheatEngine_Tutorial/Step8.2.jpg)
+
+Vamos adicionar o ponteiro na lista de endereços salvos, pelo método manual. Copiando o endereço do ponteiro e marcando a caixa *Pointer*, temos que adicionar o offset da instrução. Se tudo estiver correto, o valor ao lado do campo *Address* deve ser igual ao valor da variável:
+
+![Figura](/images/CheatEngine_Tutorial/Step8.3.jpg)
+
+Salvando este ponteiro, deve ficar da forma apresentada na imagem abaixo. Se modificar pelo ponteiro, deve modificar a variável também.
+
+![Figura](/images/CheatEngine_Tutorial/Step8.4.jpg)
+
+O tutorial nos dá a informação de que a cadeia de ponteiros tem 4 ponteiros, então temos que repetir mais 3 vezes o passo-a-passo. Para não ficar repetindo, será mostrado as janelas de adicionar endereço para cada um dos ponteiros seguintes:
+
+![Figura](/images/CheatEngine_Tutorial/Step8.5.jpg)
+
+Veja que os offsets de cada etapa são diferentes. Aperte *Add Offset* para adicionar mais campos de offset, informando que este ponteiro aponta para mais um ponteiro, a fim de chegar no valor desejado.
+
+![Figura](/images/CheatEngine_Tutorial/Step8.6.jpg)
+
+Vemos a seguir que o endereço do quarto ponteiro está em verde e tem outro formato. Significa que este endereço é estático e permanecerá igual mesmo reiniciando o programa. 
+
+![Figura](/images/CheatEngine_Tutorial/Step8.7.jpg)
+
+Esta é o último endereço que precisamos salvar. Se tudo estiver certo, ele ainda deve apontar para o valor desejado. Se sim, mude-o para 5000, congele o ponteiro e clique em *Change Pointer*.
+
+![Figura](/images/CheatEngine_Tutorial/Step8.8.jpg)
+
+### Etapa 9: Código compartilhado e Structures
+
+![Figura](/images/CheatEngine_Tutorial/Step9.jpg)
+
+![Figura](/images/CheatEngine_Tutorial/Step9.1.jpg)
+
+![Figura](/images/CheatEngine_Tutorial/Step9.2.jpg)
+
+![Figura](/images/CheatEngine_Tutorial/Step9.3.jpg)
+
+![Figura](/images/CheatEngine_Tutorial/Step9.4.jpg)
+
+![Figura](/images/CheatEngine_Tutorial/Step9.5.jpg)
+
+![Figura](/images/CheatEngine_Tutorial/Step9.6.jpg)
+
 
 ## Explorando o Tutorial GUI (gtutorial-x86_64.exe)
 
 	(CONTEÚDO!!!)
 
-## Prática com Jogo real
-
-	(CONTEÚDO!!!)
-
-## Jogos de Browser
-
-	(CONTEÚDO!!!)
 
 ## Fechamento
 
@@ -32,119 +278,12 @@ Abordaremos neste artigo sobre os princípios fundamentais sobre Game Hacking, c
 
 ## Referências
 	
-	(Esquece n, pls)
-
-##### Indice
-
-1. Apresentar os conceitos de game Hacking e o Cheat Engine, além do que será feito neste POST
-2. Tutorial do Cheat Engine (Tutorial-x86_64.exe)
-	1. Anexando um processo ao Cheat Engine
-	2. Escaneamento por Valor Exato
-	3. Valor Inicial desconhecido
-	4. Floats/Doubles
-	5. Code finder (Substituir uma instrução Assembly por NOP)
-	6. Ponteiros
-	7. Injeção de Código
-	8. Ponteiros para ponteiros para Ponteiros para...
-	9. Código compartilhado
-3. GUI tutorial do Cheat Engine (gtutorial-x86_64.exe)
-	1. Destruir Alvo que se cura
-	2. Abater naves inimigas mais fortes
-	3. Plataformer 
-4. Prática em um Jogo real (Assault Cube ou Holocure)
-5. Jogos single player de web (Achar o núm do processo)
-6. Conclusão
-7. Referências
+	https://wiki.cheatengine.org/index.php?title=Tutorials:Cheat_Engine_Tutorial_Guide_x64#Pointer_Scan
+	
+	https://wiki.cheatengine.org/index.php?title=Tutorials:Videos
+	
+	https://www.youtube.com/watch?v=Nib69uZJCaA&t=31s
+	
+	https://www.youtube.com/watch?v=yjdSxL2DWfE
 
 
-> DELETAR ABAIXO AO PUBLICAR!!!
-
-Below is just about everything you'll need to style in the theme. Check the source code to see the many embedded elements within paragraphs.
-
-# Heading 1
-
-## Heading 2
-
-### Heading 3
-
-#### Heading 4
-
-##### Heading 5
-
-###### Heading 6
-
-### Body text
-
-Lorem ipsum dolor sit amet, test link adipiscing elit. **This is strong**. Nullam dignissim convallis est. Quisque aliquam.
-
-![Smithsonian Image](/images/3953273590_704e3899d5_m.jpg)
-
-
-*This is emphasized*. Donec faucibus. Nunc iaculis suscipit dui. 53 = 125. Water is H<sub>2</sub>O. Nam sit amet sem. Aliquam libero nisi, imperdiet at, tincidunt nec, gravida vehicula, nisl. The New York Times <cite>(That’s a citation)</cite>. <u>Underline</u>. Maecenas ornare tortor. Donec sed tellus eget sapien fringilla nonummy. Mauris a ante. Suspendisse quam sem, consequat at, commodo vitae, feugiat in, nunc. Morbi imperdiet augue quis tellus.
-
-HTML and <abbr title="cascading stylesheets">CSS<abbr> are our tools. Mauris a ante. Suspendisse quam sem, consequat at, commodo vitae, feugiat in, nunc. Morbi imperdiet augue quis tellus. Praesent mattis, massa quis luctus fermentum, turpis mi volutpat justo, eu volutpat enim diam eget metus.
-
-### Blockquotes
-
-> Lorem ipsum dolor sit amet, test link adipiscing elit. Nullam dignissim convallis est. Quisque aliquam.
-
-## List Types
-
-### Ordered Lists
-
-1. Item one
-   1. sub item one
-   2. sub item two
-   3. sub item three
-2. Item two
-
-### Unordered Lists
-
-* Item one
-* Item two
-* Item three
-
-## Tables
-
-| Header1 | Header2 | Header3 |
-|:--------|:-------:|--------:|
-| cell1   | cell2   | cell3   |
-| cell4   | cell5   | cell6   |
-|----
-| cell1   | cell2   | cell3   |
-| cell4   | cell5   | cell6   |
-|=====
-| Foot1   | Foot2   | Foot3
-{: rules="groups"}
-
-## Code Snippets
-
-Syntax highlighting via Pygments
-
-{% highlight css %}
-#container {
-  float: left;
-  margin: 0 -240px 0 0;
-  width: 100%;
-}
-{% endhighlight %}
-
-Non Pygments code example
-
-    <div id="awesome">
-        <p>This is great isn't it?</p>
-    </div>
-
-## Buttons
-
-Make any link standout more when applying the `.btn` class.
-
-{% highlight html %}
-<a href="#" class="btn btn-success">Success Button</a>
-{% endhighlight %}
-
-<div markdown="0"><a href="#" class="btn">Primary Button</a></div>
-<div markdown="0"><a href="#" class="btn btn-success">Success Button</a></div>
-<div markdown="0"><a href="#" class="btn btn-warning">Warning Button</a></div>
-<div markdown="0"><a href="#" class="btn btn-danger">Danger Button</a></div>
-<div markdown="0"><a href="#" class="btn btn-info">Info Button</a></div>
