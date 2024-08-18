@@ -3,9 +3,9 @@ title: Tutorial de Game Hacking utilizando Cheat Engine
 date: 2024-08-12
 description: "Aprender como utilizar o Cheat Engine para encontrar e manipular endereços de memória de interesse, injeção/remoção de código para mudar o funcionamento do jogo"
 tags: [Game Hacking, Engenharia Reversa]
-categories: [intro]
+categories: [easy]
 author: asw4ng
-published: false
+published: true
 ---
 
 Abordaremos neste artigo sobre os princípios fundamentais sobre Game Hacking, ensinando como utilizar o Cheat Engine, um programa clássico para mudar aspectos de um jogo a seu favor. 
@@ -16,7 +16,7 @@ Antes de tudo, é bom deixar bem definido sobre o que é um jogo para o computad
 ### Sobre Cheat Engine
 O Cheat Engine é um Memory Scanner. Dado um processo, ele busca na memória RAM que este processo utiliza por determinados valores ou padrões em tempo real. Com isso podemos procurar por endereços de memória interessantes, como a posição do jogador ou a vida de um inimigo. Além disso, o Cheat Engine também possui funcionalidades de Debugger e Auto Assembler, muito úteis para análise e modificação da lógica do jogo.
 
-Neste post, vamos resolver como exemplo dois tutoriais que vem junto ao baixar o Game Engine, e desta forma mostrando na prática como usar as ferramentas para hackear.
+Neste post, vamos resolver como exemplo o tutorial que vem junto ao baixar o Game Engine, e desta forma mostrando na prática como usar as ferramentas para hackear.
 
 ## Solucionando o Tutorial Padrão (Tutorial-x86_64.exe)
 Começaremos solucionando todas as 9 etapas do tutorial padrão do Cheat Engine. Este tutorial pode ser aberto tanto pelo executável, que se encontra na pasta do executável do Cheat Engine, quanto no menu help dele aberto:
@@ -254,27 +254,55 @@ Esta é o último endereço que precisamos salvar. Se tudo estiver certo, ele ai
 
 ![Figura](/images/CheatEngine_Tutorial/Step9.jpg)
 
+Estamos chegando no fim deste tutorial. Falamos na etapa 5 e 7 sobre manipular código, mas uma instrução pode mudar vários endereços além do desejado. Por exemplo, uma mesma função pode ser chamada para reduzir a vida tando do jogador quanto para inimigos. Logo, se retirarmos esta funcionalidade os inimigos se tornam imortais! 
+
+O que queremos, então, é uma forma de direfenciar quando a instrução trata da vida dos aliados e quando trata dos inimigos. É esperado que as variáveis de cada jogador sigam um molde na memória, aliados ou inimigos, que é chamado de estruturas. Nesta etapa, vamos analisar a existência e conteúdos das estruturas de cada jogador, a fim de analisar as diferenças entre times.
+
+Começamos achando o endereço da vida de Dave, por escaneamento de valor exato (tipo Float). Descobrindo quais instruções modificam este endereço, descobrimos que existe um ponteiro que com offset 8 acessa a vida de Dave. Para achar a vida dos outros jogadores, vamos tomar proveito que este código é compartilhado e achar todos os endereços que esta intrução acessa:
+
 ![Figura](/images/CheatEngine_Tutorial/Step9.1.jpg)
+
+Reduza a vida de todos os jogadores. Os endereços listados serão as vidas de todos os jogadores, na ordem que a vida foi reduzida:
 
 ![Figura](/images/CheatEngine_Tutorial/Step9.2.jpg)
 
+Adicione todos estes endereços na lista de endereços salvos e nomeie cada um para diferenciar. Agora vamos analizar a área da memória da estrutura. Sabemos o endereço base das estruturas, sendo os endereços das vidas menos o Offset, 8 em hexadecimal. Clique em *Memory View*, no lado esquerdo acima da lista de endereços salvos. Na nova janela, vá em *Tools->Dissect data/structures*:
+
 ![Figura](/images/CheatEngine_Tutorial/Step9.3.jpg)
+
+Antes de determinar a estrutura, recomendo separar os esdereços base em dois grupos de dois endereços, para facilitar a comparação. Clique em *File->Add extra address* para adicionar novos endereços em um grupo e *File->Add new group* para adicionar um novo grupo.
 
 ![Figura](/images/CheatEngine_Tutorial/Step9.4.jpg)
 
+Clique em *Structures->Define new structure* e, com o campo *Guess Field Types* marcado, aperte Ok. O Cheat Engine vai fazer o possível para entender qual o tipo de cada endereço de memória, ele pode errar. Por exemplo, o Cheat Engine nos deu esta estrutura:
+
+![Figura](/images/CheatEngine_Tutorial/Step9.5.1.jpg)
+
+Vemos alguns endereços que sabemos de cara o que é. No offset 08, temos a vida, como esperado. Além disso, temos os nomes de cada jogador no offset 19. Podemos até supor que o offset 18 tem relação com o tamanho dos nomes, já que bate com os quatro casos. Mas não tem nada muito óbvio que nos diz qual "Time" cada jogador faz parte.
+
+Vemos no offset 58 um ponteiro, que abrindo vemos que aponta para a estrutura do aliado. Temos um loop de ponteiros, então. Por curiosidade, fui abrindo cada ponteiro deste offset e vemos algo interessante:
+
+![Figura](/images/CheatEngine_Tutorial/Step9.5.2.jpg)
+
+Uma nova interpretação da estrutura! E com um offset 14 que para aliados é 1 e para inimigos 2. É bem possível que você tenha recebido esta versão ao fazer em casa, mas isso exempla o fato de que o Cheat Engine pode errar ao assumir tipos à endereços, e deve ser levado em conta. É a mesma estrutura, podemos ver este valor na primeira interpretação no ponteiro no offset 10, no formato P->1XXXXXXX para aliados e P->2XXXXXXX para inimigos.
+
+Irei tomar a segunda interpretação como a mais válida. No final, a estrutura fica desta forma:
+
 ![Figura](/images/CheatEngine_Tutorial/Step9.5.jpg)
+
+Com um offset que determina times, agora só precisamos fazer uma injeção de código que compara este offset para determinar se é para reduzir a vida ou não. Novamente descubra qual instrução escreve em uma das vidas e, com ela selecionada, aperte *Show Dissasembler*. Com a instrução ainda selecionada na nova janela, pressione Ctrl+A para abrir o Auto-Assemble, use o template de Code Injection e escreva o código a seguir:
 
 ![Figura](/images/CheatEngine_Tutorial/Step9.6.jpg)
 
+A etapa está feita! Teste se o código está fazendo efeito e clique em *Restart game and autoplay*.
 
-## Explorando o Tutorial GUI (gtutorial-x86_64.exe)
-
-	(CONTEÚDO!!!)
-
+Com isso, terminamos o tutorial.
 
 ## Fechamento
 
-	(CONTEÚDO!!!)
+Agradeço muito pela sua atenção e espero que lhe tenha inspirado a se aprofundar mais na área de Game Hacking e Engenharia Reversa. Recomendo ver mais posts no Blog do GRIS sobre as áreas, eles devem te esninar ainda mais sobre, só clicar nas Tags.
+
+> Vale a pena lembrar que foi ensinado o básico de Cheat Engine, para jogos **SEM ANTI-CHEAT**. Seja responsável e use estas ferramentas por sua conta e risco.
 
 ## Referências
 	
@@ -285,5 +313,3 @@ Esta é o último endereço que precisamos salvar. Se tudo estiver certo, ele ai
 	https://www.youtube.com/watch?v=Nib69uZJCaA&t=31s
 	
 	https://www.youtube.com/watch?v=yjdSxL2DWfE
-
-
