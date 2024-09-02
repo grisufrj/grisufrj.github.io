@@ -2,7 +2,7 @@
 title: "Load+Reload: Uma prova de conceito de um side-channel que explora a cache associativa de processadores AMD"
 date: 2022-10-02
 published: true
-author: gabrielott
+author: ottoboni
 ---
 
 # Introdução

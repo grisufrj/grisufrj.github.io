@@ -94,8 +94,8 @@ name = "Rodrigo Rubira Branco"
 avatar = "images/bsdaemon.jpg"
 bio = "Vuln researcher and exploit writer. Failed farmer."
 
-[Author.gabrielott]
-name = "Gabriel da Fonseca Ottoboni Pinho"
+[Author.ottoboni]
+name = "Gabriel Ottoboni"
 avatar = "images/ottoboni.jpg"
 bio = "POSIX > bash"
 
