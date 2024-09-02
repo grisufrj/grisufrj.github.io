@@ -1,6 +1,6 @@
 ---
 title: "SekaiCTF 2024 writeup: Blockchain/ZOO"
-date: 2024-09-01
+date: 2024-09-02
 published: true
 description: "Writeup de um desafio de blockchain do SekaiCTF 2024."
 images: []
