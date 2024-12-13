@@ -1,11 +1,13 @@
 baseURL = 'http://blog.gris.dcc.ufrj.br/'
 theme = "mainroad"
 defaultContentLanguage = 'pt'
+
 [pagination]
 pagerSize = 10
 
 [services.googleAnalytics]
   ID = "G-YWN8S4BKK0" # Enable Google Analytics by entering your tracking ID
+
 # Define o cabeçalho
 [Params.logo]
   image = "/images/gris-logo-2020's_black.png" # Logo image. Path relative to "static"
@@ -27,8 +29,6 @@ pagerSize = 10
   title = "Instagram"
   url = "https://www.instagram.com/grisufrj"
 
-
-
 # Configurando particularidades do template
 [Params]
 description = "Blog do GRIS"
@@ -38,7 +38,7 @@ twitter_cards = true
 images = ["images/GRIS_logo.png"]
 post_meta = ["date", "categories"] # adiciona descrição no resumo das postagens
 #post_meta = ["author", "date", "categories"] # adiciona descrição no resumo das>
-
+author = "GRIS" # Define o autor padrão como parâmetro
 
 # Adiciona suporte a latex
 mathjax = true # Enable MathJax
@@ -51,109 +51,6 @@ list = "right"
 sidebar = "right"
 widgets = ["search", "categories", "taglist", "social"]
 
-
-
-
-# Configuração dos autores
-[Author]
-name = "GRIS"
-bio = "Grupo de Resposta a Incidentes de Segurança."
-avatar = "/images/GRIS_logo.png"
-
-[Author.jvitor]
-name = "João Vitor Rebouças"
-avatar = "images/jvitor.jpg"
-bio = "Estudante de ciência da computação e membro da equipe de Redes Sites e Sistemas do GRIS"
-
-[Author.lgribeiro]
-name = "Luiz Guilherme Ribeiro"
-avatar = "images/lgribeiro.jpg"
-bio = "Estudante de ciência da computação, entusiasta da área de segurança e amante de soluções criativas e mirabolantes (gambiarras)"
-
-[Author.thiagowfx]
-name = "Thiago Barroso Perrotta"
-avatar = "images/thiagowfx.png"
-bio = ""
-
-[Author.vpires]
-name = "Victor Ribeiro Pires"
-avatar = "images/vpires.jpg"
-bio = "Estudante de ciência da computação"
-
-[Author.mavellar]
-name = "Matheus Avellar de Barros"
-avatar = "images/mavellar.jpg"
-bio = "Sommelier de pizza, cientista e desenvolvedor de inutilidades<hr>"
-
-[Author.esoj]
-name = "José Luiz Oliveira"
-avatar = "images/esoj.jpg"
-bio = "Pwn"
-
-[Author.bsdaemon]
-name = "Rodrigo Rubira Branco"
-avatar = "images/bsdaemon.jpg"
-bio = "Vuln researcher and exploit writer. Failed farmer."
-
-[Author.gabrielott]
-name = "Gabriel da Fonseca Ottoboni Pinho"
-avatar = "images/ottoboni.jpg"
-bio = "POSIX > bash"
-
-[Author.ruhptura]
-name = "Abid Lohan"
-avatar = "images/ruhptura.png"
-bio = "The best feeling in the life: popping a flag after hours doing a CTF challenge."
-
-[Author.jhaysonj]
-name = "Jhayson Jales"
-avatar = "images/jhaysonj.png"
-bio = "O cara responsável por fazer o GRIS voltar a ser extensão :)"
-
-[Author.guilhermecapp]
-name = "Guilherme Cappelli"
-avatar = "images/guilhermecappicon.gif"
-bio = "Descrição temporária"
-
-[Author.jurbas]
-name = "João Pedro Duarte"
-avatar = "images/jurbas.jpg"
-bio = "Apreciador de café e segurança da informação"
-
-[Author.richardpiccoli]
-name = "Richard Piccoli"
-avatar = "images/RichardPiccoli.png"
-bio = "Estudante de ciência da computação"
-
-[Author.eduardopiccoli]
-name = "Luiz Eduardo Lahm Piccoli"
-avatar = "images/eduardopiccoli.jpg"
-bio = "Descrição temporária"
-
-[Author.martinamarques]
-name = "Martina Marques Jardim"
-avatar = "images/martina.jpg"
-bio = "Entusiasta de Álgebra Linear"
-
-[Author.michellefortunato]
-name = "Michelle Fortunato"
-avatar = "images/michelle.jpg"
-bio = "Alquimia, Ressonância e Gratidão, mas também Segurança da Informação"
-
-[Author.gbrods]
-name = "Gabriel Rodrigues da Silva"
-avatar = "images/gbrods.jpg"
-bio = "Sou um jovem estudante de Engenharia de Computação e Informação ☺"
-
-[Author.0xmr]
-name = "João Pedro Nunes"
-avatar = "images/lasanha.jpg"
-bio = "pwning "
-
-
-
-
-
 [languages]
 [languages.en]
 title = "GRIS Blog"
@@ -162,5 +59,3 @@ languageCode = "en"
 [languages.pt]
 title = "Blog do GRIS"
 languageCode = "pt"
-
-
