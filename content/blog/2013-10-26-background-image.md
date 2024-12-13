@@ -6,7 +6,7 @@ tags: [sample post]
 categories: [image]
 author: gris
 date: 2013-10-26
-published: false
+draft: true
 image:
   background: triangular.png
 ---
