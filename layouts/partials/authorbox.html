@@ -8,7 +8,7 @@
     {{ $author := . }} <!-- Page corresponding to current iteration, i.e. a Section -->
         
 
-        {{- with (index $.Site.Author $author) }}
+    {{- with (index $.Site.Params.Author $author) }}
         <div class="authorbox clearfix">
         <figure class="authorbox__avatar">
             <img alt="{{ .name }} avatar" src="{{ .avatar | relURL }}" class="avatar" height="90" width="90">
@@ -26,7 +26,7 @@
 
     {{ else }}
 
-        {{- with (index $.Site.Author .Params.author) }}
+        {{- with (index $.Site.Params.Author .Params.author) }}
         <div class="authorbox clearfix">
         <figure class="authorbox__avatar">
             <img alt="{{ .name }} avatar" src="{{ .avatar | relURL }}" class="avatar" height="90" width="90">
