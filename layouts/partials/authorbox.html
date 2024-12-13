@@ -1,14 +1,12 @@
 {{- if .Param "authorbox" }}
 {{- if .Params.author }}
 
-
     {{ if isset .Params "multiauthor" }}
         
-    {{- range ( index .Params.author ) }}
+    {{- range (index .Params.author) }}
     {{ $author := . }} <!-- Page corresponding to current iteration, i.e. a Section -->
-        
 
-        {{- with (index $.Site.Author $author) }}
+        {{- with (index $.Site.Params.Author $author) }}
         <div class="authorbox clearfix">
         <figure class="authorbox__avatar">
             <img alt="{{ .name }} avatar" src="{{ .avatar | relURL }}" class="avatar" height="90" width="90">
@@ -21,12 +19,11 @@
         </div>
         </div>
         {{- end }}
-        {{ end }}
-
+    {{ end }}
 
     {{ else }}
 
-        {{- with (index $.Site.Author .Params.author) }}
+        {{- with (index $.Site.Params.Author .Params.author) }}
         <div class="authorbox clearfix">
         <figure class="authorbox__avatar">
             <img alt="{{ .name }} avatar" src="{{ .avatar | relURL }}" class="avatar" height="90" width="90">
@@ -39,14 +36,8 @@
         </div>
         </div>
         {{- end }}
-        
-
-
-
-
 
     {{ end }}
-
 
 {{- end }}
 {{- end }}
