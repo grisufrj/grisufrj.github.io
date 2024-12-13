@@ -38,7 +38,10 @@ twitter_cards = true
 images = ["images/GRIS_logo.png"]
 post_meta = ["date", "categories"] # adiciona descrição no resumo das postagens
 #post_meta = ["author", "date", "categories"] # adiciona descrição no resumo das>
-author = "GRIS" # Define o autor padrão como parâmetro
+[Params.Author]
+  name = "GRIS"
+  bio = "Grupo de Respostas a Incidentes de Segurança."
+  avatar = "/images/gris-logo-2020's_black.png"
 
 # Adiciona suporte a latex
 mathjax = true # Enable MathJax
