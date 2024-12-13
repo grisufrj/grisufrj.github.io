@@ -5,7 +5,7 @@ description: "Aprender como utilizar o Cheat Engine para encontrar e manipular e
 tags: [Game Hacking, Engenharia Reversa]
 categories: [easy]
 author: asw4ng
-published: true
+published: 2024-01-08
 ---
 
 Abordaremos neste artigo sobre os princípios fundamentais sobre Game Hacking, ensinando como utilizar o Cheat Engine, um programa clássico para mudar aspectos de um jogo a seu favor. 
