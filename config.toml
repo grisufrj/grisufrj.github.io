@@ -1,7 +1,7 @@
 baseURL = 'http://blog.gris.dcc.ufrj.br/'
 theme = "mainroad"
 defaultContentLanguage = 'pt'
-paginate = "5"
+paginate = 10
 
 [services.googleAnalytics]
   ID = "G-YWN8S4BKK0" # Enable Google Analytics by entering your tracking ID
