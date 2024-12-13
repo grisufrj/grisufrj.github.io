@@ -1,7 +1,8 @@
 baseURL = 'http://blog.gris.dcc.ufrj.br/'
 theme = "mainroad"
 defaultContentLanguage = 'pt'
-paginate = "5"
+[pagination]
+pagerSize = 5
 
 [services.googleAnalytics]
   ID = "G-YWN8S4BKK0" # Enable Google Analytics by entering your tracking ID
@@ -35,6 +36,7 @@ authorbox = true
 pager = true
 twitter_cards = true
 images = ["images/GRIS_logo.png"]
+author = "GRIS"
 post_meta = ["date", "categories"] # adiciona descrição no resumo das postagens
 #post_meta = ["author", "date", "categories"] # adiciona descrição no resumo das>
 
