@@ -1,7 +1,7 @@
 ---
 title: "Exploração de vulnerabilidades em ambientes virtuais"
 date: 2024-08-11
-published: true
+published: 2024-08-11
 description: "Exploração de vulnerabilidades da máquina Metasploitable 2"
 categories:
   - "Easy"

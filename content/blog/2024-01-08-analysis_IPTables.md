@@ -1,7 +1,7 @@
 ---
 title: "IPTables: Análise detalhada sobre o IPTables"
 date: 2024-01-08
-published: true
+published: 2024-01-08
 description: "Conceito, Funcionamento e Importância do IPTables"
 categories:
   - "Easy"

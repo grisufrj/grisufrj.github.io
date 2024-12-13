@@ -1,7 +1,7 @@
 ---
 title: "pwn 101: Desafios de Introdução a Buffer Overflow"
 date: 2024-01-12
-published: true
+published: 2024-01-12
 description: "Introdução a exploit de binários"
 categories:
   - "Easy"

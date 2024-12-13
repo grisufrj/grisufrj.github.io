@@ -1,7 +1,7 @@
 ---
 title: "Game Hacking: Usando Patching de Maneira Dinâmica Para Modificar Jogos"
 date: 2023-08-03
-published: true
+published: 2023-08-03
 description: "Implementando patches dinâmicos em jogos com pymem"
 tags: [Game Hacking]
 images: ["/images/2023-08-03-1.png"]

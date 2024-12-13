@@ -1,7 +1,7 @@
 ---
 title: "Vulnerabilidades do Windows Subsystem for Linux (WSL)"
 date: 2024-01-08
-published: true
+published: 2024-01-08
 description: "Análise de vulnerabilidades do Windows Subsystem for Linux (WSL)"
 categories:
   - "Easy"

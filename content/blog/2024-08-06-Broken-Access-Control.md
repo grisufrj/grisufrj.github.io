@@ -1,7 +1,7 @@
 ---
 title: "Broken Access Control: Entendendo Vulnerabilidades de Controle de Acesso"
 date: 2024-06-08
-published: true
+published: 2024-06-08
 description: "Um guia básico para entender Vulnerabilidades de Controle de Acesso"
 tags:
   - "web"
