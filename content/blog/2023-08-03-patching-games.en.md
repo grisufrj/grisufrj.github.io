@@ -1,7 +1,7 @@
 ---
 title: "Game Hacking: Using Dynamic Patching to Modify Games"
 date: 2023-08-03
-published: 2023-08-03
+published: true
 author: ruhptura
 ---
 

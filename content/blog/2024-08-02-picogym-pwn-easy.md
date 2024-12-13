@@ -1,7 +1,7 @@
 ---
 title: "Resolvendo os desafios iniciais de pwn do picoCTF"
-date: 2024-08-02
-published: 2024-08-02
+date: 2024-08-02 00:00:00 -0300
+published: true
 description: "Esse é um writeup dos 15 desafios iniciais de pwning do picoGym. Você pode encontrar esses desafios em [picoGym](https://play.picoctf.org/practice). Há também um desafio extra no final do post de um outro CTF :)"
 author: dkvhr
 tags:

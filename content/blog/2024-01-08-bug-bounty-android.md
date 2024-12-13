@@ -1,7 +1,7 @@
 ---
 title: "Bug bounty android: Um breve guia de um bug bounty em Android"
 date: 2024-01-08
-published: 2024-01-08
+published: true
 description: "Um breve guia de um bug bounty em Android"
 tags:
   - "Android"

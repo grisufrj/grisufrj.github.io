@@ -1,7 +1,7 @@
 ---
 title: "Entendendo o Papel do Kernel na Segurança de Jogos Online"
 date: 2024-01-12
-published: 2024-01-12
+published: true
 description: "Uma abstração em alto nível do funcionamento de um cheat kernel level utilizando IOCTL"
 images: ["/images/kernel-1.png"]
 author: ruhptura

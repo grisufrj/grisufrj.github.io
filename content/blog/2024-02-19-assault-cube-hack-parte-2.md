@@ -1,7 +1,7 @@
 ---
 title: "Assault Cube Hack - Parte 2"
 date: 2024-02-19
-published: 2024-02-19
+published: true
 tags: [Game Hacking]
 series: ["Assault Cube Hacking"]
 author: jurbas

@@ -2,7 +2,7 @@
 title: "Uma introdução prática a Exploração de Binários com Engenharia Reversa: writeUp da sala pwn101 THM"
 date: 2024-08-11
 description: Nesse relatório tento usar a sala [pwn101](https://tryhackme.com/r/room/pwn101) para estimular o aprendizado de Engenharia Reversa e Exploração de Binários a partir de programas vulneráveis.
-published: 2024-01-08 
+published: true 
 categories:
   - easy
 tags:
