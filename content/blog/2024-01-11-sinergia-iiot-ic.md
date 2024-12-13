@@ -1,7 +1,7 @@
 ---
 title: "Sinergia entre a Internet Industrial das Coisas (IIoT) e as Infraestruturas Críticas"
 date: 2024-01-11
-published: true
+published: 2024-01-11
 description: "Infraestruturas Críticas"
 images: []
 categories:

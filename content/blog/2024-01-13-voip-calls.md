@@ -1,7 +1,7 @@
 ---
 title: "Softphones e telefonia pela Internet"
 date: 2024-01-13
-published: true
+published: 2024-01-13
 description: "Discussão de alguns protocolos da camada TCP/IP e configuração de um softphone usando VoIP."
 categories:
   - "Easy"

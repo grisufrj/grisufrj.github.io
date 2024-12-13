@@ -1,7 +1,7 @@
 ---
 title: "JSON Web Tokens"
 date: 2024-03-14
-published: true
+published: 2024-03-14
 tags: [web]
 author: jhaysonj
 categories:

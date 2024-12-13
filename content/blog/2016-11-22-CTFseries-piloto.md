@@ -7,7 +7,7 @@ tags:
   - "Engenharia Reversa"
 author: lgribeiro
 date: 2016-11-22
-published: true
+published: 2016-11-22
 ---
 
 h3ll0, fr13nd. 

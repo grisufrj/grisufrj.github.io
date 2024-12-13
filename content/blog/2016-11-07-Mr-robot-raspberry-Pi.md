@@ -6,7 +6,7 @@ tags:
   - "Raspberry"
 author: lgribeiro
 date: 2016-11-07
-published: true
+published: 2016-11-07
 ---
 
 Algum tempo atrás estava dando uma olhada nos posts da série Mr Robot do [null-byte](http://null-byte.wonderhowto.com/how-to/mr-robot-hacks/) e um artigo em especial me chamou a atenção.

@@ -1,7 +1,7 @@
 ---
 title: "Introdução a provas de zero-knowledge - Parte 1"
 date: 2024-07-15
-published: true
+published: 2024-07-15
 description: "Parte 1 de um estudo sobre ZKPs. A parte 2 irá conter a implementação desses protocolos utilizando Circom."
 author: dkvhr
 tags:
