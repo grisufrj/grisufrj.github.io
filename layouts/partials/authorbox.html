@@ -1,43 +1,49 @@
 {{- if .Param "authorbox" }}
-{{- if .Params.author }}
+  {{- if .Params.author }}
 
-    {{ if isset .Params "multiauthor" }}
-        
-    {{- range (index .Params.author) }}
-    {{ $author := . }} <!-- Page corresponding to current iteration, i.e. a Section -->
-
-        {{- with (index $.Site.Params.Author $author) }}
+    {{- if isset .Params "multiauthor" }}
+      {{- range .Params.author }}
+        {{- $author := . }}
+        {{- with (index $.Site.Author $author) }}
         <div class="authorbox clearfix">
-        <figure class="authorbox__avatar">
+          <figure class="authorbox__avatar">
             <img alt="{{ .name }} avatar" src="{{ .avatar | relURL }}" class="avatar" height="90" width="90">
+          </figure>
+          <div class="authorbox__header">
+            <span class="authorbox__name">{{ T "authorbox_name" (dict "Name" .name) }}</span>
+          </div>
+          <div class="authorbox__description">
+            {{ .bio | markdownify }}
+          </div>
+        </div>
+        {{- else }}
+        <p class="authorbox__error">Autor não encontrado: {{ $author }}</p>
+        {{- end }}
+      {{- end }}
+
+    {{- else }}
+      {{- $author := .Params.author }}
+      {{- with (index $.Site.Author $author) }}
+      <div class="authorbox clearfix">
+        <figure class="authorbox__avatar">
+          <img alt="{{ .name }} avatar" src="{{ .avatar | relURL }}" class="avatar" height="90" width="90">
         </figure>
         <div class="authorbox__header">
-            <span class="authorbox__name">{{ T "authorbox_name" (dict "Name" .name) }}</span>
+          <span class="authorbox__name">{{ T "authorbox_name" (dict "Name" .name) }}</span>
         </div>
         <div class="authorbox__description">
-            {{ .bio | markdownify }}
+          {{ .bio | markdownify }}
         </div>
-        </div>
-        {{- end }}
-    {{ end }}
+      </div>
+      {{- else }}
+      <p class="authorbox__error">Autor não encontrado: {{ $author }}</p>
+      {{- end }}
 
-    {{ else }}
+    {{- end }}
 
-        {{- with (index $.Site.Params.Author .Params.author) }}
-        <div class="authorbox clearfix">
-        <figure class="authorbox__avatar">
-            <img alt="{{ .name }} avatar" src="{{ .avatar | relURL }}" class="avatar" height="90" width="90">
-        </figure>
-        <div class="authorbox__header">
-            <span class="authorbox__name">{{ T "authorbox_name" (dict "Name" .name) }}</span>
-        </div>
-        <div class="authorbox__description">
-            {{ .bio | markdownify }}
-        </div>
-        </div>
-        {{- end }}
-
-    {{ end }}
-
-{{- end }}
+  {{- else }}
+  <p class="authorbox__error">Nenhum autor especificado para esta página.</p>
+  {{- end }}
+{{- else }}
+<p class="authorbox__error">Authorbox desativado.</p>
 {{- end }}
