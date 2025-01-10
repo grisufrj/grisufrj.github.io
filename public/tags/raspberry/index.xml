@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Raspberry on Blog do GRIS</title>
     <link>http://localhost:1313/tags/raspberry/</link>
     <description>Recent content in Raspberry on Blog do GRIS</description>
-    <generator>Hugo</generator>
+    <image>
+      <title>Blog do GRIS</title>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- 0.139.4</generator>
     <language>pt</language>
     <lastBuildDate>Mon, 07 Nov 2016 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/raspberry/index.xml" rel="self" type="application/rss+xml" />
@@ -13,7 +18,7 @@
       <link>http://localhost:1313/blog/2016-11-07-mr-robot-raspberry-pi/</link>
       <pubDate>Mon, 07 Nov 2016 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/blog/2016-11-07-mr-robot-raspberry-pi/</guid>
-      <description>&lt;p&gt;Algum tempo atrás estava dando uma olhada nos posts da série Mr Robot do &lt;a href=&#34;http://null-byte.wonderhowto.com/how-to/mr-robot-hacks/&#34;&gt;null-byte&lt;/a&gt; e um artigo em especial me chamou a atenção.&lt;/p&gt;&#xA;&lt;p&gt;A publicação sobre como criar um raspberry para hacking não retrata fielmente as condições encontradas por Elliot no episódio eps1.3__da3m0ns.mp4. Então, optei por adaptar um pouco o tutorial para ele se tornar mais parecido com o conteúdo apresentado na televisão. De início, os passos serão bem semelhantes aos apresentados pelo null-byte mas no final, teremos um algo a mais.&lt;/p&gt;</description>
+      <description>Como criar um raspberry Pi semelhante ao utilizado por Elliot na primeira temporada de Mr Robot</description>
     </item>
   </channel>
 </rss>

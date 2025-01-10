@@ -81,7 +81,7 @@ params:
     imageHeight: 160
     imageTitle: GRIS
     buttons:
-      - name: Posts
+      - name: Blog
         url: "/blog"
       - name: Tags
         url: tags
@@ -111,7 +111,7 @@ params:
     hiddenInSingle: true # hide on single page
 
   editPost:
-    URL: "https://github.com/<path_to_repo>/content"
+    URL: "https://github.com/grisufrj/grisufrj.github.io/tree/main/content"
     Text: "Suggest Changes" # edit text
     appendFilePath: true # to append file path to Edit link
 
@@ -128,6 +128,10 @@ params:
     keys: ["title", "permalink", "summary", "content"]
 menu:
   main:
+    - identifier: blog
+      name: Blog
+      url: /blog/
+      weight: 5
     - identifier: categories
       name: Categorias
       url: /categories/

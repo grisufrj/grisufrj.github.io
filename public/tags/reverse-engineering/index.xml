@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Reverse Engineering on Blog do GRIS</title>
     <link>http://localhost:1313/tags/reverse-engineering/</link>
     <description>Recent content in Reverse Engineering on Blog do GRIS</description>
-    <generator>Hugo</generator>
+    <image>
+      <title>Blog do GRIS</title>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- 0.139.4</generator>
     <language>pt</language>
     <lastBuildDate>Sun, 11 Aug 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/reverse-engineering/index.xml" rel="self" type="application/rss+xml" />
@@ -13,7 +18,7 @@
       <link>http://localhost:1313/blog/2024-08-11-pwn101-thm-writeup/</link>
       <pubDate>Sun, 11 Aug 2024 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/blog/2024-08-11-pwn101-thm-writeup/</guid>
-      <description>&lt;h1 id=&#34;pwn101-510-writeup&#34;&gt;[pwn101 5/10] writeUp&lt;/h1&gt;&#xA;&lt;h2 id=&#34;pwn101---challenge-1&#34;&gt;[pwn101 - Challenge 1]&lt;/h2&gt;&#xA;&lt;p&gt;A sala nos diz que a aplicação está rodando no endereço &amp;lsquo;10.10.151.216:9001&amp;rsquo;. Com o utilitário nc podemos escrever e ler em conexões TCP e UDP. Assim, podemos nos conectar com a aplicação usando o comando:&lt;/p&gt;&#xA;&lt;p&gt;nc 10.10.151.216 9001&lt;/p&gt;&#xA;&lt;p&gt;Ao conectarmos com a aplicação recebemos um texto com um pedido de ajuda para fornecer os ingredientes para o programa como input. A sala fornece uma dica de inicio &amp;lsquo;AAAAAAAAAAA&amp;rsquo;. É de se imaginar que o programa possua algum tipo de buffer overflow. É fácil de receber um shell quando tentamos quebrar a aplicação fornecendo uma string com um tamanho grande.&lt;/p&gt;</description>
+      <description>Nesse relatório tento usar a sala [pwn101](https://tryhackme.com/r/room/pwn101) para estimular o aprendizado de Engenharia Reversa e Exploração de Binários a partir de programas vulneráveis.</description>
     </item>
   </channel>
 </rss>
