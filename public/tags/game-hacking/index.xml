@@ -1,51 +1,40 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Game Hacking on Blog do GRIS</title>
-    <link>http://localhost:1313/tags/game-hacking/</link>
+    <link>http://localhost:38113/tags/game-hacking/</link>
     <description>Recent content in Game Hacking on Blog do GRIS</description>
-    <image>
-      <title>Blog do GRIS</title>
-      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
-    </image>
-    <generator>Hugo -- 0.139.4</generator>
+    <generator>Hugo</generator>
     <language>pt</language>
     <lastBuildDate>Mon, 12 Aug 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/game-hacking/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:38113/tags/game-hacking/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Tutorial de Game Hacking utilizando Cheat Engine</title>
-      <link>http://localhost:1313/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</link>
+      <link>http://localhost:38113/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</link>
       <pubDate>Mon, 12 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</guid>
-      <description>Aprender como utilizar o Cheat Engine para encontrar e manipular endereços de memória de interesse, injeção/remoção de código para mudar o funcionamento do jogo</description>
+      <guid>http://localhost:38113/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</guid>
+      <description>&lt;p&gt;Abordaremos neste artigo sobre os princípios fundamentais sobre Game Hacking, ensinando como utilizar o Cheat Engine, um programa clássico para mudar aspectos de um jogo a seu favor.&lt;/p&gt;&#xA;&lt;h3 id=&#34;sobre-processos&#34;&gt;Sobre Processos&lt;/h3&gt;&#xA;&lt;p&gt;Antes de tudo, é bom deixar bem definido sobre o que é um jogo para o computador. Ao abrirmos qualquer programa executável, o sistema operacional cria um novo processo para rodar este programa. Um &lt;strong&gt;Processo&lt;/strong&gt; é, portanto, uma tarefa em execução no computador. Podem ter múltiplos processos rodando ao mesmo tempo, sendo em janelas ou em plano de fundo, e pode se criar vários processos de um mesmo programa.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Assault Cube Hack - Parte 2</title>
-      <link>http://localhost:1313/blog/2024-02-19-assault-cube-hack-parte-2/</link>
+      <link>http://localhost:38113/blog/2024-02-19-assault-cube-hack-parte-2/</link>
       <pubDate>Mon, 19 Feb 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-02-19-assault-cube-hack-parte-2/</guid>
-      <description>&lt;h1 id=&#34;desenvolvimento-de-código&#34;&gt;Desenvolvimento de Código&lt;/h1&gt;
-&lt;h2 id=&#34;criando-o-projeto&#34;&gt;&lt;strong&gt;Criando o Projeto&lt;/strong&gt;&lt;/h2&gt;
-&lt;p&gt;Antes de começar o código vamos criar um projeto no Visual Studio, procure e selecione &lt;em&gt;Dynamic Link Library (DLL)&lt;/em&gt; para C++ como tipo de projeto como na imagem a seguir.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;Untitled&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/ac-hack-7.png&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Dê um nome ao projeto e escolha um local para salvá-lo e teremos uma estrutura inicial desta forma.&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;Untitled&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/ac-hack-8.png&#34;&gt;&lt;/p&gt;
-&lt;p&gt;A estrutura do nosso código se dividirá em 3 funções, &lt;strong&gt;&lt;code&gt;DllMain&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;HackThread&lt;/code&gt;&lt;/strong&gt; e &lt;strong&gt;&lt;code&gt;UpdatePlayerStats&lt;/code&gt;&lt;/strong&gt;. Irei explicar mais adiante detalhadamente cada uma.&lt;/p&gt;</description>
+      <guid>http://localhost:38113/blog/2024-02-19-assault-cube-hack-parte-2/</guid>
+      <description>&lt;h1 id=&#34;desenvolvimento-de-código&#34;&gt;Desenvolvimento de Código&lt;/h1&gt;&#xA;&lt;h2 id=&#34;criando-o-projeto&#34;&gt;&lt;strong&gt;Criando o Projeto&lt;/strong&gt;&lt;/h2&gt;&#xA;&lt;p&gt;Antes de começar o código vamos criar um projeto no Visual Studio, procure e selecione &lt;em&gt;Dynamic Link Library (DLL)&lt;/em&gt; para C++ como tipo de projeto como na imagem a seguir.&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;http://localhost:38113/images/ac-hack-7.png&#34; alt=&#34;Untitled&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Dê um nome ao projeto e escolha um local para salvá-lo e teremos uma estrutura inicial desta forma.&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;http://localhost:38113/images/ac-hack-8.png&#34; alt=&#34;Untitled&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;A estrutura do nosso código se dividirá em 3 funções, &lt;strong&gt;&lt;code&gt;DllMain&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;HackThread&lt;/code&gt;&lt;/strong&gt; e &lt;strong&gt;&lt;code&gt;UpdatePlayerStats&lt;/code&gt;&lt;/strong&gt;. Irei explicar mais adiante detalhadamente cada uma.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Entendendo o Papel do Kernel na Segurança de Jogos Online</title>
-      <link>http://localhost:1313/blog/2024-01-12-kernel-cheating/</link>
+      <link>http://localhost:38113/blog/2024-01-12-kernel-cheating/</link>
       <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-01-12-kernel-cheating/</guid>
-      <description>Uma abstração em alto nível do funcionamento de um cheat kernel level utilizando IOCTL</description>
+      <guid>http://localhost:38113/blog/2024-01-12-kernel-cheating/</guid>
+      <description>&lt;h1 id=&#34;o-que-é-o-kernel&#34;&gt;O que é o kernel&lt;/h1&gt;&#xA;&lt;p&gt;Quando falamos em sistemas operacionais, em geral pensamos em recursos visuais e interativos como suas aplicações e interface gráfica. No entanto, além de fornecer a interface com o usuário, o sistema também precisa se comunicar com a parte física do computador: o &lt;em&gt;hardware&lt;/em&gt;. Por conta disso, em geral definimos duas categorias de atuação de um sistema operacional:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;User level&lt;/li&gt;&#xA;&lt;li&gt;Kernel level&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;A primeira delas, que seria o nível de usuário ou espaço de usuário, consiste em todo o espaço reservado para executar aplicações comuns instaladas em um sistema, como o navegador, o editor de textos ou até mesmo binários em linha de comando. Quando esses programas são executados, o kernel aloca os recursos necessários para as mesmas, criando uma espécie de &lt;em&gt;sandbox&lt;/em&gt;, com uma quantidade qualquer de memória virtual.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Assault Cube Hack: Parte 1</title>
-      <link>http://localhost:1313/blog/2024-01-07-assault-cube-hack-parte-1/</link>
+      <link>http://localhost:38113/blog/2024-01-07-assault-cube-hack-parte-1/</link>
       <pubDate>Sun, 07 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-01-07-assault-cube-hack-parte-1/</guid>
-      <description>POC de hack interno para Assault Cube</description>
+      <guid>http://localhost:38113/blog/2024-01-07-assault-cube-hack-parte-1/</guid>
+      <description>&lt;h1 id=&#34;análise-do-jogo&#34;&gt;Análise do Jogo&lt;/h1&gt;&#xA;&lt;h2 id=&#34;introdução&#34;&gt;Introdução&lt;/h2&gt;&#xA;&lt;p&gt;Este material visa fornecer um olhar detalhado sobre o processo de desenvolvimento de uma POC, &lt;em&gt;proof of concept&lt;/em&gt;, para cheats internos usando o jogo Assault Cube, um jogo de tiro em primeira pessoa de código aberto, perfeito para o escopo desse material.&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;&lt;strong&gt;Nosso objetivo aqui não é encorajar o uso desonesto de cheats, mas sim explorar as complexidades e habilidades técnicas necessárias para criar e entender tais modificações.&lt;/strong&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

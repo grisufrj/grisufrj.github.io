@@ -1,59 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Intro on Blog do GRIS</title>
-    <link>http://localhost:1313/categories/intro/</link>
+    <link>http://localhost:38113/categories/intro/</link>
     <description>Recent content in Intro on Blog do GRIS</description>
-    <image>
-      <title>Blog do GRIS</title>
-      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
-    </image>
-    <generator>Hugo -- 0.139.4</generator>
+    <generator>Hugo</generator>
     <language>pt</language>
-    <lastBuildDate>Tue, 23 Dec 2014 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/categories/intro/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Syntax Highlighting Post</title>
-      <link>http://localhost:1313/blog/2013-08-16-code-highlighting-post/</link>
-      <pubDate>Tue, 23 Dec 2014 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2013-08-16-code-highlighting-post/</guid>
-      <description>Demo post displaying the various ways of highlighting code in Markdown.</description>
-    </item>
-    <item>
-      <title>Post with Large Feature Image and Text</title>
-      <link>http://localhost:1313/blog/2013-05-23-readability-feature-post/</link>
-      <pubDate>Sun, 30 Jun 2013 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2013-05-23-readability-feature-post/</guid>
-      <description>Custom written post descriptions are the way to go... if you&amp;#39;re not lazy.</description>
-    </item>
-    <item>
-      <title>A Post with Images</title>
-      <link>http://localhost:1313/blog/2013-05-22-sample-post-images/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2013-05-22-sample-post-images/</guid>
-      <description>Examples and code for displaying images in posts.</description>
-    </item>
-    <item>
-      <title>Sample Link Post</title>
-      <link>http://localhost:1313/blog/2013-08-12-sample-link-post/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2013-08-12-sample-link-post/</guid>
-      <description>Example and code for using link posts.</description>
-    </item>
+    <atom:link href="http://localhost:38113/categories/intro/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Sample Post</title>
-      <link>http://localhost:1313/blog/2011-03-10-sample-post/</link>
+      <link>http://localhost:38113/blog/2011-03-10-sample-post/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2011-03-10-sample-post/</guid>
-      <description>Just about everything you&amp;#39;ll need to style in the theme: headings, paragraphs, blockquotes, tables, code blocks, and more.</description>
-    </item>
-    <item>
-      <title>Testing Readability with a Bunch of Text</title>
-      <link>http://localhost:1313/blog/2012-05-22-readability-post/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2012-05-22-readability-post/</guid>
-      <description>A ton of text to test readability.</description>
+      <guid>http://localhost:38113/blog/2011-03-10-sample-post/</guid>
+      <description>&lt;p&gt;Below is just about everything you&amp;rsquo;ll need to style in the theme. Check the source code to see the many embedded elements within paragraphs.&lt;/p&gt;&#xA;&lt;h1 id=&#34;heading-1&#34;&gt;Heading 1&lt;/h1&gt;&#xA;&lt;h2 id=&#34;heading-2&#34;&gt;Heading 2&lt;/h2&gt;&#xA;&lt;h3 id=&#34;heading-3&#34;&gt;Heading 3&lt;/h3&gt;&#xA;&lt;h4 id=&#34;heading-4&#34;&gt;Heading 4&lt;/h4&gt;&#xA;&lt;h5 id=&#34;heading-5&#34;&gt;Heading 5&lt;/h5&gt;&#xA;&lt;h6 id=&#34;heading-6&#34;&gt;Heading 6&lt;/h6&gt;&#xA;&lt;h3 id=&#34;body-text&#34;&gt;Body text&lt;/h3&gt;&#xA;&lt;p&gt;Lorem ipsum dolor sit amet, test link adipiscing elit. &lt;strong&gt;This is strong&lt;/strong&gt;. Nullam dignissim convallis est. Quisque aliquam.&lt;/p&gt;&#xA;&lt;p&gt;![Smithsonian Image]({{ site.url }}/images/3953273590_704e3899d5_m.jpg)&#xA;{: .image-right}&lt;/p&gt;&#xA;&lt;p&gt;&lt;em&gt;This is emphasized&lt;/em&gt;. Donec faucibus. Nunc iaculis suscipit dui. 53 = 125. Water is H&lt;!-- raw HTML omitted --&gt;2&lt;!-- raw HTML omitted --&gt;O. Nam sit amet sem. Aliquam libero nisi, imperdiet at, tincidunt nec, gravida vehicula, nisl. The New York Times &lt;!-- raw HTML omitted --&gt;(That’s a citation)&lt;!-- raw HTML omitted --&gt;. &lt;!-- raw HTML omitted --&gt;Underline&lt;!-- raw HTML omitted --&gt;. Maecenas ornare tortor. Donec sed tellus eget sapien fringilla nonummy. Mauris a ante. Suspendisse quam sem, consequat at, commodo vitae, feugiat in, nunc. Morbi imperdiet augue quis tellus.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

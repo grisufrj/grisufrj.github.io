@@ -1,69 +1,40 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Criptografia on Blog do GRIS</title>
-    <link>http://localhost:1313/tags/criptografia/</link>
+    <link>http://localhost:38113/tags/criptografia/</link>
     <description>Recent content in Criptografia on Blog do GRIS</description>
-    <image>
-      <title>Blog do GRIS</title>
-      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
-    </image>
-    <generator>Hugo -- 0.139.4</generator>
+    <generator>Hugo</generator>
     <language>pt</language>
     <lastBuildDate>Fri, 09 Aug 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/criptografia/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:38113/tags/criptografia/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Explorando Criptografia de Reticulados</title>
-      <link>http://localhost:1313/blog/2024-09-08-criptografia-de-reticulados/</link>
+      <link>http://localhost:38113/blog/2024-09-08-criptografia-de-reticulados/</link>
       <pubDate>Fri, 09 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-09-08-criptografia-de-reticulados/</guid>
-      <description>Uma introdução a criptografias baseadas em reticulado</description>
+      <guid>http://localhost:38113/blog/2024-09-08-criptografia-de-reticulados/</guid>
+      <description>&lt;h2 id=&#34;1-goldreich-goldwasser-halevi-ggh&#34;&gt;1. Goldreich-Goldwasser-Halevi (GGH):&lt;/h2&gt;&#xA;&lt;p&gt;O GGH é um sistema de criptografia de chave pública baseado no Problema de Vetor mais Próximo (CVP) em reticulados. Desenvolvido por Oded Golreich, Shafi Goldwasser e Shai Halevi, seu artigo foi publicado com o título “Public-key cryptosystems from lattice reduction problems.”, onde foi explorado problemas difíceis em reticulados com aplicação em criptografia e possíveis ataques ao sistema proposto.&lt;/p&gt;&#xA;&lt;p&gt;Pouco depois, o pesquisador Phong Nguyen fez a criptoanálise do GGH, expondo que qualquer texto encriptado vaza informações da mensagem original e que uma cifra pode ser decriptada com a aproximação do Problema de Base Mais Curta, que é uma variação do Problema de Vetor mais Curto (SVP) para matrizes.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Introdução a provas de zero-knowledge - Parte 1</title>
-      <link>http://localhost:1313/blog/2024-07-15-intro-zero-knowledge/</link>
+      <link>http://localhost:38113/blog/2024-07-15-intro-zero-knowledge/</link>
       <pubDate>Mon, 15 Jul 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-07-15-intro-zero-knowledge/</guid>
-      <description>Parte 1 de um estudo sobre ZKPs. A parte 2 irá conter a implementação desses protocolos utilizando Circom.</description>
+      <guid>http://localhost:38113/blog/2024-07-15-intro-zero-knowledge/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Essa é a parte 1 de um estudo sobre ZKPs. A parte 2 irá conter a implementação desses protocolos utilizando Circom.&lt;/em&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;o-que-são-zero-knowledge-proofs&#34;&gt;O que são Zero-Knowledge Proofs?&lt;/h1&gt;&#xA;&lt;p&gt;ZK Proofs (ou em português algo como &amp;ldquo;provas de conhecimento zero&amp;rdquo;) são o que o próprio nome diz: provas de algo ou alguma coisa que não demonstram nenhum &amp;ldquo;conhecimento&amp;rdquo; adicional ao verificador.&lt;/p&gt;&#xA;&lt;h3 id=&#34;um-exemplo&#34;&gt;Um exemplo&lt;/h3&gt;&#xA;&lt;p&gt;Um exemplo bem simples pode ser visto no jogo da caverna:&lt;/p&gt;</description>
     </item>
     <item>
       <title>Writeup de alguns challenges de crypto do UTCTF 2024</title>
-      <link>http://localhost:1313/blog/2024-04-02-writeup-crypto-utctf2024/</link>
+      <link>http://localhost:38113/blog/2024-04-02-writeup-crypto-utctf2024/</link>
       <pubDate>Tue, 02 Apr 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-04-02-writeup-crypto-utctf2024/</guid>
-      <description>&lt;h1 id=&#34;rsa-256&#34;&gt;RSA-256&lt;/h1&gt;
-&lt;h3 id=&#34;descrição&#34;&gt;Descrição:&lt;/h3&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Based on the military-grade encryption offered by AES-256, RSA-256 will usher in a new era of cutting-edge security... or at least, better security than RSA-128.
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Código do chall:&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
-&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
-&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
-&lt;td class=&#34;lntd&#34;&gt;
-&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;N&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;77483692467084448965814418730866278616923517800664484047176015901835675610073&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;65537&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;11711610210897103123119971051169511511195828365955053549510511595100101100125&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/div&gt;
-&lt;/div&gt;&lt;p&gt;Esse foi um challenge bem simples de RSA. Pelo nome do chall e dando uma olhada no tamanho do N, a gente consegue ver que o N não é tão grande (justamente 256 bits!)
-Você pode conferir isso da seguinte forma:&lt;/p&gt;</description>
+      <guid>http://localhost:38113/blog/2024-04-02-writeup-crypto-utctf2024/</guid>
+      <description>&lt;h1 id=&#34;rsa-256&#34;&gt;RSA-256&lt;/h1&gt;&#xA;&lt;h3 id=&#34;descrição&#34;&gt;Descrição:&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;&#xA;&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1&#xA;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&#xA;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Based on the military-grade encryption offered by AES-256, RSA-256 will usher in a new era of cutting-edge security... or at least, better security than RSA-128.&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&#xA;&lt;/div&gt;&#xA;&lt;/div&gt;&lt;p&gt;Código do chall:&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;&#xA;&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1&#xA;&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2&#xA;&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3&#xA;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&#xA;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;N&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;77483692467084448965814418730866278616923517800664484047176015901835675610073&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;65537&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;11711610210897103123119971051169511511195828365955053549510511595100101100125&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&#xA;&lt;/div&gt;&#xA;&lt;/div&gt;&lt;p&gt;Esse foi um challenge bem simples de RSA. Pelo nome do chall e dando uma olhada no tamanho do N, a gente consegue ver que o N não é tão grande (justamente 256 bits!)&#xA;Você pode conferir isso da seguinte forma:&lt;/p&gt;</description>
     </item>
     <item>
       <title>Desvendando a Enigma</title>
-      <link>http://localhost:1313/blog/2024-01-10-enigma/</link>
+      <link>http://localhost:38113/blog/2024-01-10-enigma/</link>
       <pubDate>Wed, 10 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-01-10-enigma/</guid>
-      <description>Um estudo sobre a máquina Enigma</description>
+      <guid>http://localhost:38113/blog/2024-01-10-enigma/</guid>
+      <description>&lt;h2 id=&#34;introdução---o-que-é-a-enigma&#34;&gt;Introdução - O que é a Enigma?&lt;/h2&gt;&#xA;&lt;p&gt;Com a chegada da Segunda Guerra Mundial, os países envolvidos viram a necessidade de implementar métodos mais seguros de criptografia para que as comunicações entre rádios e outras comunicações militares não pudessem ser facilmente interceptadas e decifradas, e a Enigma foi a máquina eletromecânica de criptografia adotada pela Alemanha na Segunda Guerra Mundial.&lt;/p&gt;&#xA;&lt;p&gt;Ao longo da Guerra, muitos pesquisadores aliados estiveram envolvidos na solução da Enigma, ou melhor, nas técnicas de decriptação das mensagens intereceptadas. Suas pesquisas se baseavam em ‘KPA’ - “Known-plaintext attack”, provalmente porque as mensagens interceptadas se limitavam a somente 200 caracteres, o que dificultaria um ataque “ciphertext only”.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

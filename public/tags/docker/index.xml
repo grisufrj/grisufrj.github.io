@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Docker on Blog do GRIS</title>
-    <link>http://localhost:1313/tags/docker/</link>
+    <link>http://localhost:38113/tags/docker/</link>
     <description>Recent content in Docker on Blog do GRIS</description>
-    <image>
-      <title>Blog do GRIS</title>
-      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
-    </image>
-    <generator>Hugo -- 0.139.4</generator>
+    <generator>Hugo</generator>
     <language>pt</language>
     <lastBuildDate>Sun, 08 Oct 2017 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/docker/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:38113/tags/docker/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Resumo sobre as características e o funcionamento do Docker - Parte I</title>
-      <link>http://localhost:1313/blog/2017-10-08-resumo-sobre-o-funcionamento-do-docker-parte-i/</link>
+      <link>http://localhost:38113/blog/2017-10-08-resumo-sobre-o-funcionamento-do-docker-parte-i/</link>
       <pubDate>Sun, 08 Oct 2017 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2017-10-08-resumo-sobre-o-funcionamento-do-docker-parte-i/</guid>
-      <description>Uma introdução ao funcionamento do Docker, sem referências externas.</description>
+      <guid>http://localhost:38113/blog/2017-10-08-resumo-sobre-o-funcionamento-do-docker-parte-i/</guid>
+      <description>&lt;p&gt;O &lt;a href=&#34;https://www.docker.com/&#34;&gt;docker&lt;/a&gt; é um meio termo entre uma máquina virtual (= que roda um sistema guest (convidado) dentro de um sistema host (hospedeiro)) e um sistema rodando simultaneamente e concorrentemente com outro. Em primeiro lugar, ele é bem mais leve e mais rápido do que uma máquina virtual completa, pois reutiliza vários sub-sistemas do sistema host (diferentemente de uma máquina virtual, que tipicamente &amp;ldquo;emula&amp;rdquo; todos os aspectos de hardware e de software do guest), tal como o kernel. Em segundo lugar, assim como uma máquina virtual, tudo o que roda no docker está, a princípio (e por padrão) isolado do sistema host. Isso é feito por debaixo dos panos através de tecnologias existentes no kernel do Linux tais como cgroups e namespaces; uma consequência disso é que só é possível rodar o docker em sistemas relativamente recentes (por exemplo, qualquer Ubuntu 14.04 para cima já está de bom tamanho).&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

@@ -82,7 +82,7 @@ params:
     imageTitle: GRIS
     buttons:
       - name: Posts
-        url: "/archives"
+        url: "/blogs"
       - name: Tags
         url: tags
 
@@ -136,10 +136,6 @@ menu:
       name: Tags
       url: /tags/
       weight: 20
-    - identifier: youtube
-      name: Youtube
-      url: https://www.youtube.com/@grisufrj
-      weight: 30
 # Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
 pygmentsUseClasses: true
 markup:

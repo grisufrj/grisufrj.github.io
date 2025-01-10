@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>ZK on Blog do GRIS</title>
-    <link>http://localhost:1313/tags/zk/</link>
+    <link>http://localhost:38113/tags/zk/</link>
     <description>Recent content in ZK on Blog do GRIS</description>
-    <image>
-      <title>Blog do GRIS</title>
-      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
-    </image>
-    <generator>Hugo -- 0.139.4</generator>
+    <generator>Hugo</generator>
     <language>pt</language>
     <lastBuildDate>Mon, 15 Jul 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/zk/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:38113/tags/zk/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Introdução a provas de zero-knowledge - Parte 1</title>
-      <link>http://localhost:1313/blog/2024-07-15-intro-zero-knowledge/</link>
+      <link>http://localhost:38113/blog/2024-07-15-intro-zero-knowledge/</link>
       <pubDate>Mon, 15 Jul 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-07-15-intro-zero-knowledge/</guid>
-      <description>Parte 1 de um estudo sobre ZKPs. A parte 2 irá conter a implementação desses protocolos utilizando Circom.</description>
+      <guid>http://localhost:38113/blog/2024-07-15-intro-zero-knowledge/</guid>
+      <description>&lt;p&gt;&lt;em&gt;Essa é a parte 1 de um estudo sobre ZKPs. A parte 2 irá conter a implementação desses protocolos utilizando Circom.&lt;/em&gt;&lt;/p&gt;&#xA;&lt;h1 id=&#34;o-que-são-zero-knowledge-proofs&#34;&gt;O que são Zero-Knowledge Proofs?&lt;/h1&gt;&#xA;&lt;p&gt;ZK Proofs (ou em português algo como &amp;ldquo;provas de conhecimento zero&amp;rdquo;) são o que o próprio nome diz: provas de algo ou alguma coisa que não demonstram nenhum &amp;ldquo;conhecimento&amp;rdquo; adicional ao verificador.&lt;/p&gt;&#xA;&lt;h3 id=&#34;um-exemplo&#34;&gt;Um exemplo&lt;/h3&gt;&#xA;&lt;p&gt;Um exemplo bem simples pode ser visto no jogo da caverna:&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

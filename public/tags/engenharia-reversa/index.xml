@@ -1,45 +1,40 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Engenharia Reversa on Blog do GRIS</title>
-    <link>http://localhost:1313/tags/engenharia-reversa/</link>
+    <link>http://localhost:38113/tags/engenharia-reversa/</link>
     <description>Recent content in Engenharia Reversa on Blog do GRIS</description>
-    <image>
-      <title>Blog do GRIS</title>
-      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
-    </image>
-    <generator>Hugo -- 0.139.4</generator>
+    <generator>Hugo</generator>
     <language>pt</language>
     <lastBuildDate>Mon, 12 Aug 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/engenharia-reversa/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:38113/tags/engenharia-reversa/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Tutorial de Game Hacking utilizando Cheat Engine</title>
-      <link>http://localhost:1313/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</link>
+      <link>http://localhost:38113/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</link>
       <pubDate>Mon, 12 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</guid>
-      <description>Aprender como utilizar o Cheat Engine para encontrar e manipular endereços de memória de interesse, injeção/remoção de código para mudar o funcionamento do jogo</description>
+      <guid>http://localhost:38113/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</guid>
+      <description>&lt;p&gt;Abordaremos neste artigo sobre os princípios fundamentais sobre Game Hacking, ensinando como utilizar o Cheat Engine, um programa clássico para mudar aspectos de um jogo a seu favor.&lt;/p&gt;&#xA;&lt;h3 id=&#34;sobre-processos&#34;&gt;Sobre Processos&lt;/h3&gt;&#xA;&lt;p&gt;Antes de tudo, é bom deixar bem definido sobre o que é um jogo para o computador. Ao abrirmos qualquer programa executável, o sistema operacional cria um novo processo para rodar este programa. Um &lt;strong&gt;Processo&lt;/strong&gt; é, portanto, uma tarefa em execução no computador. Podem ter múltiplos processos rodando ao mesmo tempo, sendo em janelas ou em plano de fundo, e pode se criar vários processos de um mesmo programa.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Modern Binary Exploitation: Laboratório de Engenharia Reversa</title>
-      <link>http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/</link>
+      <link>http://localhost:38113/blog/2024-08-11-writeup-lab01-rev-mbe/</link>
       <pubDate>Sun, 11 Aug 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/</guid>
-      <description>Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) </description>
+      <guid>http://localhost:38113/blog/2024-08-11-writeup-lab01-rev-mbe/</guid>
+      <description>&lt;p&gt;Olá! Nesse post, resolveremos o primeiro laboratório do &lt;a href=&#34;https://github.com/RPISEC/MBE&#34;&gt;Modern Binary Exploitation&lt;/a&gt; da &lt;a href=&#34;https://rpis.ec/&#34;&gt;RPISEC&lt;/a&gt; que aborda a &lt;strong&gt;Engenharia Reversa&lt;/strong&gt;. Caso tenha interesse no assunto, temos diversos posts no blog que abordam o tema, basta acessar a tag!&lt;/p&gt;&#xA;&lt;h1 id=&#34;laboratório-01&#34;&gt;Laboratório 01&lt;/h1&gt;&#xA;&lt;p&gt;Todos os laboratórios do curso residem dentro de uma máquina virtual disponibilizada no material através de uma imagem de disco para Ubuntu 14.04, que possui toda a configuração necessária para o Wargame. Os desafios são separados por laboratório e dificuldade, sendo C o mais fácil e A o mais difícil. Além disso, você acessa o challenge mediante ao usuário do respectivo desafio. Portanto, começando no C, o seu objetivo é exploitar o desafio para spawnar o terminal logado no usuário da&#xA;próxima challenge e pegar a senha dele (que está em &lt;code&gt;/home/labXX/.pass&lt;/code&gt;).&lt;/p&gt;</description>
     </item>
     <item>
       <title>Write Up do Desafio Try me Out</title>
-      <link>http://localhost:1313/blog/2024-01-09-write-up-try-me-out/</link>
+      <link>http://localhost:38113/blog/2024-01-09-write-up-try-me-out/</link>
       <pubDate>Tue, 09 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2024-01-09-write-up-try-me-out/</guid>
-      <description>Solução de um dos desafios incluidos no CTF da H2HC de 2023.</description>
+      <guid>http://localhost:38113/blog/2024-01-09-write-up-try-me-out/</guid>
+      <description>&lt;p&gt;Este foi um dos desafios inclusos no CTF da H2HC 2023. Para resolver esse desafio de forma mais elegante, é necessário observar os procedimentos matemáticos realizados e perceber suas relações com um algoritmo de decomposição de matrizes bem conhecido.&lt;/p&gt;&#xA;&lt;h3 id=&#34;entendendo-o-código&#34;&gt;Entendendo o código&lt;/h3&gt;&#xA;&lt;p&gt;A principal função deste programa é a função verify, que recebe um array de 24 caracteres. Isso dá o tamanho da flag. As variáveis mat1 e mat2 são arrays de arrays, o que é uma notação conhecida para matrizes. Além disso, mat2 é a transposta de mat1. A partir dessas variáveis, são encontradas outras duas, AAT e ATA, também matrizes, e surgem ma multiplicação de mat1 por mat2 e de mat2 por mat1, respectivamente. A função MatMul faz excluisvamente a multiplicação entre matrizes.&lt;/p&gt;</description>
     </item>
     <item>
       <title>CTF series piloto -- IO netgarage</title>
-      <link>http://localhost:1313/blog/2016-11-22-ctfseries-piloto/</link>
+      <link>http://localhost:38113/blog/2016-11-22-ctfseries-piloto/</link>
       <pubDate>Tue, 22 Nov 2016 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/2016-11-22-ctfseries-piloto/</guid>
-      <description>Episódio piloto da série de guias para CTFs/wargames</description>
+      <guid>http://localhost:38113/blog/2016-11-22-ctfseries-piloto/</guid>
+      <description>&lt;p&gt;h3ll0, fr13nd.&#xA;Esse post dá início a série voltada para guias de CTFs e wargames que foram resolvidos por membros do GRIS.&lt;/p&gt;&#xA;&lt;h3 id=&#34;mas-o-que-é-um-ctf-ou-wargame&#34;&gt;Mas o que é um CTF ou wargame?&lt;/h3&gt;&#xA;&lt;p&gt;Os capture the flags (CTFs) e wargames são ótimas formas de testar conhecimento na área da segurança. Nesses desafios temos aplicações projetadas com vulnerabilidades disponíveis para que a comunidade coloque em prática aquilo que foi estudado.&lt;/p&gt;&#xA;&lt;p&gt;O intuito das postagens sobre esses desafios não é fornecer respostas, mas guiar o leitor através da linha de raciocínio utilizada para resolvê-los . Estamos fazendo isso pois é difícil encontrar esse tipo de material em português e, além disso, é uma forma de fornecer a comunidade um pouco daquilo que aprendemos no GRIS.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

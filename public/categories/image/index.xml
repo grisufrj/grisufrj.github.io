@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Image on Blog do GRIS</title>
     <link>http://localhost:1313/categories/image/</link>
     <description>Recent content in Image on Blog do GRIS</description>
-    <image>
-      <title>Blog do GRIS</title>
-      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
-      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
-    </image>
-    <generator>Hugo -- 0.139.4</generator>
+    <generator>Hugo</generator>
     <language>pt</language>
     <lastBuildDate>Sat, 26 Oct 2013 00:00:00 +0000</lastBuildDate>
     <atom:link href="http://localhost:1313/categories/image/index.xml" rel="self" type="application/rss+xml" />
@@ -18,7 +13,7 @@
       <link>http://localhost:1313/blog/2013-10-26-background-image/</link>
       <pubDate>Sat, 26 Oct 2013 00:00:00 +0000</pubDate>
       <guid>http://localhost:1313/blog/2013-10-26-background-image/</guid>
-      <description>Sample post with a background image CSS override.</description>
+      <description>&lt;p&gt;Here be a sample post with a custom background image. To utilize this &amp;ldquo;feature&amp;rdquo; just add the following YAML to a post&amp;rsquo;s front matter.&lt;/p&gt;&#xA;&lt;p&gt;{% highlight yaml %}&#xA;image:&#xA;background: filename.png&#xA;{% endhighlight %}&lt;/p&gt;&#xA;&lt;p&gt;This little bit of YAML makes the assumption that your background image asset is in the &lt;code&gt;/images&lt;/code&gt; folder. If you place it somewhere else or are hotlinking from the web, just include the full http(s):// URL. Either way you should have a background image that is tiled.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
