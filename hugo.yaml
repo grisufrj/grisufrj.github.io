@@ -73,8 +73,8 @@ params:
     safari_pinned_tab: "<link / abs url>"
 
   label:
-    text: "Home"
-    icon: /apple-touch-icon.png
+    text: "GRIS"
+    icon: "images/gris-logo-2020's_black.png"
     iconHeight: 35
 
   # profile-mode
