@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Easy on Blog do GRIS</title>
+    <link>http://localhost:1313/categories/easy/</link>
+    <description>Recent content in Easy on Blog do GRIS</description>
+    <image>
+      <title>Blog do GRIS</title>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- 0.139.4</generator>
+    <language>pt</language>
+    <lastBuildDate>Mon, 12 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/easy/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Tutorial de Game Hacking utilizando Cheat Engine</title>
+      <link>http://localhost:1313/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</link>
+      <pubDate>Mon, 12 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-11-tutorial-game-hacking-cheat-engine/</guid>
+      <description>Aprender como utilizar o Cheat Engine para encontrar e manipular endereços de memória de interesse, injeção/remoção de código para mudar o funcionamento do jogo</description>
+    </item>
+    <item>
+      <title>Exploração de vulnerabilidades em ambientes virtuais</title>
+      <link>http://localhost:1313/blog/2024-08-11-exploracao-metasploitable2/</link>
+      <pubDate>Sun, 11 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-11-exploracao-metasploitable2/</guid>
+      <description>Exploração de vulnerabilidades da máquina Metasploitable 2</description>
+    </item>
+    <item>
+      <title>Modern Binary Exploitation: Laboratório de Engenharia Reversa</title>
+      <link>http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/</link>
+      <pubDate>Sun, 11 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/</guid>
+      <description>Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) </description>
+    </item>
+    <item>
+      <title>Uma introdução prática a Exploração de Binários com Engenharia Reversa: writeUp da sala pwn101 THM</title>
+      <link>http://localhost:1313/blog/2024-08-11-pwn101-thm-writeup/</link>
+      <pubDate>Sun, 11 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-11-pwn101-thm-writeup/</guid>
+      <description>Nesse relatório tento usar a sala [pwn101](https://tryhackme.com/r/room/pwn101) para estimular o aprendizado de Engenharia Reversa e Exploração de Binários a partir de programas vulneráveis.</description>
+    </item>
+    <item>
+      <title>Explorando Criptografia de Reticulados</title>
+      <link>http://localhost:1313/blog/2024-09-08-criptografia-de-reticulados/</link>
+      <pubDate>Fri, 09 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-09-08-criptografia-de-reticulados/</guid>
+      <description>Uma introdução a criptografias baseadas em reticulado</description>
+    </item>
+    <item>
+      <title>Forense Digital: Aquisição de logs e memória volátil/não volátil</title>
+      <link>http://localhost:1313/blog/2024-08-09-aquisi%C3%A7%C3%A3o-de-imagens-forense/</link>
+      <pubDate>Fri, 09 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-09-aquisi%C3%A7%C3%A3o-de-imagens-forense/</guid>
+      <description>Resumo de ferramentas para forense digital, como logs e aquisição de imagem</description>
+    </item>
+    <item>
+      <title>Resolvendo os desafios iniciais de pwn do picoCTF</title>
+      <link>http://localhost:1313/blog/2024-08-02-picogym-pwn-easy/</link>
+      <pubDate>Fri, 02 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-02-picogym-pwn-easy/</guid>
+      <description>Esse é um writeup dos 15 desafios iniciais de pwning do picoGym. Você pode encontrar esses desafios em [picoGym](https://play.picoctf.org/practice). Há também um desafio extra no final do post de um outro CTF :)</description>
+    </item>
+    <item>
+      <title>Introdução a provas de zero-knowledge - Parte 1</title>
+      <link>http://localhost:1313/blog/2024-07-15-intro-zero-knowledge/</link>
+      <pubDate>Mon, 15 Jul 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-07-15-intro-zero-knowledge/</guid>
+      <description>Parte 1 de um estudo sobre ZKPs. A parte 2 irá conter a implementação desses protocolos utilizando Circom.</description>
+    </item>
+    <item>
+      <title>Guia de Segurança Ofensiva</title>
+      <link>http://localhost:1313/blog/2024-04-02-owasp-top10/</link>
+      <pubDate>Sun, 05 May 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-04-02-owasp-top10/</guid>
+      <description>Owasp top 10</description>
+    </item>
+    <item>
+      <title>Writeup de alguns challenges de crypto do UTCTF 2024</title>
+      <link>http://localhost:1313/blog/2024-04-02-writeup-crypto-utctf2024/</link>
+      <pubDate>Tue, 02 Apr 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-04-02-writeup-crypto-utctf2024/</guid>
+      <description>&lt;h1 id=&#34;rsa-256&#34;&gt;RSA-256&lt;/h1&gt;
+&lt;h3 id=&#34;descrição&#34;&gt;Descrição:&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Based on the military-grade encryption offered by AES-256, RSA-256 will usher in a new era of cutting-edge security... or at least, better security than RSA-128.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Código do chall:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;N&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;77483692467084448965814418730866278616923517800664484047176015901835675610073&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;65537&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;11711610210897103123119971051169511511195828365955053549510511595100101100125&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Esse foi um challenge bem simples de RSA. Pelo nome do chall e dando uma olhada no tamanho do N, a gente consegue ver que o N não é tão grande (justamente 256 bits!)
+Você pode conferir isso da seguinte forma:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Assault Cube Hack - Parte 2</title>
+      <link>http://localhost:1313/blog/2024-02-19-assault-cube-hack-parte-2/</link>
+      <pubDate>Mon, 19 Feb 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-02-19-assault-cube-hack-parte-2/</guid>
+      <description>&lt;h1 id=&#34;desenvolvimento-de-código&#34;&gt;Desenvolvimento de Código&lt;/h1&gt;
+&lt;h2 id=&#34;criando-o-projeto&#34;&gt;&lt;strong&gt;Criando o Projeto&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;Antes de começar o código vamos criar um projeto no Visual Studio, procure e selecione &lt;em&gt;Dynamic Link Library (DLL)&lt;/em&gt; para C++ como tipo de projeto como na imagem a seguir.&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;Untitled&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/ac-hack-7.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Dê um nome ao projeto e escolha um local para salvá-lo e teremos uma estrutura inicial desta forma.&lt;/p&gt;
+&lt;p&gt;&lt;img alt=&#34;Untitled&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/images/ac-hack-8.png&#34;&gt;&lt;/p&gt;
+&lt;p&gt;A estrutura do nosso código se dividirá em 3 funções, &lt;strong&gt;&lt;code&gt;DllMain&lt;/code&gt;&lt;/strong&gt;, &lt;strong&gt;&lt;code&gt;HackThread&lt;/code&gt;&lt;/strong&gt; e &lt;strong&gt;&lt;code&gt;UpdatePlayerStats&lt;/code&gt;&lt;/strong&gt;. Irei explicar mais adiante detalhadamente cada uma.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Softphones e telefonia pela Internet</title>
+      <link>http://localhost:1313/blog/2024-01-13-voip-calls/</link>
+      <pubDate>Sat, 13 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-13-voip-calls/</guid>
+      <description>Discussão de alguns protocolos da camada TCP/IP e configuração de um softphone usando VoIP.</description>
+    </item>
+    <item>
+      <title>Entendendo o Papel do Kernel na Segurança de Jogos Online</title>
+      <link>http://localhost:1313/blog/2024-01-12-kernel-cheating/</link>
+      <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-12-kernel-cheating/</guid>
+      <description>Uma abstração em alto nível do funcionamento de um cheat kernel level utilizando IOCTL</description>
+    </item>
+    <item>
+      <title>pwn 101: Desafios de Introdução a Buffer Overflow</title>
+      <link>http://localhost:1313/blog/2024-01-12-pwn-101-desafios-de-introdu%C3%A7%C3%A3o-a-buffer-overflow-2944951e3ef04485a957cea3da0e3a4a/</link>
+      <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-12-pwn-101-desafios-de-introdu%C3%A7%C3%A3o-a-buffer-overflow-2944951e3ef04485a957cea3da0e3a4a/</guid>
+      <description>Introdução a exploit de binários</description>
+    </item>
+    <item>
+      <title>IPTables: Análise detalhada sobre o IPTables</title>
+      <link>http://localhost:1313/blog/2024-01-08-analysis_iptables/</link>
+      <pubDate>Mon, 08 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-08-analysis_iptables/</guid>
+      <description>Conceito, Funcionamento e Importância do IPTables</description>
+    </item>
+    <item>
+      <title>Redes: IDS e IPS</title>
+      <link>http://localhost:1313/blog/2024-01-08-redes-ips-ids/</link>
+      <pubDate>Mon, 08 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-08-redes-ips-ids/</guid>
+      <description>Principais diferenças entre sistemas de prevenção e detecção de intrusões</description>
+    </item>
+    <item>
+      <title>Vulnerabilidades do Windows Subsystem for Linux (WSL)</title>
+      <link>http://localhost:1313/blog/2024-08-06-vulnerabilities_wsl/</link>
+      <pubDate>Mon, 08 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-06-vulnerabilities_wsl/</guid>
+      <description>Análise de vulnerabilidades do Windows Subsystem for Linux (WSL)</description>
+    </item>
+    <item>
+      <title>Assault Cube Hack: Parte 1</title>
+      <link>http://localhost:1313/blog/2024-01-07-assault-cube-hack-parte-1/</link>
+      <pubDate>Sun, 07 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-07-assault-cube-hack-parte-1/</guid>
+      <description>POC de hack interno para Assault Cube</description>
+    </item>
+    <item>
+      <title>WPA-2 PSK: Capturando conexões e quebra de hashes</title>
+      <link>http://localhost:1313/blog/2024-01-06-wpa2-psk/</link>
+      <pubDate>Sat, 06 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-06-wpa2-psk/</guid>
+      <description>Capturando handshake e quebra de hashes</description>
+    </item>
+    <item>
+      <title>Guia Básico do Burp Suite: Explorando requisições com o Burp</title>
+      <link>http://localhost:1313/blog/2023-12-24-guia-burp/</link>
+      <pubDate>Sun, 24 Dec 2023 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2023-12-24-guia-burp/</guid>
+      <description>Analisando e modificando requisições com o Burp</description>
+    </item>
+    <item>
+      <title>ReDoS</title>
+      <link>http://localhost:1313/blog/2018-06-03-redos/</link>
+      <pubDate>Sun, 03 Jun 2018 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2018-06-03-redos/</guid>
+      <description>Denial-of-Service usando expressões regulares!</description>
+    </item>
+    <item>
+      <title>Keyloggers</title>
+      <link>http://localhost:1313/blog/2018-05-23-keyloggers/</link>
+      <pubDate>Wed, 23 May 2018 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2018-05-23-keyloggers/</guid>
+      <description>O que são, para que servem, e como fazer um?</description>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Pwn on Blog do GRIS</title>
+    <link>http://localhost:1313/tags/pwn/</link>
+    <description>Recent content in Pwn on Blog do GRIS</description>
+    <image>
+      <title>Blog do GRIS</title>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- 0.139.4</generator>
+    <language>pt</language>
+    <lastBuildDate>Sun, 11 Aug 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/pwn/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Modern Binary Exploitation: Laboratório de Engenharia Reversa</title>
+      <link>http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/</link>
+      <pubDate>Sun, 11 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/</guid>
+      <description>Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) </description>
+    </item>
+    <item>
+      <title>Resolvendo os desafios iniciais de pwn do picoCTF</title>
+      <link>http://localhost:1313/blog/2024-08-02-picogym-pwn-easy/</link>
+      <pubDate>Fri, 02 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-02-picogym-pwn-easy/</guid>
+      <description>Esse é um writeup dos 15 desafios iniciais de pwning do picoGym. Você pode encontrar esses desafios em [picoGym](https://play.picoctf.org/practice). Há também um desafio extra no final do post de um outro CTF :)</description>
+    </item>
+    <item>
+      <title>pwn 101: Desafios de Introdução a Buffer Overflow</title>
+      <link>http://localhost:1313/blog/2024-01-12-pwn-101-desafios-de-introdu%C3%A7%C3%A3o-a-buffer-overflow-2944951e3ef04485a957cea3da0e3a4a/</link>
+      <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-12-pwn-101-desafios-de-introdu%C3%A7%C3%A3o-a-buffer-overflow-2944951e3ef04485a957cea3da0e3a4a/</guid>
+      <description>Introdução a exploit de binários</description>
+    </item>
+  </channel>
+</rss>

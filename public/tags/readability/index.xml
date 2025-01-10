@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Readability on Blog do GRIS</title>
+    <link>http://localhost:1313/tags/readability/</link>
+    <description>Recent content in Readability on Blog do GRIS</description>
+    <image>
+      <title>Blog do GRIS</title>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- 0.139.4</generator>
+    <language>pt</language>
+    <lastBuildDate>Sun, 30 Jun 2013 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/readability/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Post with Large Feature Image and Text</title>
+      <link>http://localhost:1313/blog/2013-05-23-readability-feature-post/</link>
+      <pubDate>Sun, 30 Jun 2013 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2013-05-23-readability-feature-post/</guid>
+      <description>Custom written post descriptions are the way to go... if you&amp;#39;re not lazy.</description>
+    </item>
+    <item>
+      <title>Testing Readability with a Bunch of Text</title>
+      <link>http://localhost:1313/blog/2012-05-22-readability-post/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2012-05-22-readability-post/</guid>
+      <description>A ton of text to test readability.</description>
+    </item>
+  </channel>
+</rss>

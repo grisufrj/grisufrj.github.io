@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Ctf on Blog do GRIS</title>
+    <link>http://localhost:1313/tags/ctf/</link>
+    <description>Recent content in Ctf on Blog do GRIS</description>
+    <image>
+      <title>Blog do GRIS</title>
+      <url>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- 0.139.4</generator>
+    <language>pt</language>
+    <lastBuildDate>Fri, 02 Aug 2024 00:00:00 -0300</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/ctf/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Resolvendo os desafios iniciais de pwn do picoCTF</title>
+      <link>http://localhost:1313/blog/2024-08-02-picogym-pwn-easy/</link>
+      <pubDate>Fri, 02 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-08-02-picogym-pwn-easy/</guid>
+      <description>Esse é um writeup dos 15 desafios iniciais de pwning do picoGym. Você pode encontrar esses desafios em [picoGym](https://play.picoctf.org/practice). Há também um desafio extra no final do post de um outro CTF :)</description>
+    </item>
+    <item>
+      <title>Writeup de alguns challenges de crypto do UTCTF 2024</title>
+      <link>http://localhost:1313/blog/2024-04-02-writeup-crypto-utctf2024/</link>
+      <pubDate>Tue, 02 Apr 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-04-02-writeup-crypto-utctf2024/</guid>
+      <description>&lt;h1 id=&#34;rsa-256&#34;&gt;RSA-256&lt;/h1&gt;
+&lt;h3 id=&#34;descrição&#34;&gt;Descrição:&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Based on the military-grade encryption offered by AES-256, RSA-256 will usher in a new era of cutting-edge security... or at least, better security than RSA-128.
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Código do chall:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-python&#34; data-lang=&#34;python&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;N&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;77483692467084448965814418730866278616923517800664484047176015901835675610073&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;e&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;65537&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;c&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;11711610210897103123119971051169511511195828365955053549510511595100101100125&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Esse foi um challenge bem simples de RSA. Pelo nome do chall e dando uma olhada no tamanho do N, a gente consegue ver que o N não é tão grande (justamente 256 bits!)
+Você pode conferir isso da seguinte forma:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>pwn 101: Desafios de Introdução a Buffer Overflow</title>
+      <link>http://localhost:1313/blog/2024-01-12-pwn-101-desafios-de-introdu%C3%A7%C3%A3o-a-buffer-overflow-2944951e3ef04485a957cea3da0e3a4a/</link>
+      <pubDate>Fri, 12 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-12-pwn-101-desafios-de-introdu%C3%A7%C3%A3o-a-buffer-overflow-2944951e3ef04485a957cea3da0e3a4a/</guid>
+      <description>Introdução a exploit de binários</description>
+    </item>
+    <item>
+      <title>Write Up do Desafio Try me Out</title>
+      <link>http://localhost:1313/blog/2024-01-09-write-up-try-me-out/</link>
+      <pubDate>Tue, 09 Jan 2024 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2024-01-09-write-up-try-me-out/</guid>
+      <description>Solução de um dos desafios incluidos no CTF da H2HC de 2023.</description>
+    </item>
+    <item>
+      <title>CTF series piloto -- IO netgarage</title>
+      <link>http://localhost:1313/blog/2016-11-22-ctfseries-piloto/</link>
+      <pubDate>Tue, 22 Nov 2016 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/2016-11-22-ctfseries-piloto/</guid>
+      <description>Episódio piloto da série de guias para CTFs/wargames</description>
+    </item>
+  </channel>
+</rss>

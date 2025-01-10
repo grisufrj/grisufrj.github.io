@@ -1,0 +1,1173 @@
+<!doctype html><html lang=en dir=auto><head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>Modern Binary Exploitation: Laboratório de Engenharia Reversa | Blog do GRIS</title>
+<meta name=keywords content="Pwn,Engenharia Reversa"><meta name=description content="Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) "><meta name=author content="kitagawa"><link rel=canonical href=http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/><meta name=google-site-verification content="G-YWN8S4BKK0"><link crossorigin=anonymous href=/assets/css/stylesheet.45e028aa8ce0961349adf411b013ee39406be2c0bc80d4ea3fc04555f7f4611a.css integrity="sha256-ReAoqozglhNJrfQRsBPuOUBr4sC8gNTqP8BFVff0YRo=" rel="preload stylesheet" as=style><link rel=icon href=http://localhost:1313/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=16x16 href=http://localhost:1313/%3Clink%20/%20abs%20url%3E><link rel=icon type=image/png sizes=32x32 href=http://localhost:1313/%3Clink%20/%20abs%20url%3E><link rel=apple-touch-icon href=http://localhost:1313/%3Clink%20/%20abs%20url%3E><link rel=mask-icon href=http://localhost:1313/%3Clink%20/%20abs%20url%3E><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><link rel=alternate hreflang=en href=http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--code-block-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css integrity=sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ crossorigin=anonymous><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.js integrity=sha384-VQ8d8WVFw0yHhCk5E8I86oOhv48xLpnDZx5T9GogA/Y84DcCKWXDmSDfn13bzFZY crossorigin=anonymous></script><script defer src=https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/contrib/auto-render.min.js integrity=sha384-+XBljXPPiv+OzfbB3cVmLHf4hdUFHlWNZN5spNQ7rmHTXpd7WvJum6fIACpNNfIR crossorigin=anonymous onload=renderMathInElement(document.body)></script>>
+<script>document.addEventListener("DOMContentLoaded",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:!0},{left:"$",right:"$",display:!1}]})})</script><meta property="og:url" content="http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/"><meta property="og:site_name" content="Blog do GRIS"><meta property="og:title" content="Modern Binary Exploitation: Laboratório de Engenharia Reversa"><meta property="og:description" content="Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) "><meta property="og:locale" content="pt"><meta property="og:type" content="article"><meta property="article:section" content="blog"><meta property="article:published_time" content="2024-08-11T00:00:00+00:00"><meta property="article:modified_time" content="2024-08-11T00:00:00+00:00"><meta property="article:tag" content="Pwn"><meta property="article:tag" content="Engenharia Reversa"><meta property="og:image" content="http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:title content="Modern Binary Exploitation: Laboratório de Engenharia Reversa"><meta name=twitter:description content="Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) "><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Blogs","item":"http://localhost:1313/blog/"},{"@type":"ListItem","position":2,"name":"Modern Binary Exploitation: Laboratório de Engenharia Reversa","item":"http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"Modern Binary Exploitation: Laboratório de Engenharia Reversa","name":"Modern Binary Exploitation: Laboratório de Engenharia Reversa","description":"Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) ","keywords":["Pwn","Engenharia Reversa"],"articleBody":"Olá! Nesse post, resolveremos o primeiro laboratório do Modern Binary Exploitation da RPISEC que aborda a Engenharia Reversa. Caso tenha interesse no assunto, temos diversos posts no blog que abordam o tema, basta acessar a tag!\nLaboratório 01 Todos os laboratórios do curso residem dentro de uma máquina virtual disponibilizada no material através de uma imagem de disco para Ubuntu 14.04, que possui toda a configuração necessária para o Wargame. Os desafios são separados por laboratório e dificuldade, sendo C o mais fácil e A o mais difícil. Além disso, você acessa o challenge mediante ao usuário do respectivo desafio. Portanto, começando no C, o seu objetivo é exploitar o desafio para spawnar o terminal logado no usuário da próxima challenge e pegar a senha dele (que está em /home/labXX/.pass).\nO laboratório 01 aborda a Engenharia Reversa, tópico, esse, que é trabalhado durante as três primeiras lectures do material. Para uma melhor compreensão do que está ocorrendo, é necessário saber um pouco sobre:\nProgramação em C Assembly x86 Stack Todas as ferramentas utilizadas estarão listadas ao final do write-up.\nLab1C Conferindo algumas informações do arquivo:\n1 2 lab1C@warzone:~$ file /levels/lab01/lab1C /levels/lab01/lab1C: setuid ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=1522352e3de50fd6d180831ba18e2bca16be4204, not stripped Nosso código está rodando em 32 bits. Isso é importante para entendermos como são passados os parâmetros das funções, dadas as características da arquitetura. Nesse caso, os parâmetros são passados através da Stack.\nAcessando com a senha padrão lab01start, o primeiro problema nos prompta com uma interface para inserir uma senha:\n1 2 3 4 5 ----------------------------- --- RPISEC - CrackMe v1.0 --- ----------------------------- Password: Realizando o disassembly da função main():\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 Dump of assembler code for function main: 0x080486ad \u003c+0\u003e:\tpush ebp 0x080486ae \u003c+1\u003e:\tmov ebp,esp 0x080486b0 \u003c+3\u003e:\tand esp,0xfffffff0 0x080486b3 \u003c+6\u003e:\tsub esp,0x20 0x080486b6 \u003c+9\u003e:\tmov DWORD PTR [esp],0x80487d0 0x080486bd \u003c+16\u003e:\tcall 0x8048560 0x080486c2 \u003c+21\u003e:\tmov DWORD PTR [esp],0x80487ee 0x080486c9 \u003c+28\u003e:\tcall 0x8048560 0x080486ce \u003c+33\u003e:\tmov DWORD PTR [esp],0x80487d0 0x080486d5 \u003c+40\u003e:\tcall 0x8048560 0x080486da \u003c+45\u003e:\tmov DWORD PTR [esp],0x804880c 0x080486e1 \u003c+52\u003e:\tcall 0x8048550 0x080486e6 \u003c+57\u003e:\tlea eax,[esp+0x1c] 0x080486ea \u003c+61\u003e:\tmov DWORD PTR [esp+0x4],eax 0x080486ee \u003c+65\u003e:\tmov DWORD PTR [esp],0x8048818 0x080486f5 \u003c+72\u003e:\tcall 0x80485a0 \u003c__isoc99_scanf@plt\u003e 0x080486fa \u003c+77\u003e:\tmov eax,DWORD PTR [esp+0x1c] 0x080486fe \u003c+81\u003e:\tcmp eax,0x149a 0x08048703 \u003c+86\u003e:\tjne 0x8048724 0x08048705 \u003c+88\u003e:\tmov DWORD PTR [esp],0x804881b 0x0804870c \u003c+95\u003e:\tcall 0x8048560 0x08048711 \u003c+100\u003e:\tmov DWORD PTR [esp],0x804882b 0x08048718 \u003c+107\u003e:\tcall 0x8048570 0x0804871d \u003c+112\u003e:\tmov eax,0x0 0x08048722 \u003c+117\u003e:\tjmp 0x8048735 0x08048724 \u003c+119\u003e:\tmov DWORD PTR [esp],0x8048833 0x0804872b \u003c+126\u003e:\tcall 0x8048560 0x08048730 \u003c+131\u003e:\tmov eax,0x1 0x08048735 \u003c+136\u003e:\tleave 0x08048736 \u003c+137\u003e:\tret End of assembler dump. Nota-se, em :\n1 2 3 4 5 6 0x080486ea \u003c+61\u003e: mov DWORD PTR [esp+0x4],eax 0x080486ee \u003c+65\u003e: mov DWORD PTR [esp],0x8048818 0x080486f5 \u003c+72\u003e: call 0x80485a0 \u003c__isoc99_scanf@plt\u003e 0x080486fa \u003c+77\u003e: mov eax,DWORD PTR [esp+0x1c] 0x080486fe \u003c+81\u003e: cmp eax,0x149a 0x08048703 \u003c+86\u003e: jne 0x8048724 Há uma chamada de scanf() e uma comparação entre o valor inputado e 0x149a (5274 em decimal). Portanto, ao inserir 5274 como senha, devemos satisfazer a comparação e evitar o jump subsequente.Assim, então, acessamos o usuário lab1B e recuperamos a senha n0_str1ngs_n0_pr0bl3m.\n1 2 3 4 5 6 7 #!/bin/bash file=\"/tmp/lab1B_pass.txt\" (python3 -c \"print(str(5274))\"; echo \"cat /home/lab1B/.pass \u003e $file\") | /levels/lab01/lab1C echo \"Password stored at $file\" Lab1B Conferindo as informações do arquivo:\n1 2 lab1B@warzone:/levels/lab01$ file lab1B lab1B: setuid ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=c9f07b581bd8d97cdc7c0ff1a288e20aea2df0f5, stripped 1 2 3 4 5 6 gdb-peda$ checksec CANARY : ENABLED FORTIFY : disabled NX : ENABLED PIE : disabled RELRO : Partial Esse arquivo de 32 bits, agora, possui algumas proteções de stack.\nAnálise das funções Dessa vez, somos promptados com a mesma inteface de login:\n1 2 3 4 5 ----------------------------- --- RPISEC - CrackMe v1.0 --- ----------------------------- Password: Realizaremos, então, o disassembly da main:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 Dump of assembler code for function main: 0x08048be4 \u003c+0\u003e:\tpush ebp 0x08048be5 \u003c+1\u003e:\tmov ebp,esp 0x08048be7 \u003c+3\u003e:\tand esp,0xfffffff0 0x08048bea \u003c+6\u003e:\tsub esp,0x20 0x08048bed \u003c+9\u003e:\tpush eax 0x08048bee \u003c+10\u003e:\txor eax,eax 0x08048bf0 \u003c+12\u003e:\tje 0x8048bf5 0x08048bf2 \u003c+14\u003e:\tadd esp,0x4 0x08048bf5 \u003c+17\u003e:\tpop eax 0x08048bf6 \u003c+18\u003e:\tmov DWORD PTR [esp],0x0 0x08048bfd \u003c+25\u003e:\tcall 0x80487b0 0x08048c02 \u003c+30\u003e:\tmov DWORD PTR [esp],eax 0x08048c05 \u003c+33\u003e:\tcall 0x8048800 0x08048c0a \u003c+38\u003e:\tmov DWORD PTR [esp],0x8048d88 0x08048c11 \u003c+45\u003e:\tcall 0x80487d0 0x08048c16 \u003c+50\u003e:\tmov DWORD PTR [esp],0x8048da6 0x08048c1d \u003c+57\u003e:\tcall 0x80487d0 0x08048c22 \u003c+62\u003e:\tmov DWORD PTR [esp],0x8048dc4 0x08048c29 \u003c+69\u003e:\tcall 0x80487d0 0x08048c2e \u003c+74\u003e:\tmov DWORD PTR [esp],0x8048de2 0x08048c35 \u003c+81\u003e:\tcall 0x8048780 0x08048c3a \u003c+86\u003e:\tlea eax,[esp+0x1c] 0x08048c3e \u003c+90\u003e:\tmov DWORD PTR [esp+0x4],eax 0x08048c42 \u003c+94\u003e:\tmov DWORD PTR [esp],0x8048dee 0x08048c49 \u003c+101\u003e:\tcall 0x8048840 \u003c__isoc99_scanf@plt\u003e 0x08048c4e \u003c+106\u003e:\tmov eax,DWORD PTR [esp+0x1c] 0x08048c52 \u003c+110\u003e:\tmov DWORD PTR [esp+0x4],0x1337d00d 0x08048c5a \u003c+118\u003e:\tmov DWORD PTR [esp],eax 0x08048c5d \u003c+121\u003e:\tcall 0x8048a74 # chama test() 0x08048c62 \u003c+126\u003e:\tmov eax,0x0 0x08048c67 \u003c+131\u003e:\tleave 0x08048c68 \u003c+132\u003e:\tret End of assembler dump. Ao efetuar o disassembly, reparamos que a função test() é chamada em :\n1 2 3 4 5 6 7 0x08048c3e \u003c+90\u003e: mov DWORD PTR [esp+0x4],eax 0x08048c42 \u003c+94\u003e: mov DWORD PTR [esp],0x8048dee 0x08048c49 \u003c+101\u003e: call 0x8048840 \u003c__isoc99_scanf@plt\u003e 0x08048c4e \u003c+106\u003e: mov eax,DWORD PTR [esp+0x1c] 0x08048c52 \u003c+110\u003e: mov DWORD PTR [esp+0x4],0x1337d00d 0x08048c5a \u003c+118\u003e: mov DWORD PTR [esp],eax 0x08048c5d \u003c+121\u003e: call 0x8048a74 # chama test() Repare que o input do usuário é inserido como parametro, além de um valor fixo 0x1337d00d. Conferindo a função test():\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 Dump of assembler code for function test: 0x08048a74 \u003c+0\u003e:\tpush ebp 0x08048a75 \u003c+1\u003e:\tmov ebp,esp 0x08048a77 \u003c+3\u003e:\tsub esp,0x28 0x08048a7a \u003c+6\u003e:\tmov eax,DWORD PTR [ebp+0x8] 0x08048a7d \u003c+9\u003e:\tmov edx,DWORD PTR [ebp+0xc] 0x08048a80 \u003c+12\u003e:\tsub edx,eax #subtrai os inputs 0x08048a82 \u003c+14\u003e:\tmov eax,edx 0x08048a84 \u003c+16\u003e:\tmov DWORD PTR [ebp-0xc],eax 0x08048a87 \u003c+19\u003e:\tcmp DWORD PTR [ebp-0xc],0x15 0x08048a8b \u003c+23\u003e:\tja 0x8048bd5 0x08048a91 \u003c+29\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048a94 \u003c+32\u003e:\tshl eax,0x2 0x08048a97 \u003c+35\u003e:\tadd eax,0x8048d30 0x08048a9c \u003c+40\u003e:\tmov eax,DWORD PTR [eax] 0x08048a9e \u003c+42\u003e:\tjmp eax 0x08048aa0 \u003c+44\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048aa3 \u003c+47\u003e:\tmov DWORD PTR [esp],eax 0x08048aa6 \u003c+50\u003e:\tcall 0x80489b7 0x08048aab \u003c+55\u003e:\tjmp 0x8048be2 0x08048ab0 \u003c+60\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048ab3 \u003c+63\u003e:\tmov DWORD PTR [esp],eax 0x08048ab6 \u003c+66\u003e:\tcall 0x80489b7 . . . 0x08048b85 \u003c+273\u003e:\tjmp 0x8048be2 0x08048b87 \u003c+275\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048b8a \u003c+278\u003e:\tmov DWORD PTR [esp],eax 0x08048b8d \u003c+281\u003e:\tcall 0x80489b7 0x08048b92 \u003c+286\u003e:\tjmp 0x8048be2 0x08048b94 \u003c+288\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048b97 \u003c+291\u003e:\tmov DWORD PTR [esp],eax 0x08048b9a \u003c+294\u003e:\tcall 0x80489b7 0x08048b9f \u003c+299\u003e:\tjmp 0x8048be2 0x08048ba1 \u003c+301\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048ba4 \u003c+304\u003e:\tmov DWORD PTR [esp],eax 0x08048ba7 \u003c+307\u003e:\tcall 0x80489b7 0x08048bac \u003c+312\u003e:\tjmp 0x8048be2 0x08048bae \u003c+314\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048bb1 \u003c+317\u003e:\tmov DWORD PTR [esp],eax 0x08048bb4 \u003c+320\u003e:\tcall 0x80489b7 0x08048bb9 \u003c+325\u003e:\tjmp 0x8048be2 0x08048bbb \u003c+327\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048bbe \u003c+330\u003e:\tmov DWORD PTR [esp],eax 0x08048bc1 \u003c+333\u003e:\tcall 0x80489b7 0x08048bc6 \u003c+338\u003e:\tjmp 0x8048be2 0x08048bc8 \u003c+340\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048bcb \u003c+343\u003e:\tmov DWORD PTR [esp],eax 0x08048bce \u003c+346\u003e:\tcall 0x80489b7 0x08048bd3 \u003c+351\u003e:\tjmp 0x8048be2 0x08048bd5 \u003c+353\u003e:\tcall 0x8048830 0x08048bda \u003c+358\u003e:\tmov DWORD PTR [esp],eax 0x08048bdd \u003c+361\u003e:\tcall 0x80489b7 0x08048be2 \u003c+366\u003e:\tleave 0x08048be3 \u003c+367\u003e:\tret End of assembler dump. Investigando a função test(), vemos que existe um grande if-else (ou switch-case) que realiza a chamada de uma função decrypt() em todos os seus casos. O único caso que se diferencia é o último, cujo é usada a função rand() para ser o parametro dessa chamada.\nEm partes, vamos analizar o comportamento da função para entendê-la. Primeiramente:\n1 2 3 0x08048a7a \u003c+6\u003e: mov eax,DWORD PTR [ebp+0x8] # input do user 0x08048a7d \u003c+9\u003e: mov edx,DWORD PTR [ebp+0xc] # 0x1337d00d 0x08048a80 \u003c+12\u003e: sub edx,eax # subtrai os valores Nesse momento, é calculada a diferença entre a senha inputada e o valor hexadecimal. Após isso:\n1 2 3 4 0x08048a82 \u003c+14\u003e: mov eax,edx 0x08048a84 \u003c+16\u003e: mov DWORD PTR [ebp-0xc],eax 0x08048a87 \u003c+19\u003e: cmp DWORD PTR [ebp-0xc],0x15 0x08048a8b \u003c+23\u003e: ja 0x8048bd5 Aqui, vemos o que provoca o caso do switch-case com o rand(): a diferença entre os valores ser maior que 21. Então, caso a diferença seja igual ou menor que 21:\n1 2 3 4 5 0x08048a91 \u003c+29\u003e: mov eax,DWORD PTR [ebp-0xc] 0x08048a94 \u003c+32\u003e: shl eax,0x2 0x08048a97 \u003c+35\u003e: add eax,0x8048d30 0x08048a9c \u003c+40\u003e: mov eax,DWORD PTR [eax] 0x08048a9e \u003c+42\u003e: jmp eax Em todo caso, esse jump é tomado para um dos blocos do switch-case (que são todos iguais). Conferindo eles:\n1 2 3 0x08048aa0 \u003c+XX\u003e: mov eax,DWORD PTR [ebp-0xc] 0x08048aa3 \u003c+XX\u003e: mov DWORD PTR [esp],eax 0x08048aa6 \u003c+XX\u003e: call 0x80489b7 Basicamente, a diferença entre 0x1337d00d e o input é enviada como parametro para decrypt(). Vejamos, então, a função:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 Dump of assembler code for function decrypt: 0x080489b7 \u003c+0\u003e:\tpush ebp 0x080489b8 \u003c+1\u003e:\tmov ebp,esp 0x080489ba \u003c+3\u003e:\tsub esp,0x38 0x080489bd \u003c+6\u003e:\tmov eax,gs:0x14 0x080489c3 \u003c+12\u003e:\tmov DWORD PTR [ebp-0xc],eax 0x080489c6 \u003c+15\u003e:\txor eax,eax 0x080489c8 \u003c+17\u003e:\tmov DWORD PTR [ebp-0x1d],0x757c7d51 0x080489cf \u003c+24\u003e:\tmov DWORD PTR [ebp-0x19],0x67667360 0x080489d6 \u003c+31\u003e:\tmov DWORD PTR [ebp-0x15],0x7b66737e 0x080489dd \u003c+38\u003e:\tmov DWORD PTR [ebp-0x11],0x33617c7d 0x080489e4 \u003c+45\u003e:\tmov BYTE PTR [ebp-0xd],0x0 0x080489e8 \u003c+49\u003e:\tpush eax 0x080489e9 \u003c+50\u003e:\txor eax,eax 0x080489eb \u003c+52\u003e:\tje 0x80489f0 0x080489ed \u003c+54\u003e:\tadd esp,0x4 0x080489f0 \u003c+57\u003e:\tpop eax 0x080489f1 \u003c+58\u003e:\tlea eax,[ebp-0x1d] 0x080489f4 \u003c+61\u003e:\tmov DWORD PTR [esp],eax 0x080489f7 \u003c+64\u003e:\tcall 0x8048810 0x080489fc \u003c+69\u003e:\tmov DWORD PTR [ebp-0x24],eax 0x080489ff \u003c+72\u003e:\tmov DWORD PTR [ebp-0x28],0x0 0x08048a06 \u003c+79\u003e:\tjmp 0x8048a28 0x08048a08 \u003c+81\u003e:\tlea edx,[ebp-0x1d] 0x08048a0b \u003c+84\u003e:\tmov eax,DWORD PTR [ebp-0x28] 0x08048a0e \u003c+87\u003e:\tadd eax,edx 0x08048a10 \u003c+89\u003e:\tmovzx eax,BYTE PTR [eax] 0x08048a13 \u003c+92\u003e:\tmov edx,eax 0x08048a15 \u003c+94\u003e:\tmov eax,DWORD PTR [ebp+0x8] 0x08048a18 \u003c+97\u003e:\txor eax,edx 0x08048a1a \u003c+99\u003e:\tlea ecx,[ebp-0x1d] 0x08048a1d \u003c+102\u003e:\tmov edx,DWORD PTR [ebp-0x28] 0x08048a20 \u003c+105\u003e:\tadd edx,ecx 0x08048a22 \u003c+107\u003e:\tmov BYTE PTR [edx],al 0x08048a24 \u003c+109\u003e:\tadd DWORD PTR [ebp-0x28],0x1 0x08048a28 \u003c+113\u003e:\tmov eax,DWORD PTR [ebp-0x28] 0x08048a2b \u003c+116\u003e:\tcmp eax,DWORD PTR [ebp-0x24] 0x08048a2e \u003c+119\u003e:\tjb 0x8048a08 0x08048a30 \u003c+121\u003e:\tmov DWORD PTR [esp+0x4],0x8048d03 0x08048a38 \u003c+129\u003e:\tlea eax,[ebp-0x1d] 0x08048a3b \u003c+132\u003e:\tmov DWORD PTR [esp],eax 0x08048a3e \u003c+135\u003e:\tcall 0x8048770 0x08048a43 \u003c+140\u003e:\ttest eax,eax 0x08048a45 \u003c+142\u003e:\tjne 0x8048a55 0x08048a47 \u003c+144\u003e:\tmov DWORD PTR [esp],0x8048d14 0x08048a4e \u003c+151\u003e:\tcall 0x80487e0 0x08048a53 \u003c+156\u003e:\tjmp 0x8048a61 0x08048a55 \u003c+158\u003e:\tmov DWORD PTR [esp],0x8048d1c 0x08048a5c \u003c+165\u003e:\tcall 0x80487d0 0x08048a61 \u003c+170\u003e:\tmov eax,DWORD PTR [ebp-0xc] 0x08048a64 \u003c+173\u003e:\txor eax,DWORD PTR gs:0x14 0x08048a6b \u003c+180\u003e:\tje 0x8048a72 0x08048a6d \u003c+182\u003e:\tcall 0x80487c0 \u003c__stack_chk_fail@plt\u003e 0x08048a72 \u003c+187\u003e:\tleave 0x08048a73 \u003c+188\u003e:\tret End of assembler dump. Em decrypt(), vemos a existência de uma string hardcoded:\n1 2 3 4 0x080489c8 \u003c+17\u003e: mov DWORD PTR [ebp-0x1d],0x757c7d51 0x080489cf \u003c+24\u003e: mov DWORD PTR [ebp-0x19],0x67667360 0x080489d6 \u003c+31\u003e: mov DWORD PTR [ebp-0x15],0x7b66737e 0x080489dd \u003c+38\u003e: mov DWORD PTR [ebp-0x11],0x33617c7d Transformando em caracteres, resulta em Q}|u\\`sfg~sf{}|a3 (tenha em mente que estamos tratando de Little Endian!).\nAlém disso, existe um loop onde todos os caracteres dessa string estranha são decodificados (usando XOR) baseados no valor da diferença calculado em test():\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 0x08048a08 \u003c+81\u003e: lea edx,[ebp-0x1d] 0x08048a0b \u003c+84\u003e: mov eax,DWORD PTR [ebp-0x28] 0x08048a0e \u003c+87\u003e: add eax,edx 0x08048a10 \u003c+89\u003e: movzx eax,BYTE PTR [eax] 0x08048a13 \u003c+92\u003e: mov edx,eax 0x08048a15 \u003c+94\u003e: mov eax,DWORD PTR [ebp+0x8] 0x08048a18 \u003c+97\u003e: xor eax,edx 0x08048a1a \u003c+99\u003e: lea ecx,[ebp-0x1d] 0x08048a1d \u003c+102\u003e: mov edx,DWORD PTR [ebp-0x28] 0x08048a20 \u003c+105\u003e: add edx,ecx 0x08048a22 \u003c+107\u003e: mov BYTE PTR [edx],al 0x08048a24 \u003c+109\u003e: add DWORD PTR [ebp-0x28],0x1 0x08048a28 \u003c+113\u003e: mov eax,DWORD PTR [ebp-0x28] 0x08048a2b \u003c+116\u003e: cmp eax,DWORD PTR [ebp-0x24] 0x08048a2e \u003c+119\u003e: jb 0x8048a08 Após a decriptação, a string final é vista novamente em main\u003c+132\u003e:\n1 2 3 4 0x08048a30 \u003c+121\u003e: mov DWORD PTR [esp+0x4],0x8048d03 # string nova? 0x08048a38 \u003c+129\u003e: lea eax,[ebp-0x1d] 0x08048a3b \u003c+132\u003e: mov DWORD PTR [esp],eax # string final 0x08048a3e \u003c+135\u003e: call 0x8048770 Ela é enviada com uma outra string (do endereço 0x8048d03) para ser comparada. Afinal, que string é essa?\n1 2 gdb-peda$ x/s 0x8048d03 0x8048d03:\t\"Congratulations!\" Ok! Temos, então, a string Congratulations! como alvo!\nObjetivo Como controlamos apenas o input, devemos inputar um número que, ao subtrair 0x1337d00d, resulte em uma chave válida para a decriptação de Q}|u\\`sfg~sf{}|a3 em Congratulations!. Nosso objetivo é descobrir essa chave e saber o payload válido.\nResolvendo Dado o funcionamento do XOR, podemos realizar XOR entre a string original e a encriptada e, assim, sabemos a chave simétrica. Usando Python:\n1 2 \u003e\u003e\u003e ord(\"Q\") ^ ord(\"C\") 18 Precisamos, então, de uma diferença de 18! Como fazemos 0x1337D00D - input, sabemos que 0x1337D00D + 0x12 é o input desejado. Assim, chegamos a 322424827 e voilà! Temos a senha 1337_3nCRyptI0n_br0.\nExploit 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 #!/usr/bin/python import pwn # XOR allow us to do that :P key = 0x1337d00d - (ord(\"Q\") ^ ord(\"C\")) # Path to the save file save_file = \"/tmp/lab1A_pass.txt\" # Initiating process p = pwn.process('/levels/lab01/lab1B') # Sending the payloads p.sendline(str(key)) p.sendline(\"cat /home/lab1A/.pass \u003e \"+ save_file) print(\"[!] Password saved on \" + save_file) p.close() Lab1A Conferindo as informações do arquivo:\n1 2 lab1A@warzone:/levels/lab01$ file lab1A lab1A: setuid ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=8207a5ad5821e47f25412161c60dc24fd2f3386e, stripped 1 2 3 4 5 6 gdb-peda$ checksec CANARY : ENABLED FORTIFY : disabled NX : ENABLED PIE : disabled RELRO : Partial Repare que todos os programas estão em 32 bits. Fiz todas essas verificações por prática, mas todos os programas desse curso são em 32 bits.\nAnálise das funções Realizando o disassembly da main(), verificamos que há 2 inputs pertinentes: um usuário e um serial.\n1 2 3 4 5 6 7 8 9 10 11 12 13 .---------------------------. |--------- RPISEC --------| |+ SECURE LOGIN SYS v. 3.0 +| |---------------------------| |~- Enter your Username: ~-| '---------------------------' UsernameTeste .---------------------------. | !! NEW ACCOUNT DETECTED !!| |---------------------------| |~- Input your serial: ~-| '---------------------------' 123456 Realizando o disassembly da função main(), temos:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 Dump of assembler code for function main: 0x08048b44 \u003c+0\u003e:\tpush ebp 0x08048b45 \u003c+1\u003e:\tmov ebp,esp 0x08048b47 \u003c+3\u003e:\tand esp,0xfffffff0 0x08048b4a \u003c+6\u003e:\tsub esp,0x40 0x08048b4d \u003c+9\u003e:\tmov eax,DWORD PTR [ebp+0xc] 0x08048b50 \u003c+12\u003e:\tmov DWORD PTR [esp+0xc],eax 0x08048b54 \u003c+16\u003e:\tmov eax,gs:0x14 0x08048b5a \u003c+22\u003e:\tmov DWORD PTR [esp+0x3c],eax 0x08048b5e \u003c+26\u003e:\txor eax,eax 0x08048b60 \u003c+28\u003e:\tpush eax 0x08048b61 \u003c+29\u003e:\txor eax,eax 0x08048b63 \u003c+31\u003e:\tje 0x8048b68 0x08048b65 \u003c+33\u003e:\tadd esp,0x4 0x08048b68 \u003c+36\u003e:\tpop eax 0x08048b69 \u003c+37\u003e:\tmov DWORD PTR [esp],0x8048d73 0x08048b70 \u003c+44\u003e:\tcall 0x8048810 0x08048b75 \u003c+49\u003e:\tmov DWORD PTR [esp],0x8048d91 0x08048b7c \u003c+56\u003e:\tcall 0x8048810 0x08048b81 \u003c+61\u003e:\tmov DWORD PTR [esp],0x8048daf 0x08048b88 \u003c+68\u003e:\tcall 0x8048810 0x08048b8d \u003c+73\u003e:\tmov DWORD PTR [esp],0x8048dcd 0x08048b94 \u003c+80\u003e:\tcall 0x8048810 0x08048b99 \u003c+85\u003e:\tmov DWORD PTR [esp],0x8048deb 0x08048ba0 \u003c+92\u003e:\tcall 0x8048810 0x08048ba5 \u003c+97\u003e:\tmov DWORD PTR [esp],0x8048e09 0x08048bac \u003c+104\u003e:\tcall 0x8048810 0x08048bb1 \u003c+109\u003e:\tmov eax,ds:0x804b060 0x08048bb6 \u003c+114\u003e:\tmov DWORD PTR [esp+0x8],eax 0x08048bba \u003c+118\u003e:\tmov DWORD PTR [esp+0x4],0x20 0x08048bc2 \u003c+126\u003e:\tlea eax,[esp+0x1c] 0x08048bc6 \u003c+130\u003e:\tmov DWORD PTR [esp],eax 0x08048bc9 \u003c+133\u003e:\tcall 0x80487d0 # Coleta o username como string 0x08048bce \u003c+138\u003e:\tmov DWORD PTR [esp],0x8048d73 0x08048bd5 \u003c+145\u003e:\tcall 0x8048810 0x08048bda \u003c+150\u003e:\tmov DWORD PTR [esp],0x8048e27 0x08048be1 \u003c+157\u003e:\tcall 0x8048810 0x08048be6 \u003c+162\u003e:\tmov DWORD PTR [esp],0x8048dcd 0x08048bed \u003c+169\u003e:\tcall 0x8048810 0x08048bf2 \u003c+174\u003e:\tmov DWORD PTR [esp],0x8048e45 0x08048bf9 \u003c+181\u003e:\tcall 0x8048810 0x08048bfe \u003c+186\u003e:\tmov DWORD PTR [esp],0x8048e09 0x08048c05 \u003c+193\u003e:\tcall 0x8048810 0x08048c0a \u003c+198\u003e:\tlea eax,[esp+0x18] 0x08048c0e \u003c+202\u003e:\tmov DWORD PTR [esp+0x4],eax 0x08048c12 \u003c+206\u003e:\tmov DWORD PTR [esp],0x8048d00 0x08048c19 \u003c+213\u003e:\tcall 0x8048860 \u003c__isoc99_scanf@plt\u003e # Coleta o serial como int 0x08048c1e \u003c+218\u003e:\tmov eax,DWORD PTR [esp+0x18] 0x08048c22 \u003c+222\u003e:\tmov DWORD PTR [esp+0x4],eax 0x08048c26 \u003c+226\u003e:\tlea eax,[esp+0x1c] 0x08048c2a \u003c+230\u003e:\tmov DWORD PTR [esp],eax 0x08048c2d \u003c+233\u003e:\tcall 0x8048a0f 0x08048c32 \u003c+238\u003e:\ttest eax,eax 0x08048c34 \u003c+240\u003e:\tjne 0x8048c55 0x08048c36 \u003c+242\u003e:\tmov DWORD PTR [esp],0x8048e63 0x08048c3d \u003c+249\u003e:\tcall 0x8048810 0x08048c42 \u003c+254\u003e:\tmov DWORD PTR [esp],0x8048e72 0x08048c49 \u003c+261\u003e:\tcall 0x8048820 0x08048c4e \u003c+266\u003e:\tmov eax,0x0 0x08048c53 \u003c+271\u003e:\tjmp 0x8048c5a 0x08048c55 \u003c+273\u003e:\tmov eax,0x1 0x08048c5a \u003c+278\u003e:\tmov edx,DWORD PTR [esp+0x3c] 0x08048c5e \u003c+282\u003e:\txor edx,DWORD PTR gs:0x14 0x08048c65 \u003c+289\u003e:\tje 0x8048c6c 0x08048c67 \u003c+291\u003e:\tcall 0x8048800 \u003c__stack_chk_fail@plt\u003e 0x08048c6c \u003c+296\u003e:\tleave 0x08048c6d \u003c+297\u003e:\tret End of assembler dump. Sendo um pouco mais breve, os inputs são armazenados na stack e enviados para auth(), em . Realizando o disassembly de auth():\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 Dump of assembler code for function auth: 0x08048a0f \u003c+0\u003e:\tpush ebp 0x08048a10 \u003c+1\u003e:\tmov ebp,esp 0x08048a12 \u003c+3\u003e:\tsub esp,0x28 0x08048a15 \u003c+6\u003e:\tmov DWORD PTR [esp+0x4],0x8048d03 0x08048a1d \u003c+14\u003e:\tmov eax,DWORD PTR [ebp+0x8] 0x08048a20 \u003c+17\u003e:\tmov DWORD PTR [esp],eax 0x08048a23 \u003c+20\u003e:\tcall 0x80487a0 0x08048a28 \u003c+25\u003e:\tmov edx,DWORD PTR [ebp+0x8] 0x08048a2b \u003c+28\u003e:\tadd eax,edx 0x08048a2d \u003c+30\u003e:\tmov BYTE PTR [eax],0x0 0x08048a30 \u003c+33\u003e:\tmov DWORD PTR [esp+0x4],0x20 0x08048a38 \u003c+41\u003e:\tmov eax,DWORD PTR [ebp+0x8] 0x08048a3b \u003c+44\u003e:\tmov DWORD PTR [esp],eax 0x08048a3e \u003c+47\u003e:\tcall 0x8048850 0x08048a43 \u003c+52\u003e:\tmov DWORD PTR [ebp-0xc],eax 0x08048a46 \u003c+55\u003e:\tpush eax 0x08048a47 \u003c+56\u003e:\txor eax,eax 0x08048a49 \u003c+58\u003e:\tje 0x8048a4e 0x08048a4b \u003c+60\u003e:\tadd esp,0x4 0x08048a4e \u003c+63\u003e:\tpop eax 0x08048a4f \u003c+64\u003e:\tcmp DWORD PTR [ebp-0xc],0x5 0x08048a53 \u003c+68\u003e:\tjg 0x8048a5f 0x08048a55 \u003c+70\u003e:\tmov eax,0x1 0x08048a5a \u003c+75\u003e:\tjmp 0x8048b42 0x08048a5f \u003c+80\u003e:\tmov DWORD PTR [esp+0xc],0x0 0x08048a67 \u003c+88\u003e:\tmov DWORD PTR [esp+0x8],0x1 0x08048a6f \u003c+96\u003e:\tmov DWORD PTR [esp+0x4],0x0 0x08048a77 \u003c+104\u003e:\tmov DWORD PTR [esp],0x0 0x08048a7e \u003c+111\u003e:\tcall 0x8048870 0x08048a83 \u003c+116\u003e:\tcmp eax,0xffffffff 0x08048a86 \u003c+119\u003e:\tjne 0x8048ab6 0x08048a88 \u003c+121\u003e:\tmov DWORD PTR [esp],0x8048d08 0x08048a8f \u003c+128\u003e:\tcall 0x8048810 0x08048a94 \u003c+133\u003e:\tmov DWORD PTR [esp],0x8048d2c 0x08048a9b \u003c+140\u003e:\tcall 0x8048810 0x08048aa0 \u003c+145\u003e:\tmov DWORD PTR [esp],0x8048d50 0x08048aa7 \u003c+152\u003e:\tcall 0x8048810 0x08048aac \u003c+157\u003e:\tmov eax,0x1 0x08048ab1 \u003c+162\u003e:\tjmp 0x8048b42 0x08048ab6 \u003c+167\u003e:\tmov eax,DWORD PTR [ebp+0x8] 0x08048ab9 \u003c+170\u003e:\tadd eax,0x3 0x08048abc \u003c+173\u003e:\tmovzx eax,BYTE PTR [eax] 0x08048abf \u003c+176\u003e:\tmovsx eax,al 0x08048ac2 \u003c+179\u003e:\txor eax,0x1337 0x08048ac7 \u003c+184\u003e:\tadd eax,0x5eeded 0x08048acc \u003c+189\u003e:\tmov DWORD PTR [ebp-0x10],eax 0x08048acf \u003c+192\u003e:\tmov DWORD PTR [ebp-0x14],0x0 0x08048ad6 \u003c+199\u003e:\tjmp 0x8048b26 0x08048ad8 \u003c+201\u003e:\tmov edx,DWORD PTR [ebp-0x14] 0x08048adb \u003c+204\u003e:\tmov eax,DWORD PTR [ebp+0x8] 0x08048ade \u003c+207\u003e:\tadd eax,edx 0x08048ae0 \u003c+209\u003e:\tmovzx eax,BYTE PTR [eax] 0x08048ae3 \u003c+212\u003e:\tcmp al,0x1f 0x08048ae5 \u003c+214\u003e:\tjg 0x8048aee 0x08048ae7 \u003c+216\u003e:\tmov eax,0x1 0x08048aec \u003c+221\u003e:\tjmp 0x8048b42 0x08048aee \u003c+223\u003e:\tmov edx,DWORD PTR [ebp-0x14] 0x08048af1 \u003c+226\u003e:\tmov eax,DWORD PTR [ebp+0x8] 0x08048af4 \u003c+229\u003e:\tadd eax,edx 0x08048af6 \u003c+231\u003e:\tmovzx eax,BYTE PTR [eax] 0x08048af9 \u003c+234\u003e:\tmovsx eax,al 0x08048afc \u003c+237\u003e:\txor eax,DWORD PTR [ebp-0x10] 0x08048aff \u003c+240\u003e:\tmov ecx,eax 0x08048b01 \u003c+242\u003e:\tmov edx,0x88233b2b 0x08048b06 \u003c+247\u003e:\tmov eax,ecx 0x08048b08 \u003c+249\u003e:\tmul edx 0x08048b0a \u003c+251\u003e:\tmov eax,ecx 0x08048b0c \u003c+253\u003e:\tsub eax,edx 0x08048b0e \u003c+255\u003e:\tshr eax,1 0x08048b10 \u003c+257\u003e:\tadd eax,edx 0x08048b12 \u003c+259\u003e:\tshr eax,0xa 0x08048b15 \u003c+262\u003e:\timul eax,eax,0x539 0x08048b1b \u003c+268\u003e:\tsub ecx,eax 0x08048b1d \u003c+270\u003e:\tmov eax,ecx 0x08048b1f \u003c+272\u003e:\tadd DWORD PTR [ebp-0x10],eax 0x08048b22 \u003c+275\u003e:\tadd DWORD PTR [ebp-0x14],0x1 0x08048b26 \u003c+279\u003e:\tmov eax,DWORD PTR [ebp-0x14] 0x08048b29 \u003c+282\u003e:\tcmp eax,DWORD PTR [ebp-0xc] 0x08048b2c \u003c+285\u003e:\tjl 0x8048ad8 0x08048b2e \u003c+287\u003e:\tmov eax,DWORD PTR [ebp+0xc] 0x08048b31 \u003c+290\u003e:\tcmp eax,DWORD PTR [ebp-0x10] 0x08048b34 \u003c+293\u003e:\tje 0x8048b3d 0x08048b36 \u003c+295\u003e:\tmov eax,0x1 0x08048b3b \u003c+300\u003e:\tjmp 0x8048b42 0x08048b3d \u003c+302\u003e:\tmov eax,0x0 0x08048b42 \u003c+307\u003e:\tleave 0x08048b43 \u003c+308\u003e:\tret End of assembler dump. O assembly dessa função está muito extenso. Portanto, para facilitar, utilizei o decompilador do Ghidra para entender melhor o que estava ocorrendo:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 /* WARNING: Removing unreachable block (ram,0x08048a4b) */ /* WARNING: Restarted to delay deadcode elimination for space: stack */ undefined4 auth(char *param_1,uint param_2) { size_t sVar1; undefined4 uVar2; long lVar3; int local_18; uint local_14; sVar1 = strcspn(param_1,\"\\n\"); param_1[sVar1] = '\\0'; sVar1 = strnlen(param_1,0x20); if ((int)sVar1 \u003c 6) { uVar2 = 1; } else { lVar3 = ptrace(PTRACE_TRACEME); if (lVar3 == -1) { puts(\"\\x1b[32m.---------------------------.\"); puts(\"\\x1b[31m| !! TAMPERING DETECTED !! |\"); puts(\"\\x1b[32m\\'---------------------------\\'\"); uVar2 = 1; } else { local_14 = ((int)param_1[3] ^ 0x1337U) + 0x5eeded; for (local_18 = 0; local_18 \u003c (int)sVar1; local_18 = local_18 + 1) { if (param_1[local_18] \u003c ' ') { return 1; } local_14 = local_14 + ((int)param_1[local_18] ^ local_14) % 0x539; } if (param_2 == local_14) { uVar2 = 0; } else { uVar2 = 1; } } } return uVar2; } Adaptando os nomes de algumas variáveis para facilitar a leitura, resultamos em:\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 int auth(char *username,uint serial) { size_t inputLength; undefined4 flag; long ptrace?; int i; uint temp; inputLength = strcspn(username,\"\\n\"); username[inputLength] = '\\0'; inputLength = strnlen(username,0x20); if ((int)inputLength \u003c 6) { flag = 1; } else { ptrace? = ptrace(PTRACE_TRACEME); if (ptrace? == -1) { puts(\"\\x1b[32m.---------------------------.\"); puts(\"\\x1b[31m| !! TAMPERING DETECTED !! |\"); puts(\"\\x1b[32m\\'---------------------------\\'\"); flag = 1; } else { temp = ((int)username[3] ^ 0x1337U) + 0x5eeded; for (i = 0; i \u003c (int)inputLength; i = i + 1) { if (username[i] \u003c ' ') { return 1; } temp = temp + ((int)username[i] ^ temp) % 0x539; } if (serial == temp) { flag = 0; } else { flag = 1; } } } return flag; } Em auth(), podemos verificar que o programa retira, do nome do usuário, o caracter \\n e substitui por \\0, além de calcular e armazenar o comprimento da string. Cabe salientar que usernames com menos de 6 caracteres não são aceitos pelo programa e resultam em retorno imediato com valor 1 (que invalida a sessão). Após isso, ele faz algo em uma lógica fixa com o username e compara com o serial inputado para validar.\nResolução Para resolver o problema, criei um pequeno keygen a partir da lógica exibida pelo decompilador.\n1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 #!/usr/bin/python import pwn #input username = str(raw_input(\"[!] Insert the username that you want to use: \")) # Serial logic num = (ord(username[3]) ^ 0x1337) + 6221293 for char in username: if char == ' ': print(\"lol\") exit(3) if char == '\\n': continue num = num + (ord(char) ^ num) % 1337 # Printing out the serial generated for the inputed username print(\"[!] Serial: \" + str(num)) # Starting process p = pwn.process(\"/levels/lab01/lab1A\") # Sending payload p.sendline(username) p.sendline(str(num)) # Give the user the shell p.interactive() # Close the program p.close() A partir de um username inputado, ele cria um serial válido e executa o programa. Basta utilizá-lo e voilà! Fim de laboratório!\nFerramentas utilizadas: GEF, uma extensão para o GDB GHIDRA, uma ferramenta de análise de binários. pwntools, uma biblioteca de Python para fabricação de exploits. ","wordCount":"4072","inLanguage":"en","image":"http://localhost:1313/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E","datePublished":"2024-08-11T00:00:00Z","dateModified":"2024-08-11T00:00:00Z","author":{"@type":"Person","name":"kitagawa"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:1313/blog/2024-08-11-writeup-lab01-rev-mbe/"},"publisher":{"@type":"Organization","name":"Blog do GRIS","logo":{"@type":"ImageObject","url":"http://localhost:1313/%3Clink%20/%20abs%20url%3E"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=http://localhost:1313/ accesskey=h title="Home (Alt + H)"><img src=http://localhost:1313/apple-touch-icon.png alt aria-label=logo height=35>Home</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=http://localhost:1313/categories/ title=Categorias><span>Categorias</span></a></li><li><a href=http://localhost:1313/tags/ title=Tags><span>Tags</span></a></li><li><a href=https://www.youtube.com/@grisufrj title=Youtube><span>Youtube</span>&nbsp;<svg fill="none" shape-rendering="geometricPrecision" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" height="12" width="12"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=http://localhost:1313/>Home</a>&nbsp;»&nbsp;<a href=http://localhost:1313/blog/>Blogs</a></div><h1 class="post-title entry-hint-parent">Modern Binary Exploitation: Laboratório de Engenharia Reversa</h1><div class=post-description>Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE)</div><div class=post-meta><span title='2024-08-11 00:00:00 +0000 UTC'>August 11, 2024</span>&nbsp;·&nbsp;20 min&nbsp;·&nbsp;4072 words&nbsp;·&nbsp;kitagawa&nbsp;|&nbsp;<a href=https://github.com/%3cpath_to_repo%3e/content/blog/2024-08-11-writeup-lab01-rev-MBE.md rel="noopener noreferrer" target=_blank>Suggest Changes</a></div></header><div class=post-content><p>Olá! Nesse post, resolveremos o primeiro laboratório do <a href=https://github.com/RPISEC/MBE>Modern Binary Exploitation</a> da <a href=https://rpis.ec/>RPISEC</a> que aborda a <strong>Engenharia Reversa</strong>. Caso tenha interesse no assunto, temos diversos posts no blog que abordam o tema, basta acessar a tag!</p><h1 id=laboratório-01>Laboratório 01<a hidden class=anchor aria-hidden=true href=#laboratório-01>#</a></h1><p>Todos os laboratórios do curso residem dentro de uma máquina virtual disponibilizada no material através de uma imagem de disco para Ubuntu 14.04, que possui toda a configuração necessária para o Wargame. Os desafios são separados por laboratório e dificuldade, sendo C o mais fácil e A o mais difícil. Além disso, você acessa o challenge mediante ao usuário do respectivo desafio. Portanto, começando no C, o seu objetivo é exploitar o desafio para spawnar o terminal logado no usuário da
+próxima challenge e pegar a senha dele (que está em <code>/home/labXX/.pass</code>).</p><p>O laboratório 01 aborda a <strong>Engenharia Reversa</strong>, tópico, esse, que é trabalhado durante as três primeiras lectures do material. Para uma melhor compreensão do que está ocorrendo, é necessário saber um pouco sobre:</p><ul><li>Programação em C</li><li>Assembly x86</li><li>Stack</li></ul><p>Todas as ferramentas utilizadas estarão listadas ao final do write-up.</p><h2 id=lab1c>Lab1C<a hidden class=anchor aria-hidden=true href=#lab1c>#</a></h2><p>Conferindo algumas informações do arquivo:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>lab1C@warzone:~$ file /levels/lab01/lab1C
+</span></span><span class=line><span class=cl>/levels/lab01/lab1C: setuid ELF 32-bit LSB  executable, Intel 80386, version <span class=m>1</span> <span class=o>(</span>SYSV<span class=o>)</span>, dynamically linked <span class=o>(</span>uses shared libs<span class=o>)</span>, <span class=k>for</span> GNU/Linux 2.6.24, BuildID<span class=o>[</span>sha1<span class=o>]=</span>1522352e3de50fd6d180831ba18e2bca16be4204, not stripped
+</span></span></code></pre></td></tr></table></div></div><p>Nosso código está rodando em 32 bits. Isso é importante para entendermos como são passados os parâmetros das funções, dadas as características da arquitetura. Nesse caso, os parâmetros são passados através da Stack.</p><p>Acessando com a senha padrão <code>lab01start</code>, o primeiro problema nos prompta com uma interface para inserir uma senha:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>-----------------------------
+</span></span><span class=line><span class=cl>--- RPISEC - CrackMe v1.0 ---
+</span></span><span class=line><span class=cl>-----------------------------
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Password: 
+</span></span></code></pre></td></tr></table></div></div><p>Realizando o disassembly da função <code>main()</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>Dump of assembler code <span class=k>for</span> <span class=k>function</span> main:
+</span></span><span class=line><span class=cl>   0x080486ad &lt;+0&gt;:	push   ebp
+</span></span><span class=line><span class=cl>   0x080486ae &lt;+1&gt;:	mov    ebp,esp
+</span></span><span class=line><span class=cl>   0x080486b0 &lt;+3&gt;:	and    esp,0xfffffff0
+</span></span><span class=line><span class=cl>   0x080486b3 &lt;+6&gt;:	sub    esp,0x20
+</span></span><span class=line><span class=cl>   0x080486b6 &lt;+9&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x80487d0
+</span></span><span class=line><span class=cl>   0x080486bd &lt;+16&gt;:	call   0x8048560 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x080486c2 &lt;+21&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x80487ee
+</span></span><span class=line><span class=cl>   0x080486c9 &lt;+28&gt;:	call   0x8048560 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x080486ce &lt;+33&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x80487d0
+</span></span><span class=line><span class=cl>   0x080486d5 &lt;+40&gt;:	call   0x8048560 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x080486da &lt;+45&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x804880c
+</span></span><span class=line><span class=cl>   0x080486e1 &lt;+52&gt;:	call   0x8048550 &lt;printf@plt&gt;
+</span></span><span class=line><span class=cl>   0x080486e6 &lt;+57&gt;:	lea    eax,<span class=o>[</span>esp+0x1c<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x080486ea &lt;+61&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x080486ee &lt;+65&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048818
+</span></span><span class=line><span class=cl>   0x080486f5 &lt;+72&gt;:	call   0x80485a0 &lt;__isoc99_scanf@plt&gt;
+</span></span><span class=line><span class=cl>   0x080486fa &lt;+77&gt;:	mov    eax,DWORD PTR <span class=o>[</span>esp+0x1c<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x080486fe &lt;+81&gt;:	cmp    eax,0x149a
+</span></span><span class=line><span class=cl>   0x08048703 &lt;+86&gt;:	jne    0x8048724 &lt;main+119&gt;
+</span></span><span class=line><span class=cl>   0x08048705 &lt;+88&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x804881b
+</span></span><span class=line><span class=cl>   0x0804870c &lt;+95&gt;:	call   0x8048560 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048711 &lt;+100&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x804882b
+</span></span><span class=line><span class=cl>   0x08048718 &lt;+107&gt;:	call   0x8048570 &lt;system@plt&gt;
+</span></span><span class=line><span class=cl>   0x0804871d &lt;+112&gt;:	mov    eax,0x0
+</span></span><span class=line><span class=cl>   0x08048722 &lt;+117&gt;:	jmp    0x8048735 &lt;main+136&gt;
+</span></span><span class=line><span class=cl>   0x08048724 &lt;+119&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048833
+</span></span><span class=line><span class=cl>   0x0804872b &lt;+126&gt;:	call   0x8048560 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048730 &lt;+131&gt;:	mov    eax,0x1
+</span></span><span class=line><span class=cl>   0x08048735 &lt;+136&gt;:	leave  
+</span></span><span class=line><span class=cl>   0x08048736 &lt;+137&gt;:	ret    
+</span></span><span class=line><span class=cl>End of assembler dump.
+</span></span></code></pre></td></tr></table></div></div><p>Nota-se, em <code>&lt;main+81></code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>    0x080486ea &lt;+61&gt;:    mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>    0x080486ee &lt;+65&gt;:    mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048818
+</span></span><span class=line><span class=cl>    0x080486f5 &lt;+72&gt;:    call   0x80485a0 &lt;__isoc99_scanf@plt&gt;
+</span></span><span class=line><span class=cl>    0x080486fa &lt;+77&gt;:    mov    eax,DWORD PTR <span class=o>[</span>esp+0x1c<span class=o>]</span>
+</span></span><span class=line><span class=cl>    0x080486fe &lt;+81&gt;:    cmp    eax,0x149a
+</span></span><span class=line><span class=cl>    0x08048703 &lt;+86&gt;:    jne    0x8048724 &lt;main+119&gt;
+</span></span></code></pre></td></tr></table></div></div><p>Há uma chamada de <code>scanf()</code> e uma comparação entre o valor inputado e <code>0x149a</code> (5274 em decimal). Portanto, ao inserir <code>5274</code> como senha, devemos satisfazer a comparação e evitar o jump subsequente.Assim, então, acessamos o usuário <code>lab1B</code> e recuperamos a senha <code>n0_str1ngs_n0_pr0bl3m</code>.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl><span class=cp>#!/bin/bash
+</span></span></span><span class=line><span class=cl><span class=cp></span>
+</span></span><span class=line><span class=cl><span class=nv>file</span><span class=o>=</span><span class=s2>&#34;/tmp/lab1B_pass.txt&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=o>(</span>python3 -c <span class=s2>&#34;print(str(5274))&#34;</span><span class=p>;</span> <span class=nb>echo</span> <span class=s2>&#34;cat /home/lab1B/.pass &gt; </span><span class=nv>$file</span><span class=s2>&#34;</span><span class=o>)</span> <span class=p>|</span> /levels/lab01/lab1C
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s2>&#34;Password stored at </span><span class=nv>$file</span><span class=s2>&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=lab1b>Lab1B<a hidden class=anchor aria-hidden=true href=#lab1b>#</a></h2><p>Conferindo as informações do arquivo:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>lab1B@warzone:/levels/lab01$ file lab1B
+</span></span><span class=line><span class=cl>lab1B: setuid ELF 32-bit LSB  executable, Intel 80386, version <span class=m>1</span> <span class=o>(</span>SYSV<span class=o>)</span>, dynamically linked <span class=o>(</span>uses shared libs<span class=o>)</span>, <span class=k>for</span> GNU/Linux 2.6.24, BuildID<span class=o>[</span>sha1<span class=o>]=</span>c9f07b581bd8d97cdc7c0ff1a288e20aea2df0f5, stripped
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>gdb-peda$ checksec
+</span></span><span class=line><span class=cl>CANARY    : ENABLED
+</span></span><span class=line><span class=cl>FORTIFY   : disabled
+</span></span><span class=line><span class=cl>NX        : ENABLED
+</span></span><span class=line><span class=cl>PIE       : disabled
+</span></span><span class=line><span class=cl>RELRO     : Partial
+</span></span></code></pre></td></tr></table></div></div><p>Esse arquivo de 32 bits, agora, possui algumas proteções de stack.</p><h3 id=análise-das-funções>Análise das funções<a hidden class=anchor aria-hidden=true href=#análise-das-funções>#</a></h3><p>Dessa vez, somos promptados com a mesma inteface de login:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>-----------------------------
+</span></span><span class=line><span class=cl>--- RPISEC - CrackMe v1.0 ---
+</span></span><span class=line><span class=cl>-----------------------------
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Password: 
+</span></span></code></pre></td></tr></table></div></div><p>Realizaremos, então, o disassembly da main:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>Dump of assembler code <span class=k>for</span> <span class=k>function</span> main:
+</span></span><span class=line><span class=cl>   0x08048be4 &lt;+0&gt;:	push   ebp
+</span></span><span class=line><span class=cl>   0x08048be5 &lt;+1&gt;:	mov    ebp,esp
+</span></span><span class=line><span class=cl>   0x08048be7 &lt;+3&gt;:	and    esp,0xfffffff0
+</span></span><span class=line><span class=cl>   0x08048bea &lt;+6&gt;:	sub    esp,0x20
+</span></span><span class=line><span class=cl>   0x08048bed &lt;+9&gt;:	push   eax
+</span></span><span class=line><span class=cl>   0x08048bee &lt;+10&gt;:	xor    eax,eax
+</span></span><span class=line><span class=cl>   0x08048bf0 &lt;+12&gt;:	je     0x8048bf5 &lt;main+17&gt;
+</span></span><span class=line><span class=cl>   0x08048bf2 &lt;+14&gt;:	add    esp,0x4
+</span></span><span class=line><span class=cl>   0x08048bf5 &lt;+17&gt;:	pop    eax
+</span></span><span class=line><span class=cl>   0x08048bf6 &lt;+18&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x0
+</span></span><span class=line><span class=cl>   0x08048bfd &lt;+25&gt;:	call   0x80487b0 &lt;time@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c02 &lt;+30&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048c05 &lt;+33&gt;:	call   0x8048800 &lt;srand@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c0a &lt;+38&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d88
+</span></span><span class=line><span class=cl>   0x08048c11 &lt;+45&gt;:	call   0x80487d0 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c16 &lt;+50&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048da6
+</span></span><span class=line><span class=cl>   0x08048c1d &lt;+57&gt;:	call   0x80487d0 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c22 &lt;+62&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048dc4
+</span></span><span class=line><span class=cl>   0x08048c29 &lt;+69&gt;:	call   0x80487d0 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c2e &lt;+74&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048de2
+</span></span><span class=line><span class=cl>   0x08048c35 &lt;+81&gt;:	call   0x8048780 &lt;printf@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c3a &lt;+86&gt;:	lea    eax,<span class=o>[</span>esp+0x1c<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048c3e &lt;+90&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048c42 &lt;+94&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048dee
+</span></span><span class=line><span class=cl>   0x08048c49 &lt;+101&gt;:	call   0x8048840 &lt;__isoc99_scanf@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c4e &lt;+106&gt;:	mov    eax,DWORD PTR <span class=o>[</span>esp+0x1c<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048c52 &lt;+110&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,0x1337d00d
+</span></span><span class=line><span class=cl>   0x08048c5a &lt;+118&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048c5d &lt;+121&gt;:	call   0x8048a74 &lt;test&gt;     <span class=c1># chama test()</span>
+</span></span><span class=line><span class=cl>   0x08048c62 &lt;+126&gt;:	mov    eax,0x0
+</span></span><span class=line><span class=cl>   0x08048c67 &lt;+131&gt;:	leave  
+</span></span><span class=line><span class=cl>   0x08048c68 &lt;+132&gt;:	ret    
+</span></span><span class=line><span class=cl>End of assembler dump.
+</span></span></code></pre></td></tr></table></div></div><p>Ao efetuar o disassembly, reparamos que a função <code>test()</code> é chamada em <code>&lt;main+121></code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>   0x08048c3e &lt;+90&gt;:    mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048c42 &lt;+94&gt;:    mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048dee
+</span></span><span class=line><span class=cl>   0x08048c49 &lt;+101&gt;:   call   0x8048840 &lt;__isoc99_scanf@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c4e &lt;+106&gt;:   mov    eax,DWORD PTR <span class=o>[</span>esp+0x1c<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048c52 &lt;+110&gt;:   mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,0x1337d00d
+</span></span><span class=line><span class=cl>   0x08048c5a &lt;+118&gt;:   mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048c5d &lt;+121&gt;:   call   0x8048a74 &lt;test&gt;     <span class=c1># chama test()</span>
+</span></span></code></pre></td></tr></table></div></div><p>Repare que o input do usuário é inserido como parametro, além de um valor fixo <code>0x1337d00d</code>. Conferindo a função <code>test()</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>Dump of assembler code <span class=k>for</span> <span class=k>function</span> test:
+</span></span><span class=line><span class=cl>   0x08048a74 &lt;+0&gt;:	push   ebp
+</span></span><span class=line><span class=cl>   0x08048a75 &lt;+1&gt;:	mov    ebp,esp
+</span></span><span class=line><span class=cl>   0x08048a77 &lt;+3&gt;:	sub    esp,0x28
+</span></span><span class=line><span class=cl>   0x08048a7a &lt;+6&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a7d &lt;+9&gt;:	mov    edx,DWORD PTR <span class=o>[</span>ebp+0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a80 &lt;+12&gt;:	sub    edx,eax                  <span class=c1>#subtrai os inputs</span>
+</span></span><span class=line><span class=cl>   0x08048a82 &lt;+14&gt;:	mov    eax,edx
+</span></span><span class=line><span class=cl>   0x08048a84 &lt;+16&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048a87 &lt;+19&gt;:	cmp    DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>,0x15
+</span></span><span class=line><span class=cl>   0x08048a8b &lt;+23&gt;:	ja     0x8048bd5 &lt;test+353&gt;         
+</span></span><span class=line><span class=cl>   0x08048a91 &lt;+29&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>      
+</span></span><span class=line><span class=cl>   0x08048a94 &lt;+32&gt;:	shl    eax,0x2
+</span></span><span class=line><span class=cl>   0x08048a97 &lt;+35&gt;:	add    eax,0x8048d30
+</span></span><span class=line><span class=cl>   0x08048a9c &lt;+40&gt;:	mov    eax,DWORD PTR <span class=o>[</span>eax<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a9e &lt;+42&gt;:	jmp    eax
+</span></span><span class=line><span class=cl>   0x08048aa0 &lt;+44&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048aa3 &lt;+47&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048aa6 &lt;+50&gt;:	call   0x80489b7 &lt;decrypt&gt;
+</span></span><span class=line><span class=cl>   0x08048aab &lt;+55&gt;:	jmp    0x8048be2 &lt;test+366&gt;
+</span></span><span class=line><span class=cl>   0x08048ab0 &lt;+60&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048ab3 &lt;+63&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048ab6 &lt;+66&gt;:	call   0x80489b7 &lt;decrypt&gt;
+</span></span><span class=line><span class=cl>   .
+</span></span><span class=line><span class=cl>   .
+</span></span><span class=line><span class=cl>   .
+</span></span><span class=line><span class=cl>   0x08048b85 &lt;+273&gt;:	jmp    0x8048be2 &lt;test+366&gt;
+</span></span><span class=line><span class=cl>   0x08048b87 &lt;+275&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048b8a &lt;+278&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048b8d &lt;+281&gt;:	call   0x80489b7 &lt;decrypt&gt;
+</span></span><span class=line><span class=cl>   0x08048b92 &lt;+286&gt;:	jmp    0x8048be2 &lt;test+366&gt;
+</span></span><span class=line><span class=cl>   0x08048b94 &lt;+288&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048b97 &lt;+291&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048b9a &lt;+294&gt;:	call   0x80489b7 &lt;decrypt&gt;
+</span></span><span class=line><span class=cl>   0x08048b9f &lt;+299&gt;:	jmp    0x8048be2 &lt;test+366&gt;
+</span></span><span class=line><span class=cl>   0x08048ba1 &lt;+301&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048ba4 &lt;+304&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048ba7 &lt;+307&gt;:	call   0x80489b7 &lt;decrypt&gt;
+</span></span><span class=line><span class=cl>   0x08048bac &lt;+312&gt;:	jmp    0x8048be2 &lt;test+366&gt;
+</span></span><span class=line><span class=cl>   0x08048bae &lt;+314&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048bb1 &lt;+317&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048bb4 &lt;+320&gt;:	call   0x80489b7 &lt;decrypt&gt;
+</span></span><span class=line><span class=cl>   0x08048bb9 &lt;+325&gt;:	jmp    0x8048be2 &lt;test+366&gt;
+</span></span><span class=line><span class=cl>   0x08048bbb &lt;+327&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048bbe &lt;+330&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048bc1 &lt;+333&gt;:	call   0x80489b7 &lt;decrypt&gt;
+</span></span><span class=line><span class=cl>   0x08048bc6 &lt;+338&gt;:	jmp    0x8048be2 &lt;test+366&gt;
+</span></span><span class=line><span class=cl>   0x08048bc8 &lt;+340&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048bcb &lt;+343&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048bce &lt;+346&gt;:	call   0x80489b7 &lt;decrypt&gt;
+</span></span><span class=line><span class=cl>   0x08048bd3 &lt;+351&gt;:	jmp    0x8048be2 &lt;test+366&gt;
+</span></span><span class=line><span class=cl>   0x08048bd5 &lt;+353&gt;:	call   0x8048830 &lt;rand@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048bda &lt;+358&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048bdd &lt;+361&gt;:	call   0x80489b7 &lt;decrypt&gt;
+</span></span><span class=line><span class=cl>   0x08048be2 &lt;+366&gt;:	leave  
+</span></span><span class=line><span class=cl>   0x08048be3 &lt;+367&gt;:	ret    
+</span></span><span class=line><span class=cl>End of assembler dump.
+</span></span></code></pre></td></tr></table></div></div><p>Investigando a função <code>test()</code>, vemos que existe um grande if-else (ou switch-case) que realiza a chamada de uma função <code>decrypt()</code> em todos os seus casos. O único caso que se diferencia é o último, cujo é usada a função <code>rand()</code> para ser o parametro dessa chamada.</p><p>Em partes, vamos analizar o comportamento da função para entendê-la. Primeiramente:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>   0x08048a7a &lt;+6&gt;: mov    eax,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span> <span class=c1># input do user</span>
+</span></span><span class=line><span class=cl>   0x08048a7d &lt;+9&gt;: mov    edx,DWORD PTR <span class=o>[</span>ebp+0xc<span class=o>]</span> <span class=c1># 0x1337d00d</span>
+</span></span><span class=line><span class=cl>   0x08048a80 &lt;+12&gt;:    sub    edx,eax          <span class=c1># subtrai os valores</span>
+</span></span></code></pre></td></tr></table></div></div><p>Nesse momento, é calculada a diferença entre a senha inputada e o valor hexadecimal. Após isso:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>   0x08048a82 &lt;+14&gt;:    mov    eax,edx
+</span></span><span class=line><span class=cl>   0x08048a84 &lt;+16&gt;:    mov    DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048a87 &lt;+19&gt;:    cmp    DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>,0x15
+</span></span><span class=line><span class=cl>   0x08048a8b &lt;+23&gt;:    ja     0x8048bd5 &lt;test+353&gt;
+</span></span></code></pre></td></tr></table></div></div><p>Aqui, vemos o que provoca o caso do switch-case com o <code>rand()</code>: a diferença entre os valores ser maior que 21. Então, caso a diferença seja igual ou menor que 21:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>   0x08048a91 &lt;+29&gt;:    mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a94 &lt;+32&gt;:    shl    eax,0x2
+</span></span><span class=line><span class=cl>   0x08048a97 &lt;+35&gt;:    add    eax,0x8048d30
+</span></span><span class=line><span class=cl>   0x08048a9c &lt;+40&gt;:    mov    eax,DWORD PTR <span class=o>[</span>eax<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a9e &lt;+42&gt;:    jmp    eax
+</span></span></code></pre></td></tr></table></div></div><p>Em todo caso, esse jump é tomado para um dos blocos do switch-case (que são todos iguais). Conferindo eles:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>   0x08048aa0 &lt;+XX&gt;:    mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048aa3 &lt;+XX&gt;:    mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048aa6 &lt;+XX&gt;:    call   0x80489b7 &lt;decrypt&gt;
+</span></span></code></pre></td></tr></table></div></div><p>Basicamente, a diferença entre <code>0x1337d00d</code> e o input é enviada como parametro para <code>decrypt()</code>. Vejamos, então, a função:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>Dump of assembler code <span class=k>for</span> <span class=k>function</span> decrypt:
+</span></span><span class=line><span class=cl>   0x080489b7 &lt;+0&gt;:	push   ebp
+</span></span><span class=line><span class=cl>   0x080489b8 &lt;+1&gt;:	mov    ebp,esp
+</span></span><span class=line><span class=cl>   0x080489ba &lt;+3&gt;:	sub    esp,0x38
+</span></span><span class=line><span class=cl>   0x080489bd &lt;+6&gt;:	mov    eax,gs:0x14
+</span></span><span class=line><span class=cl>   0x080489c3 &lt;+12&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x080489c6 &lt;+15&gt;:	xor    eax,eax
+</span></span><span class=line><span class=cl>   0x080489c8 &lt;+17&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0x1d<span class=o>]</span>,0x757c7d51
+</span></span><span class=line><span class=cl>   0x080489cf &lt;+24&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0x19<span class=o>]</span>,0x67667360
+</span></span><span class=line><span class=cl>   0x080489d6 &lt;+31&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0x15<span class=o>]</span>,0x7b66737e
+</span></span><span class=line><span class=cl>   0x080489dd &lt;+38&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0x11<span class=o>]</span>,0x33617c7d
+</span></span><span class=line><span class=cl>   0x080489e4 &lt;+45&gt;:	mov    BYTE PTR <span class=o>[</span>ebp-0xd<span class=o>]</span>,0x0
+</span></span><span class=line><span class=cl>   0x080489e8 &lt;+49&gt;:	push   eax
+</span></span><span class=line><span class=cl>   0x080489e9 &lt;+50&gt;:	xor    eax,eax
+</span></span><span class=line><span class=cl>   0x080489eb &lt;+52&gt;:	je     0x80489f0 &lt;decrypt+57&gt;
+</span></span><span class=line><span class=cl>   0x080489ed &lt;+54&gt;:	add    esp,0x4
+</span></span><span class=line><span class=cl>   0x080489f0 &lt;+57&gt;:	pop    eax
+</span></span><span class=line><span class=cl>   0x080489f1 &lt;+58&gt;:	lea    eax,<span class=o>[</span>ebp-0x1d<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x080489f4 &lt;+61&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x080489f7 &lt;+64&gt;:	call   0x8048810 &lt;strlen@plt&gt;
+</span></span><span class=line><span class=cl>   0x080489fc &lt;+69&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0x24<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x080489ff &lt;+72&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0x28<span class=o>]</span>,0x0
+</span></span><span class=line><span class=cl>   0x08048a06 &lt;+79&gt;:	jmp    0x8048a28 &lt;decrypt+113&gt;
+</span></span><span class=line><span class=cl>   0x08048a08 &lt;+81&gt;:	lea    edx,<span class=o>[</span>ebp-0x1d<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a0b &lt;+84&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0x28<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a0e &lt;+87&gt;:	add    eax,edx
+</span></span><span class=line><span class=cl>   0x08048a10 &lt;+89&gt;:	movzx  eax,BYTE PTR <span class=o>[</span>eax<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a13 &lt;+92&gt;:	mov    edx,eax
+</span></span><span class=line><span class=cl>   0x08048a15 &lt;+94&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a18 &lt;+97&gt;:	xor    eax,edx
+</span></span><span class=line><span class=cl>   0x08048a1a &lt;+99&gt;:	lea    ecx,<span class=o>[</span>ebp-0x1d<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a1d &lt;+102&gt;:	mov    edx,DWORD PTR <span class=o>[</span>ebp-0x28<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a20 &lt;+105&gt;:	add    edx,ecx
+</span></span><span class=line><span class=cl>   0x08048a22 &lt;+107&gt;:	mov    BYTE PTR <span class=o>[</span>edx<span class=o>]</span>,al
+</span></span><span class=line><span class=cl>   0x08048a24 &lt;+109&gt;:	add    DWORD PTR <span class=o>[</span>ebp-0x28<span class=o>]</span>,0x1
+</span></span><span class=line><span class=cl>   0x08048a28 &lt;+113&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0x28<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a2b &lt;+116&gt;:	cmp    eax,DWORD PTR <span class=o>[</span>ebp-0x24<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a2e &lt;+119&gt;:	jb     0x8048a08 &lt;decrypt+81&gt;
+</span></span><span class=line><span class=cl>   0x08048a30 &lt;+121&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,0x8048d03
+</span></span><span class=line><span class=cl>   0x08048a38 &lt;+129&gt;:	lea    eax,<span class=o>[</span>ebp-0x1d<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a3b &lt;+132&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048a3e &lt;+135&gt;:	call   0x8048770 &lt;strcmp@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048a43 &lt;+140&gt;:	<span class=nb>test</span>   eax,eax
+</span></span><span class=line><span class=cl>   0x08048a45 &lt;+142&gt;:	jne    0x8048a55 &lt;decrypt+158&gt;
+</span></span><span class=line><span class=cl>   0x08048a47 &lt;+144&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d14
+</span></span><span class=line><span class=cl>   0x08048a4e &lt;+151&gt;:	call   0x80487e0 &lt;system@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048a53 &lt;+156&gt;:	jmp    0x8048a61 &lt;decrypt+170&gt;
+</span></span><span class=line><span class=cl>   0x08048a55 &lt;+158&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d1c
+</span></span><span class=line><span class=cl>   0x08048a5c &lt;+165&gt;:	call   0x80487d0 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048a61 &lt;+170&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a64 &lt;+173&gt;:	xor    eax,DWORD PTR gs:0x14
+</span></span><span class=line><span class=cl>   0x08048a6b &lt;+180&gt;:	je     0x8048a72 &lt;decrypt+187&gt;
+</span></span><span class=line><span class=cl>   0x08048a6d &lt;+182&gt;:	call   0x80487c0 &lt;__stack_chk_fail@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048a72 &lt;+187&gt;:	leave  
+</span></span><span class=line><span class=cl>   0x08048a73 &lt;+188&gt;:	ret    
+</span></span><span class=line><span class=cl>End of assembler dump.
+</span></span></code></pre></td></tr></table></div></div><p>Em <code>decrypt()</code>, vemos a existência de uma string hardcoded:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>   0x080489c8 &lt;+17&gt;:    mov    DWORD PTR <span class=o>[</span>ebp-0x1d<span class=o>]</span>,0x757c7d51
+</span></span><span class=line><span class=cl>   0x080489cf &lt;+24&gt;:    mov    DWORD PTR <span class=o>[</span>ebp-0x19<span class=o>]</span>,0x67667360
+</span></span><span class=line><span class=cl>   0x080489d6 &lt;+31&gt;:    mov    DWORD PTR <span class=o>[</span>ebp-0x15<span class=o>]</span>,0x7b66737e
+</span></span><span class=line><span class=cl>   0x080489dd &lt;+38&gt;:    mov    DWORD PTR <span class=o>[</span>ebp-0x11<span class=o>]</span>,0x33617c7d
+</span></span></code></pre></td></tr></table></div></div><p>Transformando em caracteres, resulta em
+<code>Q}|u\`sfg~sf{}|a3</code> (tenha em mente que estamos tratando de Little Endian!).</p><p>Além disso, existe um loop onde todos os caracteres dessa string estranha são decodificados (usando XOR) baseados no valor da diferença calculado em <code>test()</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>   0x08048a08 &lt;+81&gt;:    lea    edx,<span class=o>[</span>ebp-0x1d<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a0b &lt;+84&gt;:    mov    eax,DWORD PTR <span class=o>[</span>ebp-0x28<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a0e &lt;+87&gt;:    add    eax,edx
+</span></span><span class=line><span class=cl>   0x08048a10 &lt;+89&gt;:    movzx  eax,BYTE PTR <span class=o>[</span>eax<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a13 &lt;+92&gt;:    mov    edx,eax
+</span></span><span class=line><span class=cl>   0x08048a15 &lt;+94&gt;:    mov    eax,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a18 &lt;+97&gt;:    xor    eax,edx
+</span></span><span class=line><span class=cl>   0x08048a1a &lt;+99&gt;:    lea    ecx,<span class=o>[</span>ebp-0x1d<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a1d &lt;+102&gt;:   mov    edx,DWORD PTR <span class=o>[</span>ebp-0x28<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a20 &lt;+105&gt;:   add    edx,ecx
+</span></span><span class=line><span class=cl>   0x08048a22 &lt;+107&gt;:   mov    BYTE PTR <span class=o>[</span>edx<span class=o>]</span>,al
+</span></span><span class=line><span class=cl>   0x08048a24 &lt;+109&gt;:   add    DWORD PTR <span class=o>[</span>ebp-0x28<span class=o>]</span>,0x1
+</span></span><span class=line><span class=cl>   0x08048a28 &lt;+113&gt;:   mov    eax,DWORD PTR <span class=o>[</span>ebp-0x28<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a2b &lt;+116&gt;:   cmp    eax,DWORD PTR <span class=o>[</span>ebp-0x24<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a2e &lt;+119&gt;:   jb     0x8048a08 &lt;decrypt+81&gt;
+</span></span></code></pre></td></tr></table></div></div><p>Após a decriptação, a string final é vista novamente em <code>main&lt;+132></code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>   0x08048a30 &lt;+121&gt;:   mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,0x8048d03 <span class=c1># string nova?</span>
+</span></span><span class=line><span class=cl>   0x08048a38 &lt;+129&gt;:   lea    eax,<span class=o>[</span>ebp-0x1d<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a3b &lt;+132&gt;:   mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax <span class=c1># string final</span>
+</span></span><span class=line><span class=cl>   0x08048a3e &lt;+135&gt;:   call   0x8048770 &lt;strcmp@plt&gt;
+</span></span></code></pre></td></tr></table></div></div><p>Ela é enviada com uma outra string (do endereço <code>0x8048d03</code>) para ser comparada. Afinal, que string é essa?</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>gdb-peda$ x/s 0x8048d03
+</span></span><span class=line><span class=cl>0x8048d03:	<span class=s2>&#34;Congratulations!&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Ok! Temos, então, a string <code>Congratulations!</code> como alvo!</p><h3 id=objetivo>Objetivo<a hidden class=anchor aria-hidden=true href=#objetivo>#</a></h3><p>Como controlamos apenas o input, devemos inputar um número que, ao subtrair <code>0x1337d00d</code>, resulte em uma chave válida para a decriptação de
+<code>Q}|u\`sfg~sf{}|a3</code> em <code>Congratulations!</code>. Nosso objetivo é descobrir essa chave e saber o payload válido.</p><h3 id=resolvendo>Resolvendo<a hidden class=anchor aria-hidden=true href=#resolvendo>#</a></h3><p>Dado o funcionamento do XOR, podemos realizar XOR entre a string original e a encriptada e, assim, sabemos a chave simétrica. Usando Python:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-py data-lang=py><span class=line><span class=cl><span class=o>&gt;&gt;&gt;</span> <span class=nb>ord</span><span class=p>(</span><span class=s2>&#34;Q&#34;</span><span class=p>)</span> <span class=o>^</span> <span class=nb>ord</span><span class=p>(</span><span class=s2>&#34;C&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=mi>18</span>
+</span></span></code></pre></td></tr></table></div></div><p>Precisamos, então, de uma diferença de 18! Como fazemos <code>0x1337D00D - input</code>, sabemos que <code>0x1337D00D + 0x12</code> é o input desejado. Assim, chegamos a <code>322424827</code> e voilà! Temos a senha <code>1337_3nCRyptI0n_br0</code>.</p><h3 id=exploit>Exploit<a hidden class=anchor aria-hidden=true href=#exploit>#</a></h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-py data-lang=py><span class=line><span class=cl><span class=ch>#!/usr/bin/python</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pwn</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># XOR allow us to do that :P</span>
+</span></span><span class=line><span class=cl><span class=n>key</span> <span class=o>=</span> <span class=mh>0x1337d00d</span> <span class=o>-</span> <span class=p>(</span><span class=nb>ord</span><span class=p>(</span><span class=s2>&#34;Q&#34;</span><span class=p>)</span> <span class=o>^</span> <span class=nb>ord</span><span class=p>(</span><span class=s2>&#34;C&#34;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Path to the save file</span>
+</span></span><span class=line><span class=cl><span class=n>save_file</span> <span class=o>=</span> <span class=s2>&#34;/tmp/lab1A_pass.txt&#34;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Initiating process</span>
+</span></span><span class=line><span class=cl><span class=n>p</span> <span class=o>=</span> <span class=n>pwn</span><span class=o>.</span><span class=n>process</span><span class=p>(</span><span class=s1>&#39;/levels/lab01/lab1B&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Sending the payloads</span>
+</span></span><span class=line><span class=cl><span class=n>p</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>key</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>p</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=s2>&#34;cat /home/lab1A/.pass &gt; &#34;</span><span class=o>+</span> <span class=n>save_file</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=s2>&#34;[!] Password saved on &#34;</span> <span class=o>+</span> <span class=n>save_file</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>p</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=lab1a>Lab1A<a hidden class=anchor aria-hidden=true href=#lab1a>#</a></h2><p>Conferindo as informações do arquivo:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>lab1A@warzone:/levels/lab01$ file lab1A
+</span></span><span class=line><span class=cl>lab1A: setuid ELF 32-bit LSB  executable, Intel 80386, version <span class=m>1</span> <span class=o>(</span>SYSV<span class=o>)</span>, dynamically linked <span class=o>(</span>uses shared libs<span class=o>)</span>, <span class=k>for</span> GNU/Linux 2.6.24, BuildID<span class=o>[</span>sha1<span class=o>]=</span>8207a5ad5821e47f25412161c60dc24fd2f3386e, stripped
+</span></span></code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>gdb-peda$ checksec
+</span></span><span class=line><span class=cl>CANARY    : ENABLED
+</span></span><span class=line><span class=cl>FORTIFY   : disabled
+</span></span><span class=line><span class=cl>NX        : ENABLED
+</span></span><span class=line><span class=cl>PIE       : disabled
+</span></span><span class=line><span class=cl>RELRO     : Partial
+</span></span></code></pre></td></tr></table></div></div><p>Repare que todos os programas estão em 32 bits. Fiz todas essas verificações por prática, mas todos os programas desse curso são em 32 bits.</p><h3 id=análise-das-funções-1>Análise das funções<a hidden class=anchor aria-hidden=true href=#análise-das-funções-1>#</a></h3><p>Realizando o disassembly da <code>main()</code>, verificamos que há 2 inputs pertinentes: um usuário e um serial.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>.---------------------------.
+</span></span><span class=line><span class=cl>|---------  RPISEC  --------|
+</span></span><span class=line><span class=cl>|+ SECURE LOGIN SYS v. 3.0 +|
+</span></span><span class=line><span class=cl>|---------------------------|
+</span></span><span class=line><span class=cl>|~- Enter your Username:  ~-|
+</span></span><span class=line><span class=cl>&#39;---------------------------&#39;
+</span></span><span class=line><span class=cl>UsernameTeste
+</span></span><span class=line><span class=cl>.---------------------------.
+</span></span><span class=line><span class=cl>| !! NEW ACCOUNT DETECTED !!|
+</span></span><span class=line><span class=cl>|---------------------------|
+</span></span><span class=line><span class=cl>|~- Input your serial:    ~-|
+</span></span><span class=line><span class=cl>&#39;---------------------------&#39;
+</span></span><span class=line><span class=cl>123456
+</span></span></code></pre></td></tr></table></div></div><p>Realizando o disassembly da função <code>main()</code>, temos:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>Dump of assembler code <span class=k>for</span> <span class=k>function</span> main:
+</span></span><span class=line><span class=cl>   0x08048b44 &lt;+0&gt;:	push   ebp
+</span></span><span class=line><span class=cl>   0x08048b45 &lt;+1&gt;:	mov    ebp,esp
+</span></span><span class=line><span class=cl>   0x08048b47 &lt;+3&gt;:	and    esp,0xfffffff0
+</span></span><span class=line><span class=cl>   0x08048b4a &lt;+6&gt;:	sub    esp,0x40
+</span></span><span class=line><span class=cl>   0x08048b4d &lt;+9&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp+0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048b50 &lt;+12&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0xc<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048b54 &lt;+16&gt;:	mov    eax,gs:0x14
+</span></span><span class=line><span class=cl>   0x08048b5a &lt;+22&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x3c<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048b5e &lt;+26&gt;:	xor    eax,eax
+</span></span><span class=line><span class=cl>   0x08048b60 &lt;+28&gt;:	push   eax
+</span></span><span class=line><span class=cl>   0x08048b61 &lt;+29&gt;:	xor    eax,eax
+</span></span><span class=line><span class=cl>   0x08048b63 &lt;+31&gt;:	je     0x8048b68 &lt;main+36&gt;
+</span></span><span class=line><span class=cl>   0x08048b65 &lt;+33&gt;:	add    esp,0x4
+</span></span><span class=line><span class=cl>   0x08048b68 &lt;+36&gt;:	pop    eax
+</span></span><span class=line><span class=cl>   0x08048b69 &lt;+37&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d73
+</span></span><span class=line><span class=cl>   0x08048b70 &lt;+44&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048b75 &lt;+49&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d91
+</span></span><span class=line><span class=cl>   0x08048b7c &lt;+56&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048b81 &lt;+61&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048daf
+</span></span><span class=line><span class=cl>   0x08048b88 &lt;+68&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048b8d &lt;+73&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048dcd
+</span></span><span class=line><span class=cl>   0x08048b94 &lt;+80&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048b99 &lt;+85&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048deb
+</span></span><span class=line><span class=cl>   0x08048ba0 &lt;+92&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048ba5 &lt;+97&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048e09
+</span></span><span class=line><span class=cl>   0x08048bac &lt;+104&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048bb1 &lt;+109&gt;:	mov    eax,ds:0x804b060
+</span></span><span class=line><span class=cl>   0x08048bb6 &lt;+114&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x8<span class=o>]</span>,eax 
+</span></span><span class=line><span class=cl>   0x08048bba &lt;+118&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,0x20
+</span></span><span class=line><span class=cl>   0x08048bc2 &lt;+126&gt;:	lea    eax,<span class=o>[</span>esp+0x1c<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048bc6 &lt;+130&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048bc9 &lt;+133&gt;:	call   0x80487d0 &lt;fgets@plt&gt; <span class=c1># Coleta o username como string</span>
+</span></span><span class=line><span class=cl>   0x08048bce &lt;+138&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d73
+</span></span><span class=line><span class=cl>   0x08048bd5 &lt;+145&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048bda &lt;+150&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048e27
+</span></span><span class=line><span class=cl>   0x08048be1 &lt;+157&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048be6 &lt;+162&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048dcd
+</span></span><span class=line><span class=cl>   0x08048bed &lt;+169&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048bf2 &lt;+174&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048e45
+</span></span><span class=line><span class=cl>   0x08048bf9 &lt;+181&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048bfe &lt;+186&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048e09
+</span></span><span class=line><span class=cl>   0x08048c05 &lt;+193&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c0a &lt;+198&gt;:	lea    eax,<span class=o>[</span>esp+0x18<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048c0e &lt;+202&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048c12 &lt;+206&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d00
+</span></span><span class=line><span class=cl>   0x08048c19 &lt;+213&gt;:	call   0x8048860 &lt;__isoc99_scanf@plt&gt; <span class=c1># Coleta o serial como int</span>
+</span></span><span class=line><span class=cl>   0x08048c1e &lt;+218&gt;:	mov    eax,DWORD PTR <span class=o>[</span>esp+0x18<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048c22 &lt;+222&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048c26 &lt;+226&gt;:	lea    eax,<span class=o>[</span>esp+0x1c<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048c2a &lt;+230&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048c2d &lt;+233&gt;:	call   0x8048a0f &lt;auth&gt;
+</span></span><span class=line><span class=cl>   0x08048c32 &lt;+238&gt;:	<span class=nb>test</span>   eax,eax
+</span></span><span class=line><span class=cl>   0x08048c34 &lt;+240&gt;:	jne    0x8048c55 &lt;main+273&gt;
+</span></span><span class=line><span class=cl>   0x08048c36 &lt;+242&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048e63
+</span></span><span class=line><span class=cl>   0x08048c3d &lt;+249&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c42 &lt;+254&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048e72
+</span></span><span class=line><span class=cl>   0x08048c49 &lt;+261&gt;:	call   0x8048820 &lt;system@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c4e &lt;+266&gt;:	mov    eax,0x0
+</span></span><span class=line><span class=cl>   0x08048c53 &lt;+271&gt;:	jmp    0x8048c5a &lt;main+278&gt;
+</span></span><span class=line><span class=cl>   0x08048c55 &lt;+273&gt;:	mov    eax,0x1
+</span></span><span class=line><span class=cl>   0x08048c5a &lt;+278&gt;:	mov    edx,DWORD PTR <span class=o>[</span>esp+0x3c<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048c5e &lt;+282&gt;:	xor    edx,DWORD PTR gs:0x14
+</span></span><span class=line><span class=cl>   0x08048c65 &lt;+289&gt;:	je     0x8048c6c &lt;main+296&gt;
+</span></span><span class=line><span class=cl>   0x08048c67 &lt;+291&gt;:	call   0x8048800 &lt;__stack_chk_fail@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048c6c &lt;+296&gt;:	leave  
+</span></span><span class=line><span class=cl>   0x08048c6d &lt;+297&gt;:	ret    
+</span></span><span class=line><span class=cl>End of assembler dump.
+</span></span></code></pre></td></tr></table></div></div><p>Sendo um pouco mais breve, os inputs são armazenados na stack e enviados para <code>auth()</code>, em <code>&lt;main+233></code>. Realizando o disassembly de <code>auth()</code>:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span><span class=lnt>72
+</span><span class=lnt>73
+</span><span class=lnt>74
+</span><span class=lnt>75
+</span><span class=lnt>76
+</span><span class=lnt>77
+</span><span class=lnt>78
+</span><span class=lnt>79
+</span><span class=lnt>80
+</span><span class=lnt>81
+</span><span class=lnt>82
+</span><span class=lnt>83
+</span><span class=lnt>84
+</span><span class=lnt>85
+</span><span class=lnt>86
+</span><span class=lnt>87
+</span><span class=lnt>88
+</span><span class=lnt>89
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sh data-lang=sh><span class=line><span class=cl>Dump of assembler code <span class=k>for</span> <span class=k>function</span> auth:
+</span></span><span class=line><span class=cl>   0x08048a0f &lt;+0&gt;:	push   ebp
+</span></span><span class=line><span class=cl>   0x08048a10 &lt;+1&gt;:	mov    ebp,esp
+</span></span><span class=line><span class=cl>   0x08048a12 &lt;+3&gt;:	sub    esp,0x28
+</span></span><span class=line><span class=cl>   0x08048a15 &lt;+6&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,0x8048d03
+</span></span><span class=line><span class=cl>   0x08048a1d &lt;+14&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a20 &lt;+17&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048a23 &lt;+20&gt;:	call   0x80487a0 &lt;strcspn@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048a28 &lt;+25&gt;:	mov    edx,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a2b &lt;+28&gt;:	add    eax,edx
+</span></span><span class=line><span class=cl>   0x08048a2d &lt;+30&gt;:	mov    BYTE PTR <span class=o>[</span>eax<span class=o>]</span>,0x0
+</span></span><span class=line><span class=cl>   0x08048a30 &lt;+33&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,0x20
+</span></span><span class=line><span class=cl>   0x08048a38 &lt;+41&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048a3b &lt;+44&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048a3e &lt;+47&gt;:	call   0x8048850 &lt;strnlen@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048a43 &lt;+52&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048a46 &lt;+55&gt;:	push   eax
+</span></span><span class=line><span class=cl>   0x08048a47 &lt;+56&gt;:	xor    eax,eax
+</span></span><span class=line><span class=cl>   0x08048a49 &lt;+58&gt;:	je     0x8048a4e &lt;auth+63&gt;
+</span></span><span class=line><span class=cl>   0x08048a4b &lt;+60&gt;:	add    esp,0x4
+</span></span><span class=line><span class=cl>   0x08048a4e &lt;+63&gt;:	pop    eax
+</span></span><span class=line><span class=cl>   0x08048a4f &lt;+64&gt;:	cmp    DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>,0x5
+</span></span><span class=line><span class=cl>   0x08048a53 &lt;+68&gt;:	jg     0x8048a5f &lt;auth+80&gt;
+</span></span><span class=line><span class=cl>   0x08048a55 &lt;+70&gt;:	mov    eax,0x1
+</span></span><span class=line><span class=cl>   0x08048a5a &lt;+75&gt;:	jmp    0x8048b42 &lt;auth+307&gt;
+</span></span><span class=line><span class=cl>   0x08048a5f &lt;+80&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0xc<span class=o>]</span>,0x0
+</span></span><span class=line><span class=cl>   0x08048a67 &lt;+88&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x8<span class=o>]</span>,0x1
+</span></span><span class=line><span class=cl>   0x08048a6f &lt;+96&gt;:	mov    DWORD PTR <span class=o>[</span>esp+0x4<span class=o>]</span>,0x0
+</span></span><span class=line><span class=cl>   0x08048a77 &lt;+104&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x0
+</span></span><span class=line><span class=cl>   0x08048a7e &lt;+111&gt;:	call   0x8048870 &lt;ptrace@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048a83 &lt;+116&gt;:	cmp    eax,0xffffffff
+</span></span><span class=line><span class=cl>   0x08048a86 &lt;+119&gt;:	jne    0x8048ab6 &lt;auth+167&gt;
+</span></span><span class=line><span class=cl>   0x08048a88 &lt;+121&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d08
+</span></span><span class=line><span class=cl>   0x08048a8f &lt;+128&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048a94 &lt;+133&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d2c
+</span></span><span class=line><span class=cl>   0x08048a9b &lt;+140&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048aa0 &lt;+145&gt;:	mov    DWORD PTR <span class=o>[</span>esp<span class=o>]</span>,0x8048d50
+</span></span><span class=line><span class=cl>   0x08048aa7 &lt;+152&gt;:	call   0x8048810 &lt;puts@plt&gt;
+</span></span><span class=line><span class=cl>   0x08048aac &lt;+157&gt;:	mov    eax,0x1
+</span></span><span class=line><span class=cl>   0x08048ab1 &lt;+162&gt;:	jmp    0x8048b42 &lt;auth+307&gt;
+</span></span><span class=line><span class=cl>   0x08048ab6 &lt;+167&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048ab9 &lt;+170&gt;:	add    eax,0x3
+</span></span><span class=line><span class=cl>   0x08048abc &lt;+173&gt;:	movzx  eax,BYTE PTR <span class=o>[</span>eax<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048abf &lt;+176&gt;:	movsx  eax,al
+</span></span><span class=line><span class=cl>   0x08048ac2 &lt;+179&gt;:	xor    eax,0x1337
+</span></span><span class=line><span class=cl>   0x08048ac7 &lt;+184&gt;:	add    eax,0x5eeded
+</span></span><span class=line><span class=cl>   0x08048acc &lt;+189&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0x10<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048acf &lt;+192&gt;:	mov    DWORD PTR <span class=o>[</span>ebp-0x14<span class=o>]</span>,0x0
+</span></span><span class=line><span class=cl>   0x08048ad6 &lt;+199&gt;:	jmp    0x8048b26 &lt;auth+279&gt;
+</span></span><span class=line><span class=cl>   0x08048ad8 &lt;+201&gt;:	mov    edx,DWORD PTR <span class=o>[</span>ebp-0x14<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048adb &lt;+204&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048ade &lt;+207&gt;:	add    eax,edx
+</span></span><span class=line><span class=cl>   0x08048ae0 &lt;+209&gt;:	movzx  eax,BYTE PTR <span class=o>[</span>eax<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048ae3 &lt;+212&gt;:	cmp    al,0x1f
+</span></span><span class=line><span class=cl>   0x08048ae5 &lt;+214&gt;:	jg     0x8048aee &lt;auth+223&gt;
+</span></span><span class=line><span class=cl>   0x08048ae7 &lt;+216&gt;:	mov    eax,0x1
+</span></span><span class=line><span class=cl>   0x08048aec &lt;+221&gt;:	jmp    0x8048b42 &lt;auth+307&gt;
+</span></span><span class=line><span class=cl>   0x08048aee &lt;+223&gt;:	mov    edx,DWORD PTR <span class=o>[</span>ebp-0x14<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048af1 &lt;+226&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp+0x8<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048af4 &lt;+229&gt;:	add    eax,edx
+</span></span><span class=line><span class=cl>   0x08048af6 &lt;+231&gt;:	movzx  eax,BYTE PTR <span class=o>[</span>eax<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048af9 &lt;+234&gt;:	movsx  eax,al
+</span></span><span class=line><span class=cl>   0x08048afc &lt;+237&gt;:	xor    eax,DWORD PTR <span class=o>[</span>ebp-0x10<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048aff &lt;+240&gt;:	mov    ecx,eax
+</span></span><span class=line><span class=cl>   0x08048b01 &lt;+242&gt;:	mov    edx,0x88233b2b
+</span></span><span class=line><span class=cl>   0x08048b06 &lt;+247&gt;:	mov    eax,ecx
+</span></span><span class=line><span class=cl>   0x08048b08 &lt;+249&gt;:	mul    edx
+</span></span><span class=line><span class=cl>   0x08048b0a &lt;+251&gt;:	mov    eax,ecx
+</span></span><span class=line><span class=cl>   0x08048b0c &lt;+253&gt;:	sub    eax,edx
+</span></span><span class=line><span class=cl>   0x08048b0e &lt;+255&gt;:	shr    eax,1
+</span></span><span class=line><span class=cl>   0x08048b10 &lt;+257&gt;:	add    eax,edx
+</span></span><span class=line><span class=cl>   0x08048b12 &lt;+259&gt;:	shr    eax,0xa
+</span></span><span class=line><span class=cl>   0x08048b15 &lt;+262&gt;:	imul   eax,eax,0x539
+</span></span><span class=line><span class=cl>   0x08048b1b &lt;+268&gt;:	sub    ecx,eax
+</span></span><span class=line><span class=cl>   0x08048b1d &lt;+270&gt;:	mov    eax,ecx
+</span></span><span class=line><span class=cl>   0x08048b1f &lt;+272&gt;:	add    DWORD PTR <span class=o>[</span>ebp-0x10<span class=o>]</span>,eax
+</span></span><span class=line><span class=cl>   0x08048b22 &lt;+275&gt;:	add    DWORD PTR <span class=o>[</span>ebp-0x14<span class=o>]</span>,0x1
+</span></span><span class=line><span class=cl>   0x08048b26 &lt;+279&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp-0x14<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048b29 &lt;+282&gt;:	cmp    eax,DWORD PTR <span class=o>[</span>ebp-0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048b2c &lt;+285&gt;:	jl     0x8048ad8 &lt;auth+201&gt;
+</span></span><span class=line><span class=cl>   0x08048b2e &lt;+287&gt;:	mov    eax,DWORD PTR <span class=o>[</span>ebp+0xc<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048b31 &lt;+290&gt;:	cmp    eax,DWORD PTR <span class=o>[</span>ebp-0x10<span class=o>]</span>
+</span></span><span class=line><span class=cl>   0x08048b34 &lt;+293&gt;:	je     0x8048b3d &lt;auth+302&gt;
+</span></span><span class=line><span class=cl>   0x08048b36 &lt;+295&gt;:	mov    eax,0x1
+</span></span><span class=line><span class=cl>   0x08048b3b &lt;+300&gt;:	jmp    0x8048b42 &lt;auth+307&gt;
+</span></span><span class=line><span class=cl>   0x08048b3d &lt;+302&gt;:	mov    eax,0x0
+</span></span><span class=line><span class=cl>   0x08048b42 &lt;+307&gt;:	leave  
+</span></span><span class=line><span class=cl>   0x08048b43 &lt;+308&gt;:	ret    
+</span></span><span class=line><span class=cl>End of assembler dump.
+</span></span></code></pre></td></tr></table></div></div><p>O assembly dessa função está muito extenso. Portanto, para facilitar, utilizei o decompilador do Ghidra para entender melhor o que estava ocorrendo:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=cm>/* WARNING: Removing unreachable block (ram,0x08048a4b) */</span>
+</span></span><span class=line><span class=cl><span class=cm>/* WARNING: Restarted to delay deadcode elimination for space: stack */</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>undefined4</span> <span class=nf>auth</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>param_1</span><span class=p>,</span><span class=n>uint</span> <span class=n>param_2</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kt>size_t</span> <span class=n>sVar1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>undefined4</span> <span class=n>uVar2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kt>long</span> <span class=n>lVar3</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>local_18</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>uint</span> <span class=n>local_14</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  <span class=n>sVar1</span> <span class=o>=</span> <span class=nf>strcspn</span><span class=p>(</span><span class=n>param_1</span><span class=p>,</span><span class=s>&#34;</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>param_1</span><span class=p>[</span><span class=n>sVar1</span><span class=p>]</span> <span class=o>=</span> <span class=sc>&#39;\0&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>sVar1</span> <span class=o>=</span> <span class=nf>strnlen</span><span class=p>(</span><span class=n>param_1</span><span class=p>,</span><span class=mh>0x20</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>((</span><span class=kt>int</span><span class=p>)</span><span class=n>sVar1</span> <span class=o>&lt;</span> <span class=mi>6</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>uVar2</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>lVar3</span> <span class=o>=</span> <span class=nf>ptrace</span><span class=p>(</span><span class=n>PTRACE_TRACEME</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>lVar3</span> <span class=o>==</span> <span class=o>-</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nf>puts</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\x1b</span><span class=s>[32m.---------------------------.&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=nf>puts</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\x1b</span><span class=s>[31m| !! TAMPERING DETECTED !!  |&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=nf>puts</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\x1b</span><span class=s>[32m</span><span class=se>\&#39;</span><span class=s>---------------------------</span><span class=se>\&#39;</span><span class=s>&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=n>uVar2</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>local_14</span> <span class=o>=</span> <span class=p>((</span><span class=kt>int</span><span class=p>)</span><span class=n>param_1</span><span class=p>[</span><span class=mi>3</span><span class=p>]</span> <span class=o>^</span> <span class=mh>0x1337U</span><span class=p>)</span> <span class=o>+</span> <span class=mh>0x5eeded</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=k>for</span> <span class=p>(</span><span class=n>local_18</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>local_18</span> <span class=o>&lt;</span> <span class=p>(</span><span class=kt>int</span><span class=p>)</span><span class=n>sVar1</span><span class=p>;</span> <span class=n>local_18</span> <span class=o>=</span> <span class=n>local_18</span> <span class=o>+</span> <span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>param_1</span><span class=p>[</span><span class=n>local_18</span><span class=p>]</span> <span class=o>&lt;</span> <span class=sc>&#39; &#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=k>return</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>local_14</span> <span class=o>=</span> <span class=n>local_14</span> <span class=o>+</span> <span class=p>((</span><span class=kt>int</span><span class=p>)</span><span class=n>param_1</span><span class=p>[</span><span class=n>local_18</span><span class=p>]</span> <span class=o>^</span> <span class=n>local_14</span><span class=p>)</span> <span class=o>%</span> <span class=mh>0x539</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=n>param_2</span> <span class=o>==</span> <span class=n>local_14</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>uVar2</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>uVar2</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=n>uVar2</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Adaptando os nomes de algumas variáveis para facilitar a leitura, resultamos em:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-C data-lang=C><span class=line><span class=cl><span class=kt>int</span> <span class=nf>auth</span><span class=p>(</span><span class=kt>char</span> <span class=o>*</span><span class=n>username</span><span class=p>,</span><span class=n>uint</span> <span class=n>serial</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kt>size_t</span> <span class=n>inputLength</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>undefined4</span> <span class=n>flag</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kt>long</span> <span class=n>ptrace</span><span class=o>?</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>uint</span> <span class=n>temp</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  <span class=n>inputLength</span> <span class=o>=</span> <span class=nf>strcspn</span><span class=p>(</span><span class=n>username</span><span class=p>,</span><span class=s>&#34;</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>username</span><span class=p>[</span><span class=n>inputLength</span><span class=p>]</span> <span class=o>=</span> <span class=sc>&#39;\0&#39;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>inputLength</span> <span class=o>=</span> <span class=nf>strnlen</span><span class=p>(</span><span class=n>username</span><span class=p>,</span><span class=mh>0x20</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>((</span><span class=kt>int</span><span class=p>)</span><span class=n>inputLength</span> <span class=o>&lt;</span> <span class=mi>6</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>flag</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>ptrace</span><span class=o>?</span> <span class=o>=</span> <span class=nf>ptrace</span><span class=p>(</span><span class=n>PTRACE_TRACEME</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>ptrace</span><span class=o>?</span> <span class=o>==</span> <span class=o>-</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nf>puts</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\x1b</span><span class=s>[32m.---------------------------.&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=nf>puts</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\x1b</span><span class=s>[31m| !! TAMPERING DETECTED !!  |&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=nf>puts</span><span class=p>(</span><span class=s>&#34;</span><span class=se>\x1b</span><span class=s>[32m</span><span class=se>\&#39;</span><span class=s>---------------------------</span><span class=se>\&#39;</span><span class=s>&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>      <span class=n>flag</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>temp</span> <span class=o>=</span> <span class=p>((</span><span class=kt>int</span><span class=p>)</span><span class=n>username</span><span class=p>[</span><span class=mi>3</span><span class=p>]</span> <span class=o>^</span> <span class=mh>0x1337U</span><span class=p>)</span> <span class=o>+</span> <span class=mh>0x5eeded</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=k>for</span> <span class=p>(</span><span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=p>(</span><span class=kt>int</span><span class=p>)</span><span class=n>inputLength</span><span class=p>;</span> <span class=n>i</span> <span class=o>=</span> <span class=n>i</span> <span class=o>+</span> <span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>username</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&lt;</span> <span class=sc>&#39; &#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>          <span class=k>return</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=n>temp</span> <span class=o>=</span> <span class=n>temp</span> <span class=o>+</span> <span class=p>((</span><span class=kt>int</span><span class=p>)</span><span class=n>username</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>^</span> <span class=n>temp</span><span class=p>)</span> <span class=o>%</span> <span class=mh>0x539</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=n>serial</span> <span class=o>==</span> <span class=n>temp</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>flag</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>      <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>flag</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=n>flag</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>Em <code>auth()</code>, podemos verificar que o programa retira, do nome do usuário, o caracter <code>\n</code> e substitui por <code>\0</code>, além de calcular e armazenar o comprimento da string. Cabe salientar que usernames com menos de 6 caracteres não são aceitos pelo programa e resultam em retorno imediato com valor 1 (que invalida a sessão). Após isso, ele faz algo em uma lógica fixa com o username e compara com o serial inputado para validar.</p><h3 id=resolução>Resolução<a hidden class=anchor aria-hidden=true href=#resolução>#</a></h3><p>Para resolver o problema, criei um pequeno keygen a partir da lógica exibida pelo decompilador.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-py data-lang=py><span class=line><span class=cl><span class=ch>#!/usr/bin/python</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pwn</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>#input</span>
+</span></span><span class=line><span class=cl><span class=n>username</span> <span class=o>=</span> <span class=nb>str</span><span class=p>(</span><span class=n>raw_input</span><span class=p>(</span><span class=s2>&#34;[!] Insert the username that you want to use: &#34;</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Serial logic</span>
+</span></span><span class=line><span class=cl><span class=n>num</span> <span class=o>=</span> <span class=p>(</span><span class=nb>ord</span><span class=p>(</span><span class=n>username</span><span class=p>[</span><span class=mi>3</span><span class=p>])</span> <span class=o>^</span> <span class=mh>0x1337</span><span class=p>)</span> <span class=o>+</span> <span class=mi>6221293</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=n>char</span> <span class=ow>in</span> <span class=n>username</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>char</span> <span class=o>==</span> <span class=s1>&#39; &#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=nb>print</span><span class=p>(</span><span class=s2>&#34;lol&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=n>exit</span><span class=p>(</span><span class=mi>3</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=n>char</span> <span class=o>==</span> <span class=s1>&#39;</span><span class=se>\n</span><span class=s1>&#39;</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>continue</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=n>num</span> <span class=o>=</span> <span class=n>num</span> <span class=o>+</span> <span class=p>(</span><span class=nb>ord</span><span class=p>(</span><span class=n>char</span><span class=p>)</span> <span class=o>^</span> <span class=n>num</span><span class=p>)</span> <span class=o>%</span> <span class=mi>1337</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Printing out the serial generated for the inputed username</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=s2>&#34;[!] Serial: &#34;</span> <span class=o>+</span> <span class=nb>str</span><span class=p>(</span><span class=n>num</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl> <span class=c1># Starting process</span>
+</span></span><span class=line><span class=cl><span class=n>p</span> <span class=o>=</span> <span class=n>pwn</span><span class=o>.</span><span class=n>process</span><span class=p>(</span><span class=s2>&#34;/levels/lab01/lab1A&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Sending payload</span>
+</span></span><span class=line><span class=cl><span class=n>p</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=n>username</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>p</span><span class=o>.</span><span class=n>sendline</span><span class=p>(</span><span class=nb>str</span><span class=p>(</span><span class=n>num</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Give the user the shell</span>
+</span></span><span class=line><span class=cl><span class=n>p</span><span class=o>.</span><span class=n>interactive</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Close the program</span>
+</span></span><span class=line><span class=cl><span class=n>p</span><span class=o>.</span><span class=n>close</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><p>A partir de um username inputado, ele cria um serial válido e executa o programa. Basta utilizá-lo e voilà! Fim de laboratório!</p><h2 id=ferramentas-utilizadas>Ferramentas utilizadas:<a hidden class=anchor aria-hidden=true href=#ferramentas-utilizadas>#</a></h2><ul><li><a href=https://github.com/hugsy/gef>GEF</a>, uma extensão para o <a href=https://www.gnu.org/savannah-checkouts/gnu/gdb/index.html>GDB</a></li><li><a href=https://ghidra-sre.org/>GHIDRA</a>, uma ferramenta de análise de binários.</li><li><a href=https://github.com/Gallopsled/pwntools>pwntools</a>, uma biblioteca de Python para fabricação de exploits.</li></ul></div><footer class=post-footer><ul class=post-tags><li><a href=http://localhost:1313/tags/pwn/>Pwn</a></li><li><a href=http://localhost:1313/tags/engenharia-reversa/>Engenharia Reversa</a></li></ul><nav class=paginav><a class=prev href=http://localhost:1313/blog/2024-08-11-exploracao-metasploitable2/><span class=title>« Prev</span><br><span>Exploração de vulnerabilidades em ambientes virtuais</span>
+</a><a class=next href=http://localhost:1313/blog/2024-08-11-pwn101-thm-writeup/><span class=title>Next »</span><br><span>Uma introdução prática a Exploração de Binários com Engenharia Reversa: writeUp da sala pwn101 THM</span></a></nav><ul class=share-buttons><li><a target=_blank rel="noopener noreferrer" aria-label="share Modern Binary Exploitation: Laboratório de Engenharia Reversa on x" href="https://x.com/intent/tweet/?text=Modern%20Binary%20Exploitation%3a%20Laborat%c3%b3rio%20de%20Engenharia%20Reversa&amp;url=http%3a%2f%2flocalhost%3a1313%2fblog%2f2024-08-11-writeup-lab01-rev-mbe%2f&amp;hashtags=Pwn%2cEngenhariaReversa"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M512 62.554V449.446C512 483.97 483.97 512 449.446 512H62.554C28.03 512 0 483.97.0 449.446V62.554C0 28.03 28.029.0 62.554.0H449.446C483.971.0 512 28.03 512 62.554zM269.951 190.75 182.567 75.216H56L207.216 272.95 63.9 436.783h61.366L235.9 310.383l96.667 126.4H456L298.367 228.367l134-153.151H371.033zM127.633 110h36.468l219.38 290.065H349.5z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Modern Binary Exploitation: Laboratório de Engenharia Reversa on linkedin" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2flocalhost%3a1313%2fblog%2f2024-08-11-writeup-lab01-rev-mbe%2f&amp;title=Modern%20Binary%20Exploitation%3a%20Laborat%c3%b3rio%20de%20Engenharia%20Reversa&amp;summary=Modern%20Binary%20Exploitation%3a%20Laborat%c3%b3rio%20de%20Engenharia%20Reversa&amp;source=http%3a%2f%2flocalhost%3a1313%2fblog%2f2024-08-11-writeup-lab01-rev-mbe%2f"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zM160.461 423.278V197.561h-75.04v225.717h75.04zm270.539.0V293.839c0-69.333-37.018-101.586-86.381-101.586-39.804.0-57.634 21.891-67.617 37.266v-31.958h-75.021c.995 21.181.0 225.717.0 225.717h75.02V297.222c0-6.748.486-13.492 2.474-18.315 5.414-13.475 17.767-27.434 38.494-27.434 27.135.0 38.007 20.707 38.007 51.037v120.768H431zM123.448 88.722C97.774 88.722 81 105.601 81 127.724c0 21.658 16.264 39.002 41.455 39.002h.484c26.165.0 42.452-17.344 42.452-39.002-.485-22.092-16.241-38.954-41.943-39.002z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Modern Binary Exploitation: Laboratório de Engenharia Reversa on reddit" href="https://reddit.com/submit?url=http%3a%2f%2flocalhost%3a1313%2fblog%2f2024-08-11-writeup-lab01-rev-mbe%2f&title=Modern%20Binary%20Exploitation%3a%20Laborat%c3%b3rio%20de%20Engenharia%20Reversa"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zM446 265.638c0-22.964-18.616-41.58-41.58-41.58-11.211.0-21.361 4.457-28.841 11.666-28.424-20.508-67.586-33.757-111.204-35.278l18.941-89.121 61.884 13.157c.756 15.734 13.642 28.29 29.56 28.29 16.407.0 29.706-13.299 29.706-29.701.0-16.403-13.299-29.702-29.706-29.702-11.666.0-21.657 6.792-26.515 16.578l-69.105-14.69c-1.922-.418-3.939-.042-5.585 1.036-1.658 1.073-2.811 2.761-3.224 4.686l-21.152 99.438c-44.258 1.228-84.046 14.494-112.837 35.232-7.468-7.164-17.589-11.591-28.757-11.591-22.965.0-41.585 18.616-41.585 41.58.0 16.896 10.095 31.41 24.568 37.918-.639 4.135-.99 8.328-.99 12.576.0 63.977 74.469 115.836 166.33 115.836s166.334-51.859 166.334-115.836c0-4.218-.347-8.387-.977-12.493 14.564-6.47 24.735-21.034 24.735-38.001zM326.526 373.831c-20.27 20.241-59.115 21.816-70.534 21.816-11.428.0-50.277-1.575-70.522-21.82-3.007-3.008-3.007-7.882.0-10.889 3.003-2.999 7.882-3.003 10.885.0 12.777 12.781 40.11 17.317 59.637 17.317 19.522.0 46.86-4.536 59.657-17.321 3.016-2.999 7.886-2.995 10.885.008 3.008 3.011 3.003 7.882-.008 10.889zm-5.23-48.781c-16.373.0-29.701-13.324-29.701-29.698.0-16.381 13.328-29.714 29.701-29.714 16.378.0 29.706 13.333 29.706 29.714.0 16.374-13.328 29.698-29.706 29.698zM160.91 295.348c0-16.381 13.328-29.71 29.714-29.71 16.369.0 29.689 13.329 29.689 29.71.0 16.373-13.32 29.693-29.689 29.693-16.386.0-29.714-13.32-29.714-29.693z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Modern Binary Exploitation: Laboratório de Engenharia Reversa on facebook" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2flocalhost%3a1313%2fblog%2f2024-08-11-writeup-lab01-rev-mbe%2f"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H342.978V319.085h66.6l12.672-82.621h-79.272v-53.617c0-22.603 11.073-44.636 46.58-44.636H425.6v-70.34s-32.71-5.582-63.982-5.582c-65.288.0-107.96 39.569-107.96 111.204v62.971h-72.573v82.621h72.573V512h-191.104c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Modern Binary Exploitation: Laboratório de Engenharia Reversa on whatsapp" href="https://api.whatsapp.com/send?text=Modern%20Binary%20Exploitation%3a%20Laborat%c3%b3rio%20de%20Engenharia%20Reversa%20-%20http%3a%2f%2flocalhost%3a1313%2fblog%2f2024-08-11-writeup-lab01-rev-mbe%2f"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zm-58.673 127.703c-33.842-33.881-78.847-52.548-126.798-52.568-98.799.0-179.21 80.405-179.249 179.234-.013 31.593 8.241 62.428 23.927 89.612l-25.429 92.884 95.021-24.925c26.181 14.28 55.659 21.807 85.658 21.816h.074c98.789.0 179.206-80.413 179.247-179.243.018-47.895-18.61-92.93-52.451-126.81zM263.976 403.485h-.06c-26.734-.01-52.954-7.193-75.828-20.767l-5.441-3.229-56.386 14.792 15.05-54.977-3.542-5.637c-14.913-23.72-22.791-51.136-22.779-79.287.033-82.142 66.867-148.971 149.046-148.971 39.793.014 77.199 15.531 105.329 43.692 28.128 28.16 43.609 65.592 43.594 105.4-.034 82.149-66.866 148.983-148.983 148.984zm81.721-111.581c-4.479-2.242-26.499-13.075-30.604-14.571-4.105-1.495-7.091-2.241-10.077 2.241-2.986 4.483-11.569 14.572-14.182 17.562-2.612 2.988-5.225 3.364-9.703 1.12-4.479-2.241-18.91-6.97-36.017-22.23C231.8 264.15 222.81 249.484 220.198 245s-.279-6.908 1.963-9.14c2.016-2.007 4.48-5.232 6.719-7.847 2.24-2.615 2.986-4.484 4.479-7.472 1.493-2.99.747-5.604-.374-7.846-1.119-2.241-10.077-24.288-13.809-33.256-3.635-8.733-7.327-7.55-10.077-7.688-2.609-.13-5.598-.158-8.583-.158-2.986.0-7.839 1.121-11.944 5.604-4.105 4.484-15.675 15.32-15.675 37.364.0 22.046 16.048 43.342 18.287 46.332 2.24 2.99 31.582 48.227 76.511 67.627 10.685 4.615 19.028 7.371 25.533 9.434 10.728 3.41 20.492 2.929 28.209 1.775 8.605-1.285 26.499-10.833 30.231-21.295 3.732-10.464 3.732-19.431 2.612-21.298-1.119-1.869-4.105-2.99-8.583-5.232z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Modern Binary Exploitation: Laboratório de Engenharia Reversa on telegram" href="https://telegram.me/share/url?text=Modern%20Binary%20Exploitation%3a%20Laborat%c3%b3rio%20de%20Engenharia%20Reversa&amp;url=http%3a%2f%2flocalhost%3a1313%2fblog%2f2024-08-11-writeup-lab01-rev-mbe%2f"><svg viewBox="2 2 28 28" height="30" width="30" fill="currentcolor"><path d="M26.49 29.86H5.5a3.37 3.37.0 01-2.47-1 3.35 3.35.0 01-1-2.47V5.48A3.36 3.36.0 013 3 3.37 3.37.0 015.5 2h21A3.38 3.38.0 0129 3a3.36 3.36.0 011 2.46V26.37a3.35 3.35.0 01-1 2.47 3.38 3.38.0 01-2.51 1.02zm-5.38-6.71a.79.79.0 00.85-.66L24.73 9.24a.55.55.0 00-.18-.46.62.62.0 00-.41-.17q-.08.0-16.53 6.11a.59.59.0 00-.41.59.57.57.0 00.43.52l4 1.24 1.61 4.83a.62.62.0 00.63.43.56.56.0 00.4-.17L16.54 20l4.09 3A.9.9.0 0021.11 23.15zM13.8 20.71l-1.21-4q8.72-5.55 8.78-5.55c.15.0.23.0.23.16a.18.18.0 010 .06s-2.51 2.3-7.52 6.8z"/></svg></a></li><li><a target=_blank rel="noopener noreferrer" aria-label="share Modern Binary Exploitation: Laboratório de Engenharia Reversa on ycombinator" href="https://news.ycombinator.com/submitlink?t=Modern%20Binary%20Exploitation%3a%20Laborat%c3%b3rio%20de%20Engenharia%20Reversa&u=http%3a%2f%2flocalhost%3a1313%2fblog%2f2024-08-11-writeup-lab01-rev-mbe%2f"><svg width="30" height="30" viewBox="0 0 512 512" fill="currentcolor" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"><path d="M449.446.0C483.971.0 512 28.03 512 62.554V449.446C512 483.97 483.97 512 449.446 512H62.554C28.03 512 0 483.97.0 449.446V62.554C0 28.03 28.029.0 62.554.0H449.446zM183.8767 87.9921h-62.034L230.6673 292.4508V424.0079h50.6655V292.4508L390.1575 87.9921H328.1233L256 238.2489z"/></svg></a></li></ul></footer></article></main><footer class=footer><span>&copy; 2025 <a href=http://localhost:1313/>Blog do GRIS</a></span> ·
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg>
+</a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>
