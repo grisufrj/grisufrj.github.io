@@ -28,6 +28,12 @@ minify:
   disableXML: true
   minifyOutput: true
 
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
   title: Blog do GRIS
@@ -112,7 +118,7 @@ params:
 
   editPost:
     URL: "https://github.com/grisufrj/grisufrj.github.io/tree/main/content"
-    Text: "Suggest Changes" # edit text
+    Text: "Sugerir mudanças" # edit text
     appendFilePath: true # to append file path to Edit link
 
   # for search
@@ -132,8 +138,12 @@ menu:
       name: Blog
       url: /blog/
       weight: 5
+    - identifier: busca
+      name: Busca
+      url: /busca/
+      weight: 6
     - identifier: categories
-      name: Categorias
+      name: Categories
       url: /categories/
       weight: 10
     - identifier: tags
