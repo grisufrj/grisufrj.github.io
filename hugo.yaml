@@ -82,7 +82,7 @@ params:
     imageTitle: GRIS
     buttons:
       - name: Posts
-        url: "/blogs"
+        url: "/blog"
       - name: Tags
         url: tags
 

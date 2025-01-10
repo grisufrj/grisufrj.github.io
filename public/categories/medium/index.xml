@@ -2,31 +2,31 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Medium on Blog do GRIS</title>
-    <link>http://localhost:38113/categories/medium/</link>
+    <link>http://localhost:1313/categories/medium/</link>
     <description>Recent content in Medium on Blog do GRIS</description>
     <generator>Hugo</generator>
     <language>pt</language>
     <lastBuildDate>Thu, 14 Mar 2024 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:38113/categories/medium/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/categories/medium/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>JSON Web Tokens</title>
-      <link>http://localhost:38113/blog/2024-03-19-json-web-tokens/</link>
+      <link>http://localhost:1313/blog/2024-03-19-json-web-tokens/</link>
       <pubDate>Thu, 14 Mar 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:38113/blog/2024-03-19-json-web-tokens/</guid>
+      <guid>http://localhost:1313/blog/2024-03-19-json-web-tokens/</guid>
       <description>&lt;h1 id=&#34;definindo-json-web-tokens&#34;&gt;Definindo JSON Web Tokens&lt;/h1&gt;&#xA;&lt;p&gt;JSON Web Token (JWT) é um formato  para transmitir informações entre partes como um objeto JSON. Do ponto de vista de segurança, JWT é uma ferramenta valiosa, pois oferece autenticação e autorização em um formato que pode ser facilmente verificado e confiado.&lt;/p&gt;&#xA;&lt;p&gt;Para identificar um JWT, pode-se observar a estrutura básica composta por três partes separadas por pontos &lt;code&gt;.&lt;/code&gt;: o cabeçalho (header), o payload (carga útil), e a assinatura (signature). Essas partes são codificadas em Base64 e são visualmente separadas por pontos.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Sinergia entre a Internet Industrial das Coisas (IIoT) e as Infraestruturas Críticas</title>
-      <link>http://localhost:38113/blog/2024-01-11-sinergia-iiot-ic/</link>
+      <link>http://localhost:1313/blog/2024-01-11-sinergia-iiot-ic/</link>
       <pubDate>Thu, 11 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:38113/blog/2024-01-11-sinergia-iiot-ic/</guid>
+      <guid>http://localhost:1313/blog/2024-01-11-sinergia-iiot-ic/</guid>
       <description>&lt;h2 id=&#34;resumo&#34;&gt;RESUMO&lt;/h2&gt;&#xA;&lt;p&gt;É consenso que a Internet Industrial das Coisas (IIoT) trouxe avanços tecnológicos para a indústria, além de novos arranjos de uma produção mais inteligente, que possibilita maior conexão entre tecnologia e desenvolvimento sustentável, além das melhorias nas funcionalidades do software SCADA, muito utilizado por diversos Sistemas de Controle Industriais (ICS). No entanto, há uma preocupação crescente com a segurança das Infraestruturas Críticas, uma vez que ficaram mais suscetíveis aos ataques cibernéticos. Nesse sentido, este resumo tem como objetivo fazer uma breve revisão bibliográfica sobre o assunto, pontuar sobre o cenário geral das inovações, além de fornecer ao leitor um exemplo de arquitetura de um sistema de tratamento de água baseado em ICS-SCADA/IIoT. A metodologia utilizada inclui além da consulta à base de artigos da Science Direct, também a base de documentos da WIPO (&lt;em&gt;World Intellectual Property Organization&lt;/em&gt;).&lt;/p&gt;</description>
     </item>
     <item>
       <title>Desvendando a Enigma</title>
-      <link>http://localhost:38113/blog/2024-01-10-enigma/</link>
+      <link>http://localhost:1313/blog/2024-01-10-enigma/</link>
       <pubDate>Wed, 10 Jan 2024 00:00:00 +0000</pubDate>
-      <guid>http://localhost:38113/blog/2024-01-10-enigma/</guid>
+      <guid>http://localhost:1313/blog/2024-01-10-enigma/</guid>
       <description>&lt;h2 id=&#34;introdução---o-que-é-a-enigma&#34;&gt;Introdução - O que é a Enigma?&lt;/h2&gt;&#xA;&lt;p&gt;Com a chegada da Segunda Guerra Mundial, os países envolvidos viram a necessidade de implementar métodos mais seguros de criptografia para que as comunicações entre rádios e outras comunicações militares não pudessem ser facilmente interceptadas e decifradas, e a Enigma foi a máquina eletromecânica de criptografia adotada pela Alemanha na Segunda Guerra Mundial.&lt;/p&gt;&#xA;&lt;p&gt;Ao longo da Guerra, muitos pesquisadores aliados estiveram envolvidos na solução da Enigma, ou melhor, nas técnicas de decriptação das mensagens intereceptadas. Suas pesquisas se baseavam em ‘KPA’ - “Known-plaintext attack”, provalmente porque as mensagens interceptadas se limitavam a somente 200 caracteres, o que dificultaria um ataque “ciphertext only”.&lt;/p&gt;</description>
     </item>
   </channel>
