@@ -60,9 +60,9 @@ params:
   assets:
     disableHLJS: false # to disable highlight.js
     # disableFingerprinting: true
-    favicon: "<link / abs url>"
-    favicon16x16: "<link / abs url>"
-    favicon32x32: "<link / abs url>"
+    favicon: "images/gris-logo-2020's_black.png"
+    favicon16x16: "images/gris-logo-2020-black-16x16.png"
+    favicon32x32: "images/gris-logo-2020-black-32x32.png"
     apple_touch_icon: "<link / abs url>"
     safari_pinned_tab: "<link / abs url>"
 
@@ -82,7 +82,7 @@ params:
     imageTitle: GRIS
     buttons:
       - name: Blog
-        url: "/blog"
+        url: blog
       - name: Tags
         url: tags
 
