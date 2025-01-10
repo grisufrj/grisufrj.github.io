@@ -76,7 +76,7 @@ params:
     enabled: true # needs to be explicitly set
     title: Blog do GRIS
     subtitle: "Grupo de Resposta a Incidentes de Segurança"
-    imageUrl: "images/GRIS_logo_2010's.png"
+    imageUrl: "images/gris-logo-2020's_black.png"
     imageWidth: 160
     imageHeight: 160
     imageTitle: GRIS
