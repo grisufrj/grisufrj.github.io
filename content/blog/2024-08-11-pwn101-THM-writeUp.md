@@ -6,8 +6,8 @@ published: 2024-08-11
 categories:
   - easy
 tags:
-  - pwning
-  - reverse engineering
+  - Pwn
+  - Engenharia Reversa
 author: 0xCr0w
 ---
 

@@ -1,22 +1,22 @@
 ---
 title: "Modern Binary Exploitation: Laboratório de Engenharia Reversa"
 date: 2024-08-11
-description: "Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) "
+description: "Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) focado em **Engenharia Reversa**"
 published: 2024-08-11 
 categories:
   - easy
 tags:
-  - "Pwn"
   - "Engenharia Reversa"
 author: kitagawa
 ---
 
 Olá! Nesse post, resolveremos o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) da [RPISEC](https://rpis.ec/) que aborda a **Engenharia Reversa**. Caso tenha interesse no assunto, temos diversos posts no blog que abordam o tema, basta acessar a tag!
 
-# Laboratório 01
+# Sobre os laboratórios do MBE
+Todos os laboratórios do curso residem dentro de uma máquina virtual disponibilizada no material através de uma imagem de disco para Ubuntu 14.04, que possui toda a configuração necessária para o Wargame. Os desafios são separados por laboratório e dificuldade, sendo C o mais fácil e A o mais difícil. Além disso, você acessa o challenge mediante ao usuário do respectivo desafio. Portanto, começando no C, o seu objetivo é exploitar o desafio para spawnar o terminal logado no usuário da próxima challenge e pegar a senha dele (que está em `/home/labXX/.pass`).
 
-Todos os laboratórios do curso residem dentro de uma máquina virtual disponibilizada no material através de uma imagem de disco para Ubuntu 14.04, que possui toda a configuração necessária para o Wargame. Os desafios são separados por laboratório e dificuldade, sendo C o mais fácil e A o mais difícil. Além disso, você acessa o challenge mediante ao usuário do respectivo desafio. Portanto, começando no C, o seu objetivo é exploitar o desafio para spawnar o terminal logado no usuário da
-próxima challenge e pegar a senha dele (que está em `/home/labXX/.pass`).
+
+# Laboratório 01
 
 O laboratório 01 aborda a **Engenharia Reversa**, tópico, esse, que é trabalhado durante as três primeiras lectures do material. Para uma melhor compreensão do que está ocorrendo, é necessário saber um pouco sobre:
 - Programação em C
