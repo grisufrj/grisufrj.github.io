@@ -1,7 +1,7 @@
 ---
 title: "Modern Binary Exploitation: Laboratório de pwning"
 date: 2025-01-24
-description: "Nesse write-up, resolvo e explico o segundo laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) que aborda **pwning**."
+description: "Nesse write-up, resolvo e explico o segundo laboratório do Modern Binary Exploitation que aborda pwning."
 published: 2025-01-27 
 categories:
   - "write-up"

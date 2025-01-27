@@ -1,7 +1,7 @@
 ---
 title: "Modern Binary Exploitation: Laboratório de Engenharia Reversa"
 date: 2024-08-11
-description: "Nesse write-up, resolvo e explico o primeiro laboratório do [Modern Binary Exploitation](https://github.com/RPISEC/MBE) focado em **Engenharia Reversa**"
+description: "Nesse write-up, resolvo e explico o primeiro laboratório do Modern Binary Exploitation focado em Engenharia Reversa"
 published: 2024-08-11 
 categories:
   - easy
