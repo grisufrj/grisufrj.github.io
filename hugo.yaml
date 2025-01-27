@@ -89,6 +89,8 @@ params:
     buttons:
       - name: Blog
         url: blog
+      - name: Sobre
+        url: sobre
       - name: Tags
         url: tags
 
@@ -142,6 +144,10 @@ menu:
       name: Busca
       url: /busca/
       weight: 6
+    - identifier: sobre
+      name: Sobre
+      url: /sobre/
+      weight: 7
     - identifier: categories
       name: Categories
       url: /categories/
