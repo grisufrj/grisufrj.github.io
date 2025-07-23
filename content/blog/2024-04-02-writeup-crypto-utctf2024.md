@@ -2,7 +2,7 @@
 title: "Writeup de alguns challenges de crypto do UTCTF 2024"
 date: 2024-04-02
 published: 2024-04-02
-author: dkvhr
+author: davi
 categories:
   - "Easy"
 tags:

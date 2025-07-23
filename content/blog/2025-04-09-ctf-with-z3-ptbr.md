@@ -5,6 +5,7 @@ categories: [rev, z3, writeup]
 tags: [z3, writeup]
 math: true
 mermaid: true
+author: davi
 # image: //
 #   path: /commons/devices-mockup.png
 #   width: 800
