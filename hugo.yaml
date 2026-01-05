@@ -1,4 +1,4 @@
-baseURL: "https://blog.gris.dcc.ufrj.br"
+baseURL: "https://grisufrj.github.io"
 title: Blog do GRIS
 paginate: 5
 theme: PaperMod
