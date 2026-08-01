@@ -3,23 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GRISWEEK 2026</title>
-  <meta name="description" content="Evento de segurança da informação organizado pelo GRIS. 17 a 21/08 na UFRJ — Ilha do Fundão. Palestras para todos os níveis e um CTF Jeopardy com premiação.">
-
-  <meta property="og:title" content="GRISWEEK 2026">
-  <meta property="og:description" content="Evento de segurança da informação organizado pelo GRIS. 17 a 21/08 na UFRJ — Ilha do Fundão. Palestras para todos os níveis e um CTF Jeopardy com premiação.">
-  <meta property="og:image" content="https://grisufrj.com/images/GRIS_logo.png">
-  <meta property="og:url" content="https://grisufrj.com/grisweek/">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="pt_BR">
-  <meta property="og:site_name" content="GRIS">
-
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="GRISWEEK 2026">
-  <meta name="twitter:description" content="Evento de segurança da informação organizado pelo GRIS. 17 a 21/08 na UFRJ — Ilha do Fundão. Palestras para todos os níveis e um CTF Jeopardy com premiação.">
-  <meta name="twitter:image" content="https://grisufrj.com/images/GRIS_logo.png">
-
-  <link rel="icon" href="https://grisufrj.com/images/gris-logo-2020-black-32x32.png">
+  <title>GRISWEEK</title>
   <style>
     @font-face {
       font-family: "WebPlus";
@@ -40,30 +24,41 @@
 
     html,
     body {
+      width: 100%;
       min-height: 100%;
       margin: 0;
       background: #000;
+      overflow-x: hidden;
     }
 
     body {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 120ch;
+      min-width: 0;
       min-height: 100vh;
-      overflow: auto;
     }
 
     pre {
       width: 120ch;
+      flex: 0 0 auto;
       margin: 0;
       padding: 0;
       overflow: visible;
       color: white;
       background: black;
-      font: 16px/1 "WebPlus", monospace;
+      font-family: "WebPlus", monospace;
+      font-size: 16px;
+      line-height: 1;
       white-space: pre;
       tab-size: 8;
+    }
+
+    /* Scale the fixed-width ANSI canvas instead of reflowing its artwork. */
+    @media (max-width: 960px) {
+      pre {
+        font-size: 1.666667vw;
+      }
     }
   </style>
 </head>
