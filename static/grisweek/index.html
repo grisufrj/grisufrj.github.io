@@ -24,120 +24,138 @@
 
     html,
     body {
-      width: 100%;
       min-height: 100%;
       margin: 0;
       background: #000;
-      overflow-x: hidden;
     }
 
     body {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 0;
+      min-width: 120ch;
       min-height: 100vh;
+      overflow: auto;
     }
 
     pre {
-      width: 94ch;
-      flex: 0 0 auto;
+      width: 120ch;
       margin: 0;
       padding: 0;
       overflow: visible;
       color: white;
       background: black;
-      font-family: "WebPlus", monospace;
-      font-size: 16px;
-      line-height: 1;
+      font: 16px/1 "WebPlus", monospace;
       white-space: pre;
       tab-size: 8;
-    }
-
-    /* Scale the fixed-width ANSI canvas instead of reflowing its artwork. */
-    @media (max-width: 752px) {
-      pre {
-        font-size: 2.127660vw;
-      }
     }
   </style>
 </head>
 <body>
   <pre aria-label="ansi"><span style="color:gray; background:black"></span>
-                 ▄▄▄▄▄▄▄                   ▄▀▀▄      ▄▀▀▄          ▄▄▄▀▀▀▄▀▀▀▄
-               █▀ ▄▄▄▄▄ ▀▀▀▀▀▀▀▀▄▄▀▀█▄▄   ▄▀ ▌ █    █ ▐ ▀▀▄▄▄  ▄▀▀▀    █   ▌ █
-              █▀ ████▀▀▀ ▄█████   ▄▌  ▀▀▀▀▀  █▄ █  █ ▄█      ▀▀ ▄███▄ ██   █▌ █
-             █▀ ▄██▀     ██▀  ██▄ ██  ▄████  ██ █  █ ██  ▄███▄ ███▀▀▀ ██   ██ █
-             █  ██▀  ▄▄▄ ██    ██ ███ ██▀▀██ ██  ▀▀  ██ ███▀▀▀ ██     ██  ▄█▀ █
-             █  ██  ████ ██  ▄███ ███ ██  ▀▌ ██  ▐▌  ██ ██     ██▄▄▄▄ ██▄██▀ █
-              █ ██▄   ██ ██████▀  ███ ██▄▄▄▄ ██  ██  ██ ██▄▄▄▄ ██▀▀▀▀ ██▀██▄ █
-              █  ██▄▄███ ██▀██▄   ███ ▀▀▀███ ██ ▄██▄ ██ ██▀▀▀▀ ██     ██  ▀█▄ █
-              ▀▄ ▀▀███▀  ██  ███   ██ ▄▌ ███ ████▀▀████ ██     ███▄▄▄ ██   ██ █
-                ▀▀▄▄▄▄▄  ██   ██   ▐▀ ██▄███  ▀▀    ▀▀▀ ███▄▄▄  ▀███▀ ██   █▌ █
-                       ▀▄▄▄▄▀▄▄▄▄▀▀▄▄  ▀▀▀▀   ▄▄█▀▀█▄▄▄  ▀███▀ ▄▄      █   ▌ ▄▀
-                                     ▀▀▀▀▀▀▀▀▀▀       ▀█▄▄▄▄▄▄▀  ▀▀▀▀▀▄▄▄▀▄▄▄▀
+                               <span style="color:white; background:black">▄▄▄▄▄▄▄                   ▄▀▀▄      ▄▀▀▄          ▄▄▄▀▀▀▄▀▀▀▄</span>
+<span style="color:gray; background:black">                             </span><span style="color:white; background:black">█▀ ▄▄▄▄▄ ▀▀▀▀▀▀▀▀▄▄▀▀█▄▄   ▄▀ ▌ █    █ ▐ ▀▀▄▄▄  ▄▀▀▀    █   ▌ █</span>
+<span style="color:gray; background:black">                            </span><span style="color:white; background:black">█▀ ████▀▀▀ ▄█████   ▄▌  ▀▀▀▀▀  █▄ █  █ ▄█      ▀▀ ▄███▄ ██   █▌ █</span>
+<span style="color:gray; background:black">                           </span><span style="color:white; background:black">█▀ ▄██▀     ██▀  ██▄ ██  ▄████  ██ █  █ ██  ▄███▄ ███▀▀▀ ██   ██ █</span>
+<span style="color:gray; background:black">                           </span><span style="color:white; background:black">█  ██▀  ▄▄▄ ██    ██ ███ ██▀▀██ ██  ▀▀  ██ ███▀▀▀ ██     ██  ▄█▀ █</span>
+<span style="color:gray; background:black">                           </span><span style="color:white; background:black">█  ██  ████ ██  ▄███ ███ ██  ▀▌ ██  ▐▌  ██ ██     ██▄▄▄▄ ██▄██▀ █</span>
+<span style="color:gray; background:black">                            </span><span style="color:white; background:black">█ ██▄   ██ ██████▀  ███ ██▄▄▄▄ ██  ██  ██ ██▄▄▄▄ ██▀▀▀▀ ██▀██▄ █</span>
+<span style="color:gray; background:black">                            </span><span style="color:white; background:black">█  ██▄▄███ ██▀██▄   ███ ▀▀▀███ ██ ▄██▄ ██ ██▀▀▀▀ ██     ██  ▀█▄ █</span>
+<span style="color:gray; background:black">                            </span><span style="color:white; background:black">▀▄ ▀▀███▀  ██  ███   ██ ▄▌ ███ ████▀▀████ ██     ███▄▄▄ ██   ██ █</span>
+<span style="color:gray; background:black">                              </span><span style="color:white; background:black">▀▀▄▄▄▄▄  ██   ██   ▐▀ ██▄███  ▀▀    ▀▀▀ ███▄▄▄  ▀███▀ ██   █▌ █</span>
+<span style="color:gray; background:black">                                     </span><span style="color:white; background:black">▀▄▄▄▄▀▄▄▄▄▀▀▄▄  ▀▀▀▀   ▄▄█▀▀█▄▄▄  ▀███▀ ▄▄      █   ▌ ▄▀</span>
+<span style="color:gray; background:black">                                                   </span><span style="color:white; background:black">▀▀▀▀▀▀▀▀▀▀       ▀█▄▄▄▄▄▄▀  ▀▀▀▀▀▄▄▄▀▄▄▄▀</span>
+<span style="color:gray; background:black"></span>
+                                                                               <span style="color:white; background:black">[GRISWEEK 2026]</span>
+<span style="color:gray; background:black"></span>
+          <span style="color:white; background:black">╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕    ╕╕╕╕</span><span style="color:gray; background:black">                                                                                      </span><span style="color:white; background:black">╕╕╕╕    ╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕╕  ╕╕╕                                                                                          ╕╕╕  ╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕╕╕╕╕         Vem aí mais uma edição da GRISWEEK, o evento de segurança da informação          ╕╕╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">        </span><span style="color:white; background:black">╕╕╕╕╕╕          organizado pelo GRIS!                                                             ╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">         </span><span style="color:white; background:black">╕╕╕╕╕                                                                                            ╕╕╕╕╕</span>
+<span style="color:gray; background:black">        </span><span style="color:white; background:black">╕╕╕╕╕╕          Durante uma semana inteira, estudantes, profissionais e entusiastas da            ╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕ ╕╕╕         área terão a oportunidade de aprender, trocar experiências e conhecer            ╕╕╕ ╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕   ╕╕╕         mais sobre diferentes temas relacionados à cibersegurança.                       ╕╕╕   ╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕  ╕╕╕                                                                                          ╕╕╕  ╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕ ╕╕╕          Neste ano, teremos palestras introdutórias e aprofundadas, atendendo              ╕╕╕ ╕╕╕</span>
+<span style="color:gray; background:black">         </span><span style="color:white; background:black">╕╕╕╕           tanto quem está começando agora quanto quem já possui experiência e                ╕╕╕╕</span>
+<span style="color:gray; background:black">         </span><span style="color:white; background:black">╕╕╕╕           deseja expandir seus conhecimentos.                                                ╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕ ╕╕╕╕                                                                                            ╕╕╕╕ ╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕   ╕╕          As apresentações serão conduzidas por membros da comunidade, estudantes           ╕╕   ╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕    ╕╕         e convidados, trazendo conceitos teóricos, demonstrações práticas,               ╕╕    ╕╕</span>
+       ╕╕╕  ╕╕╕         ferramentas, técnicas e experi<span style="color:gray; background:black"> </span><span style="color:white; background:black">ncias reais da área de segurança.                 ╕╕╕  ╕╕╕</span>
+        ╕╕╕╕╕╕                                                                                            ╕╕╕╕╕╕
+         ╕╕╕╕           Será uma ótima oportunidade para conhecer novos assuntos, tirar dúvidas,           ╕╕╕╕
+         ╕╕╕╕           interagir com outros participantes e dar os primeiros passos no universo           ╕╕╕╕
+          ╕╕╕           da segurança da informação.                                                        ╕╕╕
+         ╕╕╕╕╕                                                                                            ╕╕╕╕╕
+        ╕╕╕╕╕╕          Além das palestras durante a semana, teremos também um CTF (Capture The           ╕╕╕╕╕╕
+       ╕╕╕  ╕╕╕         Flag) no modelo Jeopardy no último dia de evento (com premiação)!                ╕╕╕  ╕╕╕
+       ╕╕   ╕╕╕                                                                                          ╕╕╕   ╕╕
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕   ╕╕╕         Inscrição: <a href="https://forms.gle/tACFXSE6qFEjmQHn9">https://forms.gle/tACFXSE6qFEjmQHn9</a></span><span style="color:gray; background:black">                                   </span><span style="color:white; background:black">╕╕╕   ╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕ ╕╕╕                                                                                            ╕╕╕ ╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕╕╕╕          Inscrição CTF: <a href="https://forms.gle/C2mXpxtH13ss1Y3D9">https://forms.gle/C2mXpxtH13ss1Y3D9</a></span><span style="color:gray; background:black">                                </span><span style="color:white; background:black">╕╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕    ╕╕                                                                                          ╕╕    ╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕╕  ╕╕╕         Localização:                                       UFRJ - Ilha do fundão         ╕╕╕  ╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕╕╕╕╕                                                                                          ╕╕╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">        </span><span style="color:white; background:black">╕╕╕╕╕╕                +----------------------------------------------------------+                ╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">        </span><span style="color:white; background:black">╕╕╕╕╕                 ¦ ¦                          CCMN                        ¦ ¦                 ╕╕╕╕╕</span>
+       ╕╕╕╕╕╕                 ¦ ¦------------------------------------------------------¦ ¦                 ╕╕╕╕╕╕
+      ╕╕╕╕ ╕╕╕<span style="color:gray; background:black">                </span><span style="color:white; background:black">¦ ¦                                                      ¦ ¦                ╕╕╕ ╕╕╕╕</span>
+      ╕╕   ╕╕╕<span style="color:gray; background:black">                </span><span style="color:white; background:black">¦ ¦                                                      ¦ ¦                ╕╕╕   ╕╕</span>
+      ╕╕╕  ╕╕╕<span style="color:gray; background:black">                </span><span style="color:white; background:black">+-+----------------¦==========¦==========¦---------------+-+                ╕╕╕  ╕╕╕</span>
+      ╕╕╕ ╕╕╕                                    /==========¦==========\                                   ╕╕╕ ╕╕╕
+        ╕╕╕╕                                    /===========¦===========\                                   ╕╕╕╕
+        ╕╕╕╕╕             ---------------------/============¦============\--------------------             ╕╕╕╕╕
+       ╕╕ ╕╕╕╕                                                                                            ╕╕╕╕ ╕╕
+       ╕╕   ╕╕          Agenda:<span style="color:gray; background:black">                                                                           </span><span style="color:white; background:black">╕╕   ╕╕</span>
+       ╕╕    ╕╕<span style="color:gray; background:black">                                                                                          </span><span style="color:white; background:black">╕╕    ╕╕</span>
+       ╕╕╕  ╕╕╕<span style="color:gray; background:black">  </span><span style="color:white; background:black">+=========+==============+==============+==============+==============+==============+  ╕╕╕  ╕╕╕</span>
+        ╕╕╕╕╕╕   ¦ Horário ¦    17/08<span style="color:gray; background:black">     </span><span style="color:white; background:black">¦    18/08     ¦    19/08</span><span style="color:gray; background:black">     </span><span style="color:white; background:black">¦    20/08</span><span style="color:gray; background:black">     </span><span style="color:white; background:black">¦    21/08     ¦   ╕╕╕╕╕╕</span>
+       ╕╕╕╕╕╕    +=========+==============+==============+==============+==============+==============+    ╕╕╕╕╕╕
+      ╕╕╕╕ ╕╕╕   ¦ 13:00   ¦ Abertura     ¦ Boas-vindas  ¦ Boas-vindas  ¦ Boas-vindas  ¦ Boas-vindas  ¦   ╕╕╕ ╕╕╕╕
+      ╕╕   ╕╕╕   +---------+--------------+--------------+--------------+--------------+--------------+   ╕╕╕   ╕╕
+      ╕╕╕  ╕╕╕   ¦ 13:15   ¦ Introdução à ¦ Introdução   ¦ malwares and ¦ Denuvo e     ¦ "Capture the ¦   ╕╕╕  ╕╕╕
+      ╕╕╕ ╕╕╕    ¦         ¦ Segurança    ¦ ao PWN       ¦ their        ¦ Bypass por   ¦ Flag (CTF)"  ¦    ╕╕╕ ╕╕╕
+        ╕╕╕╕     ¦         ¦ Web:         ¦              ¦ friends :)   ¦ Hypervisor:  ¦              ¦     ╕╕╕╕
+        ╕╕╕╕     ¦         ¦ Explorando   ¦              ¦              ¦ funciona<span style="color:gray; background:black">     </span><span style="color:white; background:black">¦              ¦     ╕╕╕╕</span>
+      ╕╕ ╕╕╕╕    ¦         ¦ Vulnerabili<span style="color:gray; background:black">  </span><span style="color:white; background:black">¦              ¦              ¦ mento        ¦              ¦    ╕╕╕╕ ╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕   ╕╕    ¦         ¦ dades        ¦              ¦              ¦ e riscos de  ¦              ¦    ╕╕   ╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕    ╕╕   ¦         ¦ na Prática   ¦              ¦              ¦ segurança    ¦              ¦   ╕╕    ╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕  ╕╕╕   +---------+</span><span style="color:gray; background:black">              </span><span style="color:white; background:black">+</span><span style="color:gray; background:black">              </span><span style="color:white; background:black">+--------------+--------------+</span><span style="color:gray; background:black">              </span><span style="color:white; background:black">+   ╕╕╕  ╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕╕╕    ¦ 14:00   ¦              ¦              ¦ BitTorrent:  ¦ O            ¦              ¦    ╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">        </span><span style="color:white; background:black">╕╕╕╕     ¦         ¦              ¦              ¦ Uma          ¦ Destinatário ¦              ¦     ╕╕╕╕</span>
+<span style="color:gray; background:black">        </span><span style="color:white; background:black">╕╕╕╕     ¦         ¦              ¦              ¦ plataforma   ¦ Não Existe:  ¦              ¦     ╕╕╕╕</span>
+<span style="color:gray; background:black">         </span><span style="color:white; background:black">╕╕╕     ¦         ¦              ¦              ¦ para ataques ¦ Como a       ¦              ¦     ╕╕╕</span>
+<span style="color:gray; background:black">        </span><span style="color:white; background:black">╕╕╕╕╕    ¦         ¦              ¦              ¦ DoS          ¦ Coreia do    ¦              ¦    ╕╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕╕╕    ¦         ¦              ¦              ¦              ¦ Norte        ¦              ¦    ╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕  ╕╕╕   ¦         ¦              ¦              ¦              ¦ Esconde      ¦              ¦   ╕╕╕  ╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕   ╕╕╕   ¦         ¦              ¦              ¦              ¦ Malware na   ¦              ¦   ╕╕╕   ╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕   ╕╕╕   ¦         ¦              ¦              ¦              ¦ Blockchain   ¦              ¦   ╕╕╕   ╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕ ╕╕╕    +---------+--------------+--------------+--------------+--------------+--------------+    ╕╕╕ ╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕╕╕╕╕    ¦ 14:45   ¦ Coffee Break ¦ Coffee Break ¦ Coffee Break ¦ Coffee Break ¦ Coffee Break ¦    ╕╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">     </span><span style="color:white; background:black">╕╕╕    ╕╕   +---------+--------------+--------------+--------------+--------------+--------------+   ╕╕    ╕╕╕</span>
+<span style="color:gray; background:black">     </span><span style="color:white; background:black">╕╕╕╕  ╕╕╕   ¦ 15:15   ¦ Hack the     ¦ Pivot        ¦ Introdução à ¦ Fantasmas na ¦              ¦   ╕╕╕  ╕╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕╕╕╕╕╕   ¦         ¦ Box: Guia de ¦ facial: o    ¦ Crypto       ¦ memória:     ¦              ¦   ╕╕╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕╕╕    ¦         ¦ primeira     ¦ rosto como   ¦              ¦ Desmistifi</span><span style="color:gray; background:black">   </span><span style="color:white; background:black">¦              ¦</span><span style="color:gray; background:black">    </span><span style="color:white; background:black">╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">        </span><span style="color:white; background:black">╕╕╕╕╕    ¦         ¦ viagem       ¦ ponto de     ¦              ¦ cando        ¦              ¦</span><span style="color:gray; background:black">    </span><span style="color:white; background:black">╕╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕╕╕    ¦         ¦              ¦ entrada em   ¦              ¦ a Heap       ¦              ¦</span><span style="color:gray; background:black">    </span><span style="color:white; background:black">╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕╕ ╕╕╕   ¦         ¦              ¦ grafos de    ¦              ¦ através do   ¦              ¦</span><span style="color:gray; background:black">   </span><span style="color:white; background:black">╕╕╕ ╕╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕   ╕╕╕   ¦         ¦              ¦ identidade   ¦              ¦ exploit      ¦              ¦   ╕╕╕   ╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕  ╕╕╕   ¦         ¦              ¦ vazada       ¦              ¦ GHOST        ¦              ¦</span><span style="color:gray; background:black">   </span><span style="color:white; background:black">╕╕╕  ╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕ ╕╕╕    +---------+</span><span style="color:gray; background:black">              </span><span style="color:white; background:black">+</span><span style="color:gray; background:black">              </span><span style="color:white; background:black">+--------------+--------------+--------------+</span><span style="color:gray; background:black">    </span><span style="color:white; background:black">╕╕╕ ╕╕╕</span>
+<span style="color:gray; background:black">        </span><span style="color:white; background:black">╕╕╕╕     ¦ 16:00   ¦              ¦              ¦ Sandbox      ¦ Apple File   ¦ "Premiação e ¦</span><span style="color:gray; background:black">     </span><span style="color:white; background:black">╕╕╕╕</span>
+<span style="color:gray; background:black">       </span><span style="color:white; background:black">╕╕╕╕╕     ¦         ¦              ¦              ¦ Exploiting   ¦ Conduit Heap ¦ Review CTF"  ¦</span><span style="color:gray; background:black">     </span><span style="color:white; background:black">╕╕╕╕╕</span>
+<span style="color:gray; background:black">      </span><span style="color:white; background:black">╕╕╕╕╕╕     ¦         ¦              ¦              ¦              ¦ Overflow to  ¦              ¦</span><span style="color:gray; background:black">     </span><span style="color:white; background:black">╕╕╕╕╕╕</span><span style="color:gray; background:black"></span>
+       <span style="color:white; background:black">╕╕  ╕╕    ¦         ¦              ¦              ¦              ¦ RCE          ¦              ¦</span><span style="color:gray; background:black">    </span><span style="color:white; background:black">╕╕  ╕╕</span><span style="color:gray; background:black"></span>
+       <span style="color:white; background:black">╕╕   ╕╕╕  +---------+--------------+--------------+--------------+--------------+--------------+</span><span style="color:gray; background:black">  </span><span style="color:white; background:black">╕╕╕   ╕╕</span><span style="color:gray; background:black"></span>
+        <span style="color:white; background:black">╕╕╕  ╕╕╕</span><span style="color:gray; background:black">                                                                                        </span><span style="color:white; background:black">╕╕╕  ╕╕╕</span>
+<span style="color:gray; background:black">         </span><span style="color:white; background:black">╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕</span>
+<span style="color:gray; background:black">            </span><span style="color:white; background:black">╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕</span>
+<span style="color:gray; background:black"></span>
 
-                                                                 [GRISWEEK 2026]
-
-       ╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕
-    ╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕
-   ╕╕╕    ╕╕╕╕                                                                  ╕╕╕╕    ╕╕╕
-   ╕╕╕╕  ╕╕╕                                                                      ╕╕╕  ╕╕╕╕
-    ╕╕╕╕╕╕╕╕      Vem aí mais uma edição da GRISWEEK, o evento de segurança       ╕╕╕╕╕╕╕╕
-     ╕╕╕╕╕╕       da informação organizado pelo GRIS!                              ╕╕╕╕╕╕
-      ╕╕╕╕╕                                                                        ╕╕╕╕╕
-     ╕╕╕╕╕╕       Durante uma semana inteira, estudantes, profissionais e          ╕╕╕╕╕╕
-    ╕╕╕╕ ╕╕╕      entusiastas da área terão a oportunidade de aprender,           ╕╕╕ ╕╕╕╕
-    ╕╕   ╕╕╕      trocar experiências e conhecer mais sobre diferentes            ╕╕╕   ╕╕
-    ╕╕╕  ╕╕╕      temas relacionados à cibersegurança.                            ╕╕╕  ╕╕╕
-    ╕╕╕ ╕╕╕                                                                        ╕╕╕ ╕╕╕
-      ╕╕╕╕        Neste ano, teremos palestras introdutórias e                      ╕╕╕╕
-      ╕╕╕╕        aprofundadas, atendendo tanto quem está começando agora           ╕╕╕╕
-    ╕╕ ╕╕╕╕       quanto quem já possui experiência e deseja expandir seus         ╕╕╕╕ ╕╕
-    ╕╕   ╕╕       conhecimentos.                                                   ╕╕   ╕╕
-    ╕╕    ╕╕                                                                      ╕╕    ╕╕
-    ╕╕╕  ╕╕╕      Entre os assuntos abordados durante o evento, teremos:          ╕╕╕  ╕╕╕
-     ╕╕╕╕╕╕                                                                        ╕╕╕╕╕╕
-      ╕╕╕╕        [Engenharia Reversa] - [Criptografia] - [WEB] - [Wi-Fi] -         ╕╕╕╕
-      ╕╕╕╕        [OSINT] - [SO] - [PWN] - [Redes] - [Malware] - E muito            ╕╕╕╕
-       ╕╕╕        mais...                                                           ╕╕╕
-      ╕╕╕╕╕                                                                        ╕╕╕╕╕
-     ╕╕╕╕╕╕       As apresentações serão conduzidas por membros da                 ╕╕╕╕╕╕
-    ╕╕╕  ╕╕╕      comunidade, estudantes e convidados, trazendo conceitos         ╕╕╕  ╕╕╕
-    ╕╕   ╕╕╕      teóricos, demonstrações práticas, ferramentas, técnicas e       ╕╕╕   ╕╕
-    ╕╕   ╕╕╕      experiências reais da área de segurança.                        ╕╕╕   ╕╕
-    ╕╕╕ ╕╕╕                                                                        ╕╕╕ ╕╕╕
-    ╕╕╕╕╕╕╕       Será uma ótima oportunidade para conhecer novos assuntos,        ╕╕╕╕╕╕╕
-   ╕╕╕    ╕╕      tirar dúvidas, interagir com outros participantes e dar         ╕╕    ╕╕╕
-   ╕╕╕╕  ╕╕╕      os primeiros passos no universo da segurança da                 ╕╕╕  ╕╕╕╕
-    ╕╕╕╕╕╕╕╕      informação.                                                     ╕╕╕╕╕╕╕╕
-     ╕╕╕╕╕╕                                                                        ╕╕╕╕╕╕
-      ╕╕╕╕╕       Além das palestras durante a semana, teremos também um           ╕╕╕╕╕
-     ╕╕╕╕╕╕       CTF (Capture The Flag) no modelo Jeopardy no último dia          ╕╕╕╕╕╕
-    ╕╕╕╕ ╕╕╕      de evento (com premiação)!                                      ╕╕╕ ╕╕╕╕
-    ╕╕   ╕╕╕                                                                      ╕╕╕   ╕╕
-   ╕╕╕╕  ╕╕╕      Data:                                       17/08 - 21/08       ╕╕╕  ╕╕╕╕
-   ╕╕╕╕╕╕╕╕                                                                        ╕╕╕╕╕╕╕╕
-    ╕╕  ╕╕        Localização:                        UFRJ - Ilha do fundão         ╕╕  ╕╕
-    ╕╕  ╕╕        +-------------------------------------------------------+         ╕╕  ╕╕
-   ╕╕╕  ╕╕╕       ¦ ¦                        CCMN                       ¦ ¦        ╕╕╕  ╕╕╕
-   ╕╕   ╕╕╕       ¦ ¦---------------------------------------------------¦ ¦        ╕╕╕   ╕╕
-   ╕╕╕   ╕╕       ¦ ¦                                                   ¦ ¦        ╕╕   ╕╕╕
-    ╕╕╕  ╕╕       ¦ ¦                                                   ¦ ¦        ╕╕  ╕╕╕
-     ╕╕╕╕╕╕       +-+--------------¦==========¦==========¦--------------+-+        ╕╕╕╕╕╕
-    ╕╕ ╕╕╕╕                        /==========¦==========\                         ╕╕╕╕ ╕╕
-    ╕╕   ╕╕                       /===========¦===========\                        ╕╕   ╕╕
-    ╕╕    ╕╕    -----------------/============¦============\-----------------     ╕╕    ╕╕
-    ╕╕╕  ╕╕╕                                                                      ╕╕╕  ╕╕╕
-     ╕╕╕╕╕╕       Fique atento à programação, às inscrições e às próximas          ╕╕╕╕╕╕
-     ╕╕╕╕╕        novidades.                                                        ╕╕╕╕╕
-     ╕╕╕╕╕╕                                                                        ╕╕╕╕╕╕
-     ╕╕  ╕╕╕      Esperamos você na GRISWEEK!                                     ╕╕╕  ╕╕
-     ╕╕   ╕╕╕                                                                    ╕╕╕   ╕╕
-      ╕╕╕  ╕╕╕╕                                                                ╕╕╕╕  ╕╕╕
-       ╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕
-          ╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕╕
-
-</pre>
+<span style="color:white; background:black"></span><span style="color:gray; background:black"></span><span style="color:white; background:black"></span><span style="color:gray; background:black"></span><span style="color:white; background:black"></span><span style="color:gray; background:black"></span></pre>
 </body>
 </html>
